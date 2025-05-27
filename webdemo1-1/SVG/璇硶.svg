@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_图层_1" data-name="图层 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 44 44">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+      }
+
+      .cls-2 {
+        fill: #d7def7;
+      }
+
+      .cls-2, .cls-3, .cls-4, .cls-5, .cls-6 {
+        stroke: #12b4e3;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-3 {
+        fill: #eecfca;
+      }
+
+      .cls-4 {
+        fill: #dccced;
+      }
+
+      .cls-7, .cls-5 {
+        fill: none;
+      }
+
+      .cls-6 {
+        fill: #cbdcee;
+      }
+
+      .cls-8 {
+        mask: url(#mask-1);
+      }
+
+      .cls-9 {
+        mask: url(#mask);
+      }
+    </style>
+    <mask id="mask" x="10" y="9" width="24.1" height="24.15" maskUnits="userSpaceOnUse"/>
+    <mask id="mask-1" x="7.44" y="6.44" width="29.23" height="29.27" maskUnits="userSpaceOnUse"/>
+  </defs>
+  <rect class="cls-1" y="0" width="44" height="44" rx="6" ry="6"/>
+  <g class="cls-9">
+    <g class="cls-8">
+      <rect class="cls-7" x="7.34" y="6.3" width="29.5" height="29.5"/>
+    </g>
+  </g>
+  <rect class="cls-2" x="16.9" y="4.3" width="10.3" height="7.11"/>
+  <ellipse class="cls-2" cx="22.27" cy="23.31" rx="15.72" ry="15.46"/>
+  <line class="cls-5" x1="6.55" y1="23.31" x2="10.21" y2="23.31"/>
+  <line class="cls-5" x1="35.63" y1="23.31" x2="37.99" y2="23.31"/>
+  <line class="cls-5" x1="22.37" y1="10.42" x2="22.27" y2="7.85"/>
+  <line class="cls-5" x1="22.05" y1="35.95" x2="22.27" y2="38.78"/>
+  <polygon class="cls-3" points="13.88 14.68 24.93 21.77 30.65 31.95 19.28 25.63 13.88 14.68"/>
+  <polygon class="cls-6" points="22.27 23.31 24.93 21.77 30.65 31.95 19.28 25.63 22.27 23.31"/>
+  <ellipse class="cls-4" cx="22.01" cy="23.88" rx="1.5" ry="1.48"/>
+</svg>
