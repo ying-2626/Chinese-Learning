@@ -1,0 +1,474 @@
+body,html{
+    background-color: #f7f5f2;
+    font-family: Poppins, sans-serif;
+}
+
+*{
+    font-family: Poppins, sans-serif;
+    text-decoration: none;
+    padding: 0;
+    margin:0;
+}
+
+.header-container{
+    background-color: #fff;
+    height: 90px;
+
+}
+
+.header-container img{
+    position: relative;
+    top: 0;
+    left: 0;
+    height: 90px;
+    text-align: center;
+    display:inline-block
+}
+
+.header-container ul{
+    display: inline-block;
+    line-height: 90px;
+    position: absolute;
+    top:0;
+    left:330px;
+}
+
+.headerlist{
+    display: inline-block;
+    text-align: center;
+    font-size: 16px;
+    font-family: sans-serif;
+    margin:0 0 0 10px;
+    padding: 0 20px 0 20px;
+    color: #4b5563;
+}
+
+.droplist{
+    background-color: #fff;
+    color: #4b5563;
+}
+
+.login-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #0c94ba;
+    color: white;
+    text-decoration: none;
+    border-radius: 24px;
+    font-size: 18px; /* 增加字体大小 */
+    font-weight: bold; /* 加粗字体 */
+    cursor: pointer;
+    text-align: center;
+    box-sizing: border-box; /* 使边框包含在元素尺寸内 */
+    border: 2px solid #fff; /* 根据需要调整边框样式 */
+    float: right;
+    margin: 21px 10px 21px 0;
+}
+
+.login-button:last-child{
+    margin: 21px 40px 21px 0;
+}
+
+.login-button:hover {
+    border: 2px solid #0c94ba; /* 根据需要调整边框样式 */
+}
+
+.main-title{ 
+    color: #000;
+    font-size: 3.2rem;
+    text-align: center;
+    max-width: 600px;
+    margin-bottom: 0;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+}
+
+.color-title{
+    background: linear-gradient(to right, #0c94ba, #16bae8); /*设置渐变的方向从左到右 颜色从ff0000到ffff00*/
+    -webkit-background-clip: text;/*将设置的背景颜色限制在文字中*/
+    -webkit-text-fill-color: transparent;/*给文字设置成透明*/
+    font-size: 4rem;
+    font-weight: 600;
+    text-align: center;
+    max-width: 600px;
+    margin-top: 30px;
+    margin-bottom: 0;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.logo-container{
+    margin-top: 45px;
+    text-align: center;
+}
+
+.logo{
+    margin-right: 25px;
+    height: 30px;
+}
+
+.index-button-container{
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 8px;
+    color: #333;
+    font-size: 1.1rem;
+    height: 50px;
+}
+
+.index-button-container div{
+    margin-top: 8px;
+    position: relative;
+}
+
+.index-button-container span{
+    display: block;
+    font-size: 0.9rem;
+    text-align: center;
+    height: 40px;
+    width: 150px;
+    line-height: 40px;
+    border-radius: 27px;
+    background-color: #000;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: 600;
+    border: 2px solid #f7f5f2;
+}
+
+.index-button-container span:hover{
+    border:#000 2px solid;
+}
+
+.index-button-container a{
+    color: #fff;
+}
+
+.h21{
+    text-align: center;
+    margin-top: 70px;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.wrap ul,
+.wrap ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.wrap {
+    height: 100px;
+    padding: 5px;
+    margin-top: 30px;
+    margin-bottom: 50px;
+    position: relative;
+}
+.slide {
+    height: 100px;
+    position: relative;
+    overflow: hidden;
+}
+.wrap ul {
+    width: 3600px;
+    position: absolute;
+    left: 0;
+}
+.wrap ul li {
+    float: left;
+}
+.wrap img {
+    width: 150px;
+    height: 100px;
+    vertical-align: middle;
+}
+
+.h22{
+    text-align: center;
+    margin-top: 50px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.middle-text{
+    width: 468px;
+    margin: 0 351px 0 351px;
+    text-align: center;
+    color: #333;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    font-size: 0.83rem;
+}
+
+.h11{
+    text-align: center;
+    margin-top: 50px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.video{
+    height: 500px;
+    margin:30px 100px 60px 100px;
+}
+
+.video iframe{
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+}
+
+.bottom-block{
+    display: flex;
+    margin-top: 60px;
+    margin-bottom: 40px;
+    height: 588px;
+}
+
+.span1{
+    float: left;
+    width: 580px;
+    height: 588px;
+}
+
+.h31{
+    color: #190bdd;
+    font-size: 1.1rem;
+    margin: 30px 0 10px 30px;
+    text-align: left;
+}
+
+.h32{
+    color: #0056b3;
+    font-size: 1.7rem;
+    margin:90px 0 10px 50px;
+    text-align: left;
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+.span1 ul{
+    margin: 0 0 0 30px;
+}
+
+.span1 li{
+    margin: 0 0 0 40px;
+    list-style-type: square;
+    color: #0c94ba;
+    font-size: 2.2rem;
+}
+
+.span1 div{
+    color: #000;
+    font-size: 17.5px;
+    text-align: left;
+    margin:0 20px 0 0;
+
+}
+
+/* .bottom-block .span2{
+    width: 580px;
+    float: right;
+    background-color: #ad00ff;
+    background-image: linear-gradient(150deg, #6b81fa6b, #fff0 57%), linear-gradient(2deg, #2d22b0, #fff0), linear-gradient(168deg, #ad00ff, #fff);
+    border-radius: 20px 0 0 20px;
+} */
+.bottom-block {
+    align-items: flex-start; 
+    display: flex
+}
+.bottom-block .span2 {
+    width: 800px;
+    float: right;
+    height: 430px;
+    width: 800px;
+    background: url('../img/一带一路背景.jpeg') no-repeat center bottom;
+    background-size: cover;
+    border-radius: 20px 0 0 20px;
+}
+
+.bottom-block img{
+    margin-top: 70px;
+    margin-bottom: 0px;
+
+    float: right;
+    height: 400px;
+    width: 700px;
+    border-radius: 20px 0 0 20px;
+
+}
+
+.final-box{
+    background-image: linear-gradient(303deg, #0c94ba, #fff0), linear-gradient(29deg, #3b5998, #fff0 63%);
+    height: 400px;
+    margin:60px 60px 10px 60px;
+    border-radius: 20px;
+    color: #fff;
+    text-align: center;
+}
+
+.final-text{
+    position: relative;
+    top:100px;
+    height: 260px;
+}
+
+.final-text h2{
+    font: 2rem Poppins, sans-serif;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.final-text h4{
+    position: relative;
+    top:15px;
+    font: 1.25rem Poppins, sans-serif;
+    font-weight: 700;
+    line-height: 1.2;
+    max-width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.final-text a{
+    position: relative;
+    top:87px;
+    background-color: #000;
+    color: #fff;
+    border-radius: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 10px 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    font-size: .9rem;
+    font-weight: 600;
+}
+
+.final-logo {
+    display: flex;
+    align-items: center;
+    justify-content: space-around; /* 根据需要选择适当的对齐方式 */
+    list-style: none; /* 移除列表项的默认样式 */
+    padding: 0; /* 移除内边距 */
+    margin: 70px 0; /* 移除外边距 */
+    height: 60px;
+}
+  
+.final-logo ul {
+    display: flex;
+    flex-wrap: wrap; /* 允许换行，以防一行放不下所有 logo */
+    gap: 40px; /* 设置 logo 之间的间距 */
+    list-style: none;
+}
+  
+.final-logo li {
+    flex: 0 1 auto; /* 允许 logo 根据内容大小自动调整，但不会超过其最大宽度 */
+}
+  
+.final-logo li img {
+    width: auto; /* 宽度自动，保持图片比例 */
+    height: 60px; /* 可以设置一个高度，或者使用 max-height 来限制高度 */
+    display: block; /* 移除默认的行内元素间距 */
+}
+
+.lxfs{
+    margin: 70px 0 ;
+    color: #333;
+    text-align: center;
+    line-height: 30px;
+}
+
+.lxfs div{
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 270px;
+}
+/*新增代码*/
+.testimonial-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 50px;
+    margin-bottom: 150px;
+}
+
+.testimonial-text {
+    width: 60%; /* 文字区域宽度调整为60% */
+    padding-right: 20px; /* 文字和图片之间的间距 */
+}
+
+.testimonial-text h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.testimonial-text p {
+}
+
+.testimonial-text {
+    width: 40%; /* 文字区域宽度调整为40% */
+    padding-right: 20px; /* 文字和图片之间的间距 */
+}
+
+.testimonial-text h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.testimonial-text p {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.testimonial-images {
+    width: 50%; /* 图片区域宽度调整为50% */
+    overflow: hidden;
+}
+
+.image-slide {
+    display: flex;
+    width: 100%;
+    animation: slide 10s infinite;
+}
+
+.image-slide img {
+    width: 100%;
+    display: block;
+}
+
+@keyframes slide {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(-100%); }
+    100% { transform: translateX(0); }
+}
+.login-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px;
+}
+
+.text-content {
+    flex-basis: 60%; /* 文字区域占据60%的宽度 */
+    padding-right: 20px; /* 文字和图片之间的间距 */
+    font-size: 16px; /* 文字大小 */
+    line-height: 1.6; /* 行高 */
+}
+
+.text-content h2 {
+    font-size: 24px; /* 标题字体大小 */
+    margin-bottom: 10px;
+}
+
+.image-content {
+    flex-basis: 70%;
+    text-align: right; /* 图片靠右显示 */
+}
+
+.image-content img {
+    max-width: 100%; /* 图片最大宽度为容器宽度 */
+    height: auto; /* 图片高度自动 */
+}

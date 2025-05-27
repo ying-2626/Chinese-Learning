@@ -1,0 +1,74 @@
+body,
+html {
+    font-family: 'arial', sans-serif;
+    height: 100vh;
+    margin: 0;
+
+}
+
+/* 表单容器样式 */
+.form-container {
+    background: #f3f3f3;
+    padding: 20px;
+    border-radius: 5px;
+    width: 400px;
+    position: absolute;
+    top: -10px;
+    left: 82%;
+    transform: translate(-50%,0%);
+}
+
+p{
+    display: inline-block;
+}
+
+input {
+    align-items: end;
+    width: 330px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin: 0 auto;
+    border-radius: 5px;
+    font-size: 16px;
+    outline: none;
+}
+
+input:focus {
+    border-color: #0ab1df;
+}
+
+.GetCode{
+    display: inline-block;
+    outline: none;
+	/* 清除默认边框 */
+	border:0;
+	outline:none;
+   /*清除默认背景 */
+   background-color: #0ab1df;
+   /*position: absolute;*/
+   color: white;
+   transform: translate(0%, -50%);
+   margin-right: 50px;
+}
+
+/* 按钮样式 */
+.button {
+    width: 50%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #56c2f4;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+    margin: 10px 60px;
+}
+
+.form-container a {
+    text-align: center;
+    margin: 10px 60px;
+    text-decoration: none;
+    text-transform: capitalize;
+    color: #56c2f4;
+}
