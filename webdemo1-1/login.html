@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="styles/login.css">
+    </link>
+</head>
+
+<body background="img/背景图.jpg" style="background-attachment: fixed; background-size: 100% 100%;">
+    <div class="form-container">
+        <h1 class="form-title" style="text-align:left">欢迎 <span style="color:#2a91f6;">登录</span></h2>
+        <!-- 登录表单 -->
+        <form id="LoginForm">
+                <span style="font-size:14px;width:80px;text-align:right;line-height: 40px;">用户名: </span>
+                <br>
+                <input type="text" placeholder="" class="username" required>
+                <span style="font-size:14px;width:80px;text-align:right;line-height: 40px;">密码: </span>
+                <br>
+                <input type="password" placeholder="" class="password" required>
+            <button type="button" class="button" id="login" onclick="dologin()">登录</button>
+        </form>
+        <a href="register.html">新用户？立即注册</a>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        let loginButton = document.querySelector('.button');
+        function base64Encode(str) {
+            // 将字符串转换为Uint8Array
+            const utf8 = new Uint8Array(str.length);
+            for (let i = 0; i < str.length; i++) {
+                utf8[i] = str.charCodeAt(i);
+            }
+            // 使用btoa()进行Base64编码
+            return btoa(String.fromCharCode.apply(null, utf8));
+        }
+        function dologin() {
+            //获取User信息
+            let user_name = document.querySelector('.username');
+            let password = document.querySelector('.password');
+            let password_encoded = base64Encode(password.value);
+            axios({
+                url: 'http://localhost:8080/Login',
+                method: 'post',
+                data: JSON.stringify({
+                    "user_name": user_name.value,
+                    "user_password": password_encoded
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(function (response) {
+                console.log(response.data.message);
+                if (response.data.code == 200) {
+                    //alert(response.data)
+                    window.location.href = 'index.html';
+                    localStorage.setItem("token", JSON.stringify(response.data));
+                } else {
+                    alert(response.data.message);
+                }
+            })
+        }
+    </script>
+
+</body>
+
+</html>

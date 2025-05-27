@@ -1,0 +1,30 @@
+<style>
+.blue-table {
+    border-collapse: collapse; /* 使边框合并为一个单一的边框 */
+    width: 500px;
+    font-family: Arial, sans-serif; /* 设置字体 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
+}
+.blue-table th, .blue-table td {
+    border: 1px solid #b3c6db; /* 设置边框颜色 */
+    text-align: center; /* 文本居中 */
+    padding: 10px; /* 单元格内边距 */
+    color: #333; /* 文本颜色 */
+}
+.blue-table thead tr {
+    background-color: #007bff; /* 表头背景颜色 */
+    color: white; /* 表头文字颜色 */
+}
+.blue-table thead tr th {
+    font-weight: bold; /* 加粗表头文字 */
+}
+.blue-table tbody tr:nth-child(odd) {
+    background-color: #e8f4ff; /* 奇数行背景颜色 */
+}
+.blue-table tbody tr:nth-child(even) {
+    background-color: #d0e6ff; /* 偶数行背景颜色 */
+}
+.blue-table tbody tr:hover {
+    background-color: #cbe4ff; /* 鼠标悬停时的行背景颜色 */
+}
+</style>
