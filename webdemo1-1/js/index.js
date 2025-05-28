@@ -1,39 +1,39 @@
 /* 后端发起请求，检查是否完成EntryTest */
 let token = localStorage.getItem('token');
 //alert(JSON.parse(token).message);
-axios({
-  url: 'http://localhost:8080/EntryTest',
-  method: 'post',
-  headers: {
-    'Content-Type': 'application/json',
-    'token': JSON.parse(token).message
-  }
-}).then(function (response) {
-  console.log(response);
-  if (response.data.code != 200) {
-    alert(response.data.message);
-    window.location.href = 'EntryTest.html';
-  } else {
-    alert(response.data.message);
-  }
-})  
+// axios({
+//   url: 'http://localhost:8080/EntryTest',
+//   method: 'post',
+//   headers: {
+//     'Content-Type': 'application/json',
+//     'token': JSON.parse(token).message
+//   }
+// }).then(function (response) {
+//   console.log("是否运行到这", response);
+//   if (response.data.code != 200) {
+//     alert(response.data.message);
+//     window.location.href = 'EntryTest.html';
+//   } else {
+//     alert(response.data.message);
+//   }
+// })  
 /* 后端发起请求，获取用户名*/
 
-axios({
-  url: 'http://localhost:8080/GetUsername',
-  method: 'post',
-  headers: {
-    'Content-Type': 'application/json',
-    'token': JSON.parse(token).message
-  }
-}).then(function (response) {
-  console.log(response);
-  if (response.data.code == 200) {
-    localStorage.setItem('username', response.data.message);
-  } else {
-    alert(response.data.message);
-  }
-})  
+// axios({
+//   url: 'http://localhost:8080/GetUsername',
+//   method: 'post',
+//   headers: {
+//     'Content-Type': 'application/json',
+//     'token': JSON.parse(token).message
+//   }
+// }).then(function (response) {
+//   console.log(response);
+//   if (response.data.code == 200) {
+//     localStorage.setItem('username', response.data.message);
+//   } else {
+//     alert(response.data.message);
+//   }
+// })  
 
 let Authorization = 'Bearer fastgpt-zqwHxu6FNdgPMOHiSngQkwZmITk9CDHpiPPQknc70ZNOxdIsFKZZvQEc3BkO71P'
 let textarea1 = document.querySelector(".chat-input");
@@ -270,7 +270,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         // 显示对应的模块
         var correspondingModule = moduleItems[index];
-         //console.log(index)
          //console.log(correspondingModule)
         correspondingModule.style.display = 'block';
         sidelogos[index].src = img_fff[index]

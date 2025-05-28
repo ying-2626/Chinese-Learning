@@ -125,54 +125,134 @@
         </div>-->
         <!--加入语音测评页面-->
         <div class="module speech-evaluation" id="speech-evaluation">
-            <textarea placeholder="where are you"
-                style="width: 500px; height: 100px; font-size: 16px; padding: 10px; border: 2px solid #007bff; border-radius: 5px; outline: none; transition: border 0.3s; box-sizing: border-box;">
-</textarea>
+            <div id="evalText" contenteditable="true"
+                style="width: 500px; height: 130px; font-size: 16px; padding: 10px; border: 2px solid #007bff; border-radius: 5px; outline: none; transition: border 0.3s; box-sizing: border-box; background-color: White; margin-top: 30px; overflow: auto;">
+                输入你想要朗读的内容
+            </div>
+
+            <br><br>
+
+            <label>
+                <input type="radio" name="group" checked> 读单词
+            </label>
+            <label>
+                <input type="radio" name="group"> 读句子
+            </label>
+            <label>
+                <input type="radio" name="group"> 读段落
+            </label>
+
+            <br><br>
+
             <br />
             <button id="btn_control"
-                style="padding: 10px 20px; font-size: 16px; border: none; border-radius: 5px; background-color: #007bff; color: white; cursor: pointer;">开始录音</button>
+                style="padding: 6px 20px; font-size: 16px; border: none; border-radius: 5px; background-color: #007bff; color: white; cursor: pointer;">开始录音</button>
             <div class="output-box" id="result_output">
                 <br />
 
-                <div class="left"
-                    style="border: 3px solid #007bff; padding: 20px; border-radius: 15px; box-shadow: 2px 2px 10px #cccccc; width: 300px; background-color: #f7f7f7;">
-                    <p
-                        style="border-bottom: 2px solid #007bff; padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
-                        准确度分：<span id="accuracy_score" style="font-weight: bold; color: #007bff;">0</span></p>
-                    <p
-                        style="border-bottom: 2px solid #007bff; padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
-                        流畅度分：<span id="fluency_score" style="font-weight: bold; color: #007bff;">0</span></p>
-                    <p
-                        style="border-bottom: 2px solid #007bff; padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
-                        完整度分：<span id="integrity_score" style="font-weight: bold; color: #007bff;">0</span></p>
-                    <p
-                        style="border-bottom: 2px solid #007bff; padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
-                        声韵分（仅限中文）：<span id="phone_score" style="font-weight: bold; color: #007bff;">0</span></p>
-                    <p
-                        style="border-bottom: 2px solid #007bff; padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
-                        调型分（仅限中文）：<span id="tone_score" style="font-weight: bold; color: #007bff;">0</span></p>
-                    <p
-                        style="border-bottom: 2px solid #007bff; padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
-                        整体印象分（仅限中文）：<span id="emotion_score" style="font-weight: bold; color: #007bff;">0</span></p>
-                    <p style="margin: 0; color: #333; font-size: 18px;">总分：<span id="total_score"
-                            style="font-weight: bold; color: #007bff;">0</span></p>
-                </div>
-                <div id="right" style="display: none;">
-                    <p class="title">红色文字代表发音不标准：</p>
-                    <p id="result"></p>
+                <div style="display: flex; gap: 20px; align-items: start;">
+
+                    <!-- <div class="left" style="border: 3px solid #007bff; padding: 20px; border-radius: 15px; box-shadow: 2px 2px 10px #cccccc; width: 300px; background-color: #f7f7f7;">
+                    <p style="border-bottom: 2px solid #007bff; padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">准确度：<span id="accuracy_score" style="font-weight: bold; color: #007bff;">0</span></p>
+                    <p style="border-bottom: 2px solid #007bff; padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">流畅度：<span id="fluency_score" style="font-weight: bold; color: #007bff;">0</span></p>
+                    <p style="border-bottom: 2px solid #007bff; padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">完整度：<span id="integrity_score" style="font-weight: bold; color: #007bff;">0</span></p>
+
+                    <p style="margin: 0; color: #333; font-size: 18px;">总分：<span id="total_score" style="font-weight: bold; color: #007bff;">0</span></p>
+                    
+            </div>
+
+        
+            <textarea class="suggestion-box" readonly 
+            style="border: 3px solid #28a745; padding: 20px; border-radius: 15px; 
+           box-shadow: 2px 2px 10px #cccccc; width: 300px; height: 150px; 
+           background-color: #f7f7f7; font-size: 16px; color: #333;">
+            改进建议：
+            </textarea>
+
+            </div> -->
+                    <div style="display: flex; gap: 20px; align-items: stretch;">
+                        <!-- 评分框 -->
+                        <div class="left" style="border: 3px solid #007bff; padding: 20px; border-radius: 15px; 
+    box-shadow: 2px 2px 10px #cccccc; width: 300px; background-color: #f7f7f7;
+    display: flex; flex-direction: column; justify-content: space-between; min-height: 150px;">
+
+                            <p style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
+                                准确度：<span id="accuracy_score" style="font-weight: bold; color: #007bff;">0</span>
+                            </p>
+
+                            <p style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
+                                流畅度：<span id="fluency_score" style="font-weight: bold; color: #007bff;">0</span>
+                            </p>
+
+                            <p style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
+                                完整度：<span id="integrity_score" style="font-weight: bold; color: #007bff;">0</span>
+                            </p>
+
+                            <p style="margin: 0; color: #333; font-size: 18px;">
+                                总分：<span id="total_score" style="font-weight: bold; color: #007bff;">0</span>
+                            </p>
+                        </div>
+
+                        <textarea class="suggestion-box" readonly style="border: 3px solid #007bff; padding: 20px; border-radius: 15px; 
+            box-shadow: 2px 2px 10px #cccccc; width: 300px; background-color: #f7f7f7; 
+            font-size: 16px; color: #333; min-height: 150px; flex-grow: 1;">
+改进建议：
+                </textarea>
+                    </div>
+
+
+
+                    <style>
+                        /* 样式设置 */
+                        body {
+                            font-family: Arial, sans-serif;
+                            margin: 20px;
+                            background-color: #f4f4f9;
+                        }
+
+                        h2 {
+                            text-align: center;
+                            color: #333;
+                        }
+
+                        .suggestion-box {
+                            width: 100%;
+                            height: 150px;
+                            padding: 10px;
+                            border: 1px solid #ccc;
+                            border-radius: 5px;
+                            background-color: #f9f9f9;
+                            font-family: Arial, sans-serif;
+                            font-size: 14px;
+                            color: #333;
+                            resize: none;
+                            /* 不允许用户调整大小 */
+                            overflow: auto;
+                            /* 允许出现滚动条 */
+                        }
+                    </style>
+
+
+
+                    <script>
+                        const APPID = "78836aa7";
+                        const API_SECRET = "ZTVjYzEwOGJkZjczNmIyMjJkYjgxOGE1";
+                        const API_KEY = "9939e98c7aa76c1660cb2023ef9fc120";
+                    </script>
+
+                    <script src="js/fast-xml-parser.min.js"></script>
+                    <script src="js/crypto-js.js"></script>
+                    <script src="dist/index.umd.js"></script>
+
+                    <script type="module">
+                        import https from "tencentcloud-sdk-nodejs-soe";
+                        import crypto from "crypto";
+                    </script>
+                    <script src="js/tencent_api.js"></script>
+                    <!-- <script src="eval-index.js"></script> -->
                 </div>
             </div>
-            <script>
-                const APPID = "78836aa7";
-                const API_SECRET = "ZTVjYzEwOGJkZjczNmIyMjJkYjgxOGE1";
-                const API_KEY = "9939e98c7aa76c1660cb2023ef9fc120";
-            </script>
-            <script src="js/fast-xml-parser.min.js"></script>
-            <script src="js/crypto-js.js"></script>
-            <script src="dist/index.umd.js"></script>
-            <script src="js/eval-index.js"></script>
         </div>
-
 
 
         <!-- <script src="./index.js"></script> -->
