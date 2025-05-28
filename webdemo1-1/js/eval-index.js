@@ -16,6 +16,7 @@
    */
   function getWebSocketUrl() {
     // 请求地址根据语种不同变化
+    // 如果换api，这里是要改的地方
     var url = "wss://ise-api.xfyun.cn/v2/open-ise";
     var host = "ise-api.xfyun.cn";
     var apiKey = "9939e98c7aa76c1660cb2023ef9fc120";
@@ -32,6 +33,7 @@
     return url;
   }
 
+  //通常用于将二进制数据（如音频或视频数据）转换为可以在网络上传输的字符串。  
   function toBase64(buffer) {
     var binary = "";
     var bytes = new Uint8Array(buffer);
@@ -55,6 +57,7 @@
     }
   }
 
+  // 测评结果显示***********************************************************************************************
   function renderResult(resultData) {
     // 识别结束
     let jsonData = JSON.parse(resultData);
@@ -67,8 +70,13 @@
         ignoreAttributes: false,
       });
       console.log(grade);
-      const readSentence =
-        grade?.xml_result?.read_sentence?.rec_paper?.read_chapter;
+
+      //yshi 3.3 added
+      const readSentence = grade?.xml_result?.read_sentence?.rec_paper?.read_chapter;
+      // const readWord = grade?.xml_result?.read_word?.rec_paper?.read_chapter;
+      // const readParagraph = grade?.xml_result?.read_paragraph?.rec_paper?.read_chapter;
+      // const readWord = grade?.xml_result?.read_word?.rec_paper?.read_chapter;
+
       document.getElementById("accuracy_score").innerText =
         readSentence?.accuracy_score;
       document.getElementById("fluency_score").innerText =
@@ -83,6 +91,8 @@
         readSentence?.emotion_score || 0;
       document.getElementById("total_score").innerText =
         readSentence?.total_score;
+
+      document.getElementById("syll").innerText = readSentence?.syll;
       let sentence = readSentence?.word || [];
       let resultStr = "";
       sentence.forEach((item) => {

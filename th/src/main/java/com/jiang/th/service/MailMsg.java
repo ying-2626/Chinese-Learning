@@ -19,24 +19,19 @@ public class MailMsg {
 
     @Autowired
     private CodeGeneratorUtil codeGeneratorUtil;
+
     public String mail(String email) throws MailException, MessagingException {
-        MimeMessage mimeMessage =mailSender.createMimeMessage();
-        //随机验证码
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        // 随机验证码
         String code = codeGeneratorUtil.generateCode(6);
-        //邮件
+        // 邮件
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
-        helper.setText("声动汉语提醒您，您的验证码为："+code,true);
+        helper.setText("声动汉语提醒您，您的验证码为：" + code, true);
         helper.setSubject("声动汉语验证码");
         helper.setTo(email);
         helper.setFrom("2952651469@qq.com");
         mailSender.send(mimeMessage);
         return code;
     }
-
-
-
-
-
-
 
 }

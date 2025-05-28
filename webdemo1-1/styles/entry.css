@@ -1,50 +1,49 @@
-body,
-html {
+body,html{
     background-color: #f7f5f2;
     font-family: Poppins, sans-serif;
 }
 
-* {
+*{
     font-family: Poppins, sans-serif;
     text-decoration: none;
     padding: 0;
-    margin: 0;
+    margin:0;
 }
 
-.header-container {
+.header-container{
     background-color: #fff;
     height: 90px;
 
 }
 
-.header-container img {
+.header-container img{
     position: relative;
     top: 0;
     left: 0;
     height: 90px;
     text-align: center;
-    display: inline-block
+    display:inline-block
 }
 
-.header-container ul {
+.header-container ul{
     display: inline-block;
     line-height: 90px;
     position: absolute;
-    top: 0;
-    left: 330px;
+    top:0;
+    left:330px;
 }
 
-.headerlist {
+.headerlist{
     display: inline-block;
     text-align: center;
     font-size: 16px;
     font-family: sans-serif;
-    margin: 0 0 0 10px;
+    margin:0 0 0 10px;
     padding: 0 20px 0 20px;
     color: #4b5563;
 }
 
-.droplist {
+.droplist{
     background-color: #fff;
     color: #4b5563;
 }
@@ -56,32 +55,27 @@ html {
     color: white;
     text-decoration: none;
     border-radius: 24px;
-    font-size: 18px;
-    /* 增加字体大小 */
-    font-weight: bold;
-    /* 加粗字体 */
+    font-size: 18px; /* 增加字体大小 */
+    font-weight: bold; /* 加粗字体 */
     cursor: pointer;
     text-align: center;
-    box-sizing: border-box;
-    /* 使边框包含在元素尺寸内 */
-    border: 2px solid #fff;
-    /* 根据需要调整边框样式 */
+    box-sizing: border-box; /* 使边框包含在元素尺寸内 */
+    border: 2px solid #fff; /* 根据需要调整边框样式 */
     float: right;
     margin: 21px 10px 21px 0;
 }
 
-.login-button:last-child {
+.login-button:last-child{
     margin: 21px 40px 21px 0;
 }
 
 .login-button:hover {
-    border: 2px solid #0c94ba;
-    /* 根据需要调整边框样式 */
+    border: 2px solid #0c94ba; /* 根据需要调整边框样式 */
 }
 
-.main-title {
+.main-title{ 
     color: #000;
-    font-size: 3.5rem;
+    font-size: 3.2rem;
     text-align: center;
     max-width: 600px;
     margin-bottom: 0;
@@ -90,13 +84,10 @@ html {
     margin-top: 20px;
 }
 
-.color-title {
-    background: linear-gradient(to right, #0c94ba, #16bae8);
-    /*设置渐变的方向从左到右 颜色从ff0000到ffff00*/
-    -webkit-background-clip: text;
-    /*将设置的背景颜色限制在文字中*/
-    -webkit-text-fill-color: transparent;
-    /*给文字设置成透明*/
+.color-title{
+    background: linear-gradient(to right, #0c94ba, #16bae8); /*设置渐变的方向从左到右 颜色从ff0000到ffff00*/
+    -webkit-background-clip: text;/*将设置的背景颜色限制在文字中*/
+    -webkit-text-fill-color: transparent;/*给文字设置成透明*/
     font-size: 4rem;
     font-weight: 600;
     text-align: center;
@@ -107,17 +98,17 @@ html {
     margin-right: auto;
 }
 
-.logo-container {
+.logo-container{
     margin-top: 45px;
     text-align: center;
 }
 
-.logo {
+.logo{
     margin-right: 25px;
     height: 30px;
 }
 
-.index-button-container {
+.index-button-container{
     text-align: center;
     margin-top: 30px;
     margin-bottom: 8px;
@@ -126,12 +117,12 @@ html {
     height: 50px;
 }
 
-.index-button-container div {
+.index-button-container div{
     margin-top: 8px;
     position: relative;
 }
 
-.index-button-container span {
+.index-button-container span{
     display: block;
     font-size: 0.9rem;
     text-align: center;
@@ -147,15 +138,15 @@ html {
     border: 2px solid #f7f5f2;
 }
 
-.index-button-container span:hover {
-    border: #000 2px solid;
+.index-button-container span:hover{
+    border:#000 2px solid;
 }
 
-.index-button-container a {
+.index-button-container a{
     color: #fff;
 }
 
-.h21 {
+.h21{
     text-align: center;
     margin-top: 70px;
     color: #333;
@@ -168,7 +159,6 @@ html {
     margin: 0;
     padding: 0;
 }
-
 .wrap {
     height: 100px;
     padding: 5px;
@@ -176,37 +166,33 @@ html {
     margin-bottom: 50px;
     position: relative;
 }
-
 .slide {
     height: 100px;
     position: relative;
     overflow: hidden;
 }
-
 .wrap ul {
     width: 3600px;
     position: absolute;
     left: 0;
 }
-
 .wrap ul li {
     float: left;
 }
-
 .wrap img {
     width: 150px;
     height: 100px;
     vertical-align: middle;
 }
 
-.h22 {
+.h22{
     text-align: center;
     margin-top: 50px;
     color: #333;
     margin-bottom: 10px;
 }
 
-.middle-text {
+.middle-text{
     width: 468px;
     margin: 0 351px 0 351px;
     text-align: center;
@@ -216,69 +202,69 @@ html {
     font-size: 0.83rem;
 }
 
-.h11 {
+.h11{
     text-align: center;
     margin-top: 50px;
     color: #333;
     margin-bottom: 10px;
 }
 
-.video {
+.video{
     height: 500px;
-    margin: 30px 100px 60px 100px;
+    margin:30px 100px 60px 100px;
 }
 
-.video iframe {
+.video iframe{
     width: 100%;
     height: 100%;
     border-radius: 10px;
 }
 
-.bottom-block {
+.bottom-block{
     display: flex;
     margin-top: 60px;
     margin-bottom: 40px;
     height: 588px;
 }
 
-.span1 {
+.span1{
     float: left;
     width: 580px;
     height: 588px;
 }
 
-.h31 {
+.h31{
     color: #190bdd;
     font-size: 1.1rem;
     margin: 30px 0 10px 30px;
     text-align: left;
 }
 
-.h32 {
+.h32{
     color: #0056b3;
     font-size: 1.7rem;
-    margin: 90px 0 10px 50px;
+    margin:90px 0 10px 50px;
     text-align: left;
     line-height: 1.2;
     font-weight: 700;
 }
 
-.span1 ul {
+.span1 ul{
     margin: 0 0 0 30px;
 }
 
-.span1 li {
+.span1 li{
     margin: 0 0 0 40px;
     list-style-type: square;
     color: #0c94ba;
     font-size: 2.2rem;
 }
 
-.span1 div {
+.span1 div{
     color: #000;
     font-size: 17.5px;
     text-align: left;
-    margin: 0 20px 0 0;
+    margin:0 20px 0 0;
 
 }
 
@@ -290,10 +276,9 @@ html {
     border-radius: 20px 0 0 20px;
 } */
 .bottom-block {
-    align-items: flex-start;
+    align-items: flex-start; 
     display: flex
 }
-
 .bottom-block .span2 {
     width: 800px;
     float: right;
@@ -304,7 +289,7 @@ html {
     border-radius: 20px 0 0 20px;
 }
 
-.bottom-block img {
+.bottom-block img{
     margin-top: 70px;
     margin-bottom: 0px;
 
@@ -315,30 +300,30 @@ html {
 
 }
 
-.final-box {
+.final-box{
     background-image: linear-gradient(303deg, #0c94ba, #fff0), linear-gradient(29deg, #3b5998, #fff0 63%);
     height: 400px;
-    margin: 60px 60px 10px 60px;
+    margin:60px 60px 10px 60px;
     border-radius: 20px;
     color: #fff;
     text-align: center;
 }
 
-.final-text {
+.final-text{
     position: relative;
-    top: 100px;
+    top:100px;
     height: 260px;
 }
 
-.final-text h2 {
+.final-text h2{
     font: 2rem Poppins, sans-serif;
     font-weight: 700;
     line-height: 1.2;
 }
 
-.final-text h4 {
+.final-text h4{
     position: relative;
-    top: 15px;
+    top:15px;
     font: 1.25rem Poppins, sans-serif;
     font-weight: 700;
     line-height: 1.2;
@@ -347,9 +332,9 @@ html {
     margin-right: auto;
 }
 
-.final-text a {
+.final-text a{
     position: relative;
-    top: 87px;
+    top:87px;
     background-color: #000;
     color: #fff;
     border-radius: 20px;
@@ -365,53 +350,42 @@ html {
 .final-logo {
     display: flex;
     align-items: center;
-    justify-content: space-around;
-    /* 根据需要选择适当的对齐方式 */
-    list-style: none;
-    /* 移除列表项的默认样式 */
-    padding: 0;
-    /* 移除内边距 */
-    margin: 70px 0;
-    /* 移除外边距 */
+    justify-content: space-around; /* 根据需要选择适当的对齐方式 */
+    list-style: none; /* 移除列表项的默认样式 */
+    padding: 0; /* 移除内边距 */
+    margin: 70px 0; /* 移除外边距 */
     height: 60px;
 }
-
+  
 .final-logo ul {
     display: flex;
-    flex-wrap: wrap;
-    /* 允许换行，以防一行放不下所有 logo */
-    gap: 40px;
-    /* 设置 logo 之间的间距 */
+    flex-wrap: wrap; /* 允许换行，以防一行放不下所有 logo */
+    gap: 40px; /* 设置 logo 之间的间距 */
     list-style: none;
 }
-
+  
 .final-logo li {
-    flex: 0 1 auto;
-    /* 允许 logo 根据内容大小自动调整，但不会超过其最大宽度 */
+    flex: 0 1 auto; /* 允许 logo 根据内容大小自动调整，但不会超过其最大宽度 */
 }
-
+  
 .final-logo li img {
-    width: auto;
-    /* 宽度自动，保持图片比例 */
-    height: 60px;
-    /* 可以设置一个高度，或者使用 max-height 来限制高度 */
-    display: block;
-    /* 移除默认的行内元素间距 */
+    width: auto; /* 宽度自动，保持图片比例 */
+    height: 60px; /* 可以设置一个高度，或者使用 max-height 来限制高度 */
+    display: block; /* 移除默认的行内元素间距 */
 }
 
-.lxfs {
-    margin: 70px 0;
+.lxfs{
+    margin: 70px 0 ;
     color: #333;
     text-align: center;
     line-height: 30px;
 }
 
-.lxfs div {
+.lxfs div{
     margin-left: auto;
     margin-right: auto;
     max-width: 270px;
 }
-
 /*新增代码*/
 .testimonial-container {
     display: flex;
@@ -422,10 +396,8 @@ html {
 }
 
 .testimonial-text {
-    width: 60%;
-    /* 文字区域宽度调整为60% */
-    padding-right: 20px;
-    /* 文字和图片之间的间距 */
+    width: 60%; /* 文字区域宽度调整为60% */
+    padding-right: 20px; /* 文字和图片之间的间距 */
 }
 
 .testimonial-text h2 {
@@ -433,13 +405,12 @@ html {
     margin-bottom: 10px;
 }
 
-.testimonial-text p {}
+.testimonial-text p {
+}
 
 .testimonial-text {
-    width: 40%;
-    /* 文字区域宽度调整为40% */
-    padding-right: 20px;
-    /* 文字和图片之间的间距 */
+    width: 40%; /* 文字区域宽度调整为40% */
+    padding-right: 20px; /* 文字和图片之间的间距 */
 }
 
 .testimonial-text h2 {
@@ -453,8 +424,7 @@ html {
 }
 
 .testimonial-images {
-    width: 50%;
-    /* 图片区域宽度调整为50% */
+    width: 50%; /* 图片区域宽度调整为50% */
     overflow: hidden;
 }
 
@@ -470,19 +440,10 @@ html {
 }
 
 @keyframes slide {
-    0% {
-        transform: translateX(0);
-    }
-
-    50% {
-        transform: translateX(-100%);
-    }
-
-    100% {
-        transform: translateX(0);
-    }
+    0% { transform: translateX(0); }
+    50% { transform: translateX(-100%); }
+    100% { transform: translateX(0); }
 }
-
 .login-container {
     display: flex;
     justify-content: space-between;
@@ -491,31 +452,23 @@ html {
 }
 
 .text-content {
-    flex-basis: 60%;
-    /* 文字区域占据60%的宽度 */
-    padding-right: 20px;
-    /* 文字和图片之间的间距 */
-    font-size: 16px;
-    /* 文字大小 */
-    line-height: 1.6;
-    /* 行高 */
+    flex-basis: 60%; /* 文字区域占据60%的宽度 */
+    padding-right: 20px; /* 文字和图片之间的间距 */
+    font-size: 16px; /* 文字大小 */
+    line-height: 1.6; /* 行高 */
 }
 
 .text-content h2 {
-    font-size: 24px;
-    /* 标题字体大小 */
+    font-size: 24px; /* 标题字体大小 */
     margin-bottom: 10px;
 }
 
 .image-content {
     flex-basis: 70%;
-    text-align: right;
-    /* 图片靠右显示 */
+    text-align: right; /* 图片靠右显示 */
 }
 
 .image-content img {
-    max-width: 100%;
-    /* 图片最大宽度为容器宽度 */
-    height: auto;
-    /* 图片高度自动 */
+    max-width: 100%; /* 图片最大宽度为容器宽度 */
+    height: auto; /* 图片高度自动 */
 }
