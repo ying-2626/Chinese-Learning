@@ -26,7 +26,7 @@
             <br>
             <input type="password" placeholder="" class="password" required>
             <br>
-            <span style="font-size:14px;width:80px;text-align:right;line-height: 30px;">密码: 
+            <span style="font-size:14px;width:80px;text-align:right;line-height: 30px;">密码:
                 <p class="error" style=" text-align: center;color: red; margin: 0">请再次输入密码以确认</p>
             </span>
             <br>
@@ -71,7 +71,7 @@
             }
             //GetCode时发送请求
             axios({
-                url: 'http://localhost:8080/GetCode',
+                url: 'http://47.117.92.199:8080/GetCode',
                 method: 'post',
                 data: email,
                 headers: {
@@ -120,7 +120,7 @@
                     "user_email": document.querySelector('.email').value
                 }))
                 axios({
-                    url: 'http://localhost:8080/Register',
+                    url: 'http://47.117.92.199:8080/Register',
                     method: 'post',
                     data: JSON.stringify({
                         "user_name": user_name.value,

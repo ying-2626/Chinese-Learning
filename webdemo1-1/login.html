@@ -12,17 +12,17 @@
 <body background="img/背景图.jpg" style="background-attachment: fixed; background-size: 100% 100%;">
     <div class="form-container">
         <h1 class="form-title" style="text-align:left">欢迎 <span style="color:#2a91f6;">登录</span></h2>
-        <!-- 登录表单 -->
-        <form id="LoginForm">
+            <!-- 登录表单 -->
+            <form id="LoginForm">
                 <span style="font-size:14px;width:80px;text-align:right;line-height: 40px;">用户名: </span>
                 <br>
                 <input type="text" placeholder="" class="username" required>
                 <span style="font-size:14px;width:80px;text-align:right;line-height: 40px;">密码: </span>
                 <br>
                 <input type="password" placeholder="" class="password" required>
-            <button type="button" class="button" id="login" onclick="dologin()">登录</button>
-        </form>
-        <a href="register.html">新用户？立即注册</a>
+                <button type="button" class="button" id="login" onclick="dologin()">登录</button>
+            </form>
+            <a href="register.html">新用户？立即注册</a>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
@@ -42,7 +42,7 @@
             let password = document.querySelector('.password');
             let password_encoded = base64Encode(password.value);
             axios({
-                url: 'http://localhost:8080/Login',
+                url: 'http://47.117.92.199:8080/Login',
                 method: 'post',
                 data: JSON.stringify({
                     "user_name": user_name.value,
