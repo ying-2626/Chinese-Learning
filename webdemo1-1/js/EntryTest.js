@@ -90,7 +90,7 @@ function submit(data1) {
   let token = localStorage.getItem('token');
   console.log(JSON.parse(token).message);
   axios({
-    url: 'http://localhost:8080/EntryTestSubmit',
+    url: 'http://47.117.92.199:8080/EntryTestSubmit',
     method: 'post',
     headers: {
       'Content-Type': 'application/json',

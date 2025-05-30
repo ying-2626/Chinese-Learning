@@ -2,7 +2,7 @@
 let token = localStorage.getItem('token');
 //alert(JSON.parse(token).message);
 // axios({
-//   url: 'http://localhost:8080/EntryTest',
+//   url: 'http://47.117.92.199:8080/EntryTest',
 //   method: 'post',
 //   headers: {
 //     'Content-Type': 'application/json',
@@ -20,7 +20,7 @@ let token = localStorage.getItem('token');
 /* 后端发起请求，获取用户名*/
 
 // axios({
-//   url: 'http://localhost:8080/GetUsername',
+//   url: 'http://47.117.92.199:8080/GetUsername',
 //   method: 'post',
 //   headers: {
 //     'Content-Type': 'application/json',
@@ -81,7 +81,7 @@ function getReturn(req_content) {
       'Authorization': Authorization
     }
   }).then(function (response) {
-   // console.log(response.data)
+    // console.log(response.data)
     let content = response.data.choices[0].message.content;
     //console.log(content);
     let newHTML = '\
@@ -146,8 +146,8 @@ textarea1.addEventListener("keydown", function (e) {
               </div>'
       let innnn = document.querySelectorAll(".chat-item")
       innnn[0].insertAdjacentHTML('beforeEnd', newHTML)
-    getReturn1(textarea1.value)
-    textarea1.value = ''
+      getReturn1(textarea1.value)
+      textarea1.value = ''
     }
 
   }
@@ -190,7 +190,7 @@ img1.addEventListener("click", function () {
     //getReturn(textarea1.value);
     getReturn1(textarea1.value)
     textarea1.value = ''
-    
+
   }
 })
 img2.addEventListener("click", function () {
@@ -256,38 +256,38 @@ document.addEventListener('DOMContentLoaded', function () {
   //点击module元素，显示对应的module内容
   toggleItems.forEach(function (item, index) {
     item.addEventListener('click', function () {
-      if(index <= 5){
+      if (index <= 5) {
         // 移除所有元素的module类
         moduleItems.forEach(function (module) {
           module.style.display = 'none';
         });
         //console.log(moduleItems)
         //console.log(index)
-        
+
         //修改前面的tupian
         sidelogos.forEach(function (logo, index) {
           logo.src = img_color[index]
         });
         // 显示对应的模块
         var correspondingModule = moduleItems[index];
-         //console.log(correspondingModule)
+        //console.log(correspondingModule)
         correspondingModule.style.display = 'block';
         sidelogos[index].src = img_fff[index]
-         //console.log(sidelogos[index])
-         //console.log(img_fff[index]) 
+        //console.log(sidelogos[index])
+        //console.log(img_fff[index]) 
       }
-        //修改前面的tupian
-        sidelogos.forEach(function (logo, index) {
-          logo.src = img_color[index]
-        });
-        // 显示对应的模块
-        var correspondingModule = moduleItems[index];
-        // console.log(index)
-        // console.log(correspondingModule)
-        
-        sidelogos[index].src = img_fff[index]
-        // console.log(sidelogos[index])
-        // console.log(img_fff[index])           
+      //修改前面的tupian
+      sidelogos.forEach(function (logo, index) {
+        logo.src = img_color[index]
+      });
+      // 显示对应的模块
+      var correspondingModule = moduleItems[index];
+      // console.log(index)
+      // console.log(correspondingModule)
+
+      sidelogos[index].src = img_fff[index]
+      // console.log(sidelogos[index])
+      // console.log(img_fff[index])           
     });
     //显示对应的图片
   });
@@ -366,8 +366,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 let toolbuttons = document.querySelectorAll(".tools")
 let tooldisplay = document.querySelector(".tool-display")
-toolbuttons.forEach(function (bu) { 
-  if(!bu.textContent.includes("Typing")){
+toolbuttons.forEach(function (bu) {
+  if (!bu.textContent.includes("Typing")) {
     bu.addEventListener('click', function (e) {
       tooldisplay.style.display = 'block';
       var moduleItems = document.querySelectorAll('.module');
@@ -379,7 +379,7 @@ toolbuttons.forEach(function (bu) {
 })
 
 var moduleItems = document.querySelectorAll('.module');
-function closeToolDisplay(){
+function closeToolDisplay() {
   tooldisplay.style.display = 'none';
   moduleItems[2].style.display = 'block';
 }
@@ -393,7 +393,7 @@ function getReturn2(req_content) {
       "detail": false,
       "messages": [
         {
-          "content": "请写出一篇文章是关于"+req_content,//TODO
+          "content": "请写出一篇文章是关于" + req_content,//TODO
           "role": "user"
         },
       ]
@@ -416,7 +416,7 @@ function getReturn2(req_content) {
     // p[p.length - 1].innerHTML = marked.parse(content);
   })
 }
-function generate(){
+function generate() {
   tooldisplay.style.display = 'none';
   moduleItems[2].style.display = 'none';
   moduleItems[1].style.display = 'block';
@@ -434,8 +434,8 @@ function generate(){
 
 loveimg = document.querySelector(".loveimg")
 //点击切换下一个图片
-function changeImg(){
-  if(loveimg.src.includes("1.png")){
+function changeImg() {
+  if (loveimg.src.includes("1.png")) {
     loveimg.src = "img/love放图2.png"
   }
   else
