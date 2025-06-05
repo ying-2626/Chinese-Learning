@@ -405,16 +405,18 @@ function getReturn2(req_content) {
     }
   }).then(function (response) {
     let content = response.data.choices[0].message.content;
-    // console.log(content);
-    let newHTML = '\
-  <div class="message ai-message" id="start-message">\
-  <div class="p1">' + marked.parse(content) + '</div>\
-  </div>'
-    //console.log(marked.parse(content))
-    let innnn = document.querySelectorAll(".chat-item")
-    innnn[0].insertAdjacentHTML('beforeEnd', newHTML)
-    // let p = document.querySelectorAll(".ai-message p")
-    // p[p.length - 1].innerHTML = marked.parse(content);
+    let chatItem = document.querySelectorAll(".chat-item")[0];
+    // 找到“回答生成中”气泡
+    let loadingMsg = chatItem.querySelector('.loading-message');
+    let answerHTML = '\
+      <div class="message ai-message" id="start-message">\
+      <div class="p1">' + marked.parse(content) + '</div>\
+      </div>';
+    if (loadingMsg) {
+      loadingMsg.outerHTML = answerHTML;
+    } else {
+      chatItem.insertAdjacentHTML('beforeEnd', answerHTML);
+    }
   })
 }
 function generate() {
@@ -429,19 +431,14 @@ function generate() {
   </div>'
   let innnn = document.querySelectorAll(".chat-item")
   innnn[0].insertAdjacentHTML('beforeEnd', newHTML)
+  // 插入“回答生成中”气泡
+  let loadingHTML = '\
+    <div class="message ai-message loading-message">\
+      <div class="p1">回答生成中……请稍后</div>\
+    </div>';
+  innnn[0].insertAdjacentHTML('beforeEnd', loadingHTML)
   getReturn2(content.value)
   content.value = ''
   moduleItems[2].style.display = 'block';
   moduleItems[3].style.display = 'none';
 }
-
-loveimg = document.querySelector(".loveimg")
-//点击切换下一个图片
-function changeImg() {
-  if (loveimg.src.includes("1.png")) {
-    loveimg.src = "img/love放图2.png"
-  }
-  else
-    loveimg.src = "img/love放图1.png"
-}
-loveimg.addEventListener("click", changeImg)
