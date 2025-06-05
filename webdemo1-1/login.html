@@ -42,7 +42,7 @@
             let password = document.querySelector('.password');
             let password_encoded = base64Encode(password.value);
             axios({
-                url: 'http://47.117.92.199:8080/Login',
+                url: 'https://47.117.92.199:8080/Login',
                 method: 'post',
                 data: JSON.stringify({
                     "user_name": user_name.value,

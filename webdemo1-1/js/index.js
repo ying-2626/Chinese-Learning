@@ -2,7 +2,7 @@
 let token = localStorage.getItem('token');
 //alert(JSON.parse(token).message);
 // axios({
-//   url: 'http://47.117.92.199:8080/EntryTest',
+//   url: 'https://47.117.92.199:8080/EntryTest',
 //   method: 'post',
 //   headers: {
 //     'Content-Type': 'application/json',
@@ -20,7 +20,7 @@ let token = localStorage.getItem('token');
 /* 后端发起请求，获取用户名*/
 
 // axios({
-//   url: 'http://47.117.92.199:8080/GetUsername',
+//   url: 'https://47.117.92.199:8080/GetUsername',
 //   method: 'post',
 //   headers: {
 //     'Content-Type': 'application/json',

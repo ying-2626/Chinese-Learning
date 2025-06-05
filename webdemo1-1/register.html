@@ -71,7 +71,7 @@
             }
             //GetCode时发送请求
             axios({
-                url: 'http://47.117.92.199:8080/GetCode',
+                url: 'https://47.117.92.199:8080/GetCode',
                 method: 'post',
                 data: email,
                 headers: {
@@ -120,7 +120,7 @@
                     "user_email": document.querySelector('.email').value
                 }))
                 axios({
-                    url: 'http://47.117.92.199:8080/Register',
+                    url: 'https://47.117.92.199:8080/Register',
                     method: 'post',
                     data: JSON.stringify({
                         "user_name": user_name.value,
