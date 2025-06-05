@@ -19,3 +19,22 @@ spring:
         #表示开启 DEBUG 模式，这样，邮件发送过程的日志会在控制台打印出来，方便排查错误
         debug: true
         ssl: true
+
+server:
+  ssl:
+    enabled: true
+
+    # KeyStore 类型，如果打包成 .p12，就写 PKCS12；如果是 .jks，就写 JKS
+    key-store-type: PKCS12
+
+    # KeyStore 路径：
+    #  1. 放在 classpath 下的 resources/ssl/keystore.p12
+    #  2. 如果需要放到项目外部，也可以写绝对路径，例如
+    #     key-store: /opt/myapp/ssl/keystore.p12
+    key-store: classpath:ssl/keystore.p12
+
+    # KeyStore 密码，跟在 openssl pkcs12 -export 时输入的一致
+    key-store-password: shengdonghanyu
+
+    # KeyStore 中的私钥条目别名，需与打包时使用的 -name tomcat 保持一致
+    key-alias: tomcat
