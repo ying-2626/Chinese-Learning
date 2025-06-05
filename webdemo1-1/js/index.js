@@ -381,7 +381,8 @@ toolbuttons.forEach(function (bu) {
 var moduleItems = document.querySelectorAll('.module');
 function closeToolDisplay() {
   tooldisplay.style.display = 'none';
-  moduleItems[2].style.display = 'block';
+  moduleItems[2].style.display = 'none';
+  moduleItems[3].style.display = 'block';
 }
 function getReturn2(req_content) {
   axios({
@@ -419,7 +420,7 @@ function getReturn2(req_content) {
 function generate() {
   tooldisplay.style.display = 'none';
   moduleItems[2].style.display = 'none';
-  moduleItems[1].style.display = 'block';
+  moduleItems[3].style.display = 'block';
   content = document.querySelector('.content111')
   console.log(content.value)
   let newHTML = '\
@@ -430,6 +431,8 @@ function generate() {
   innnn[0].insertAdjacentHTML('beforeEnd', newHTML)
   getReturn2(content.value)
   content.value = ''
+  moduleItems[2].style.display = 'block';
+  moduleItems[3].style.display = 'none';
 }
 
 loveimg = document.querySelector(".loveimg")
