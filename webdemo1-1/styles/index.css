@@ -3,45 +3,45 @@ html {
     height: 100%;
     margin: 0;
     font-family: "arial", sans-serif;
-    background: #e5e7ed;
+    /*background: #e5e7ed;
+    /* 设置背景图片固定 */
+    background: #e5e7ed url('../img/聊天背景图.jpg') no-repeat center center fixed;
+    background-size: cover;
     /*消除链接效果*/
     text-decoration: none;
 
 }
 
-<html lang="zh">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>自定义单选框</title>
-  <style>
-    /* 基础样式 */
-    input[type="radio"] {
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
-      width: 20px;
-      height: 20px;
-      border: 2px solid #007bff;
-      border-radius: 50%;
-      background-color: #fff;
-      outline: none;
-      cursor: pointer;
-      position: relative;
-    }
+<html lang="zh"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>自定义单选框</title><style>
 
-    /* 选中时：在按钮中间生成黑色实心圆 */
-    input[type="radio"]:checked::before {
-      content: "";
-      width: 10px;
-      height: 10px;
-      background-color: black;
-      border-radius: 50%;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
+/* 基础样式 */
+input[type="radio"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #007bff;
+    border-radius: 50%;
+    background-color: #fff;
+    outline: none;
+    cursor: pointer;
+    position: relative;
+}
+
+/* 选中时：在按钮中间生成黑色实心圆 */
+input[type="radio"]:checked::before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    background-color: black;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
 .header {
     position: absolute;
     top: 20px;
@@ -133,7 +133,7 @@ html {
     margin-bottom: 50px;
 }
 
-.sidelogo1{
+.sidelogo1 {
     position: relative;
     width: 25px;
     height: 25px;
@@ -221,10 +221,14 @@ html {
 
 
 .main-container {
-    background-image: url('../img/聊天背景图.jpg'); /* 图片路径 */
-    background-size: cover; /* 图片填充方式 */
-    background-position: center; /* 图片定位 */
-    background-repeat: no-repeat; /* 禁止图片重复 */
+
+    /* 图片路径 */
+    background-size: cover;
+    /* 图片填充方式 */
+    background-position: center;
+    /* 图片定位 */
+    background-repeat: no-repeat;
+    /* 禁止图片重复 */
     width: calc(100% - 300px);
     /*内部设置20px的padding*/
     padding: 0 20px 20px 20px;
@@ -460,7 +464,8 @@ html {
     left: 320px;
     height: 160px;
     padding: 28px;
-    display: block;
+    /*display: block;*/
+    display: none;
     z-index: 100;
 }
 
@@ -563,6 +568,12 @@ html {
     top: 331px;
     left: 30px;
     right: 60px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px 24px;
+    /* 行间距和列间距 */
+    justify-content: flex-start;
+    align-items: stretch;
 
 }
 
@@ -610,18 +621,18 @@ html {
     max-height: 14px;
 }
 
-.tool-display{
+.tool-display {
     /* display: none; */
     background-color: #e5e7ed;
     z-index: 199999;
     left: 270px;
-    top:0;
+    top: 0;
     bottom: 0;
     right: 0;
     position: absolute;
 }
 
-.back-btn{
+.back-btn {
     margin: 10px;
     padding: 10px;
     width: 50px;
@@ -633,10 +644,10 @@ html {
     border-radius: 5px;
 }
 
-.tool-display-content{
+.tool-display-content {
     background-color: #fff;
     position: absolute;
-    top:0;
+    top: 0;
     bottom: 0;
     width: 600px;
     border-radius: 10px;
@@ -644,25 +655,29 @@ html {
     font-size: 18px;
 }
 
-.tool-display-content h2{
-    top:20px;
+.tool-display-content h2 {
+    top: 20px;
     position: relative;
     text-align: center;
 }
 
-.tool-display-content div{
+.tool-display-content div {
     margin: 10px 30px;
     font-weight: 900;
 }
 
-input button{
-    border: none; /* 移除默认边框 */
-    outline: none; /* 移除聚焦时的轮廓线 */
-    background: none; /* 移除默认背景 */
-    cursor: pointer; /* 鼠标手势 */
+input button {
+    border: none;
+    /* 移除默认边框 */
+    outline: none;
+    /* 移除聚焦时的轮廓线 */
+    background: none;
+    /* 移除默认背景 */
+    cursor: pointer;
+    /* 鼠标手势 */
 }
 
-.tool-display-content input{
+.tool-display-content input {
     width: 500px;
     margin: 10px;
     height: 34px;
@@ -670,25 +685,25 @@ input button{
     border: #12b4e3 solid 1px;
 }
 
-.tool-display-content textarea{
+.tool-display-content textarea {
     width: 500px;
     margin: 10px;
     height: 34px;
     border-radius: 12px;
-    border: #12b4e3 solid 1px; 
+    border: #12b4e3 solid 1px;
 }
 
-.tool-display-content textarea:focus{
+.tool-display-content textarea:focus {
     border: #12b4e3 solid 2px;
-} 
+}
 
-.tool-display-content input:focus{
+.tool-display-content input:focus {
     outline: none;
     border: #12b4e3 solid 2px;
 }
 
 
-.tool-display-content button{
+.tool-display-content button {
     width: 100px;
     height: 40px;
     margin: 10px;
@@ -705,4 +720,3 @@ input button{
     top: 80%;
     transform: translate(-50%, 0);
 }
-
