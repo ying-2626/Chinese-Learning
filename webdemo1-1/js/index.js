@@ -62,6 +62,18 @@ function isAllWhitespace(text) {
 }
 
 function getReturn(req_content) {
+  // 插入“思考中……”提示
+  let voiceItem = document.querySelectorAll(".voice-item")[0];
+  let thinkingId = "thinking-message-voice";
+  // 移除已有的“思考中……”提示，避免重复
+  let oldThinking = voiceItem.querySelector(`#${thinkingId}`);
+  if (oldThinking) oldThinking.remove();
+  let thinkingHTML = `
+    <div class="message ai-message" id="${thinkingId}">
+      <div class="p1">思考中……</div>
+    </div>`;
+  voiceItem.insertAdjacentHTML('beforeEnd', thinkingHTML);
+
   axios({
     url: 'https://api.fastgpt.in/api/v1/chat/completions',
     method: 'post',
@@ -81,21 +93,34 @@ function getReturn(req_content) {
       'Authorization': Authorization
     }
   }).then(function (response) {
-    // console.log(response.data)
     let content = response.data.choices[0].message.content;
-    //console.log(content);
     let newHTML = '\
   <div class="message ai-message" id="start-message">\
   <div class="p1">' + marked.parse(content) + '</div>\
-  </div>'
-    //console.log(marked.parse(content))
-    let innnn = document.querySelectorAll(".voice-item")
-    innnn[0].insertAdjacentHTML('beforeEnd', newHTML)
-    // let p = document.querySelectorAll(".ai-message p")
-    // p[p.length - 1].innerHTML = marked.parse(content);
+  </div>';
+    // 替换“思考中……”提示为真正回答
+    let thinkingMsg = voiceItem.querySelector(`#${thinkingId}`);
+    if (thinkingMsg) {
+      thinkingMsg.outerHTML = newHTML;
+    } else {
+      voiceItem.insertAdjacentHTML('beforeEnd', newHTML);
+    }
   })
 }
+
 function getReturn1(req_content) {
+  // 插入“思考中……”提示
+  let chatItem = document.querySelectorAll(".chat-item")[0];
+  let thinkingId = "thinking-message-chat";
+  // 移除已有的“思考中……”提示，避免重复
+  let oldThinking = chatItem.querySelector(`#${thinkingId}`);
+  if (oldThinking) oldThinking.remove();
+  let thinkingHTML = `
+    <div class="message ai-message" id="${thinkingId}">
+      <div class="p1">思考中……</div>
+    </div>`;
+  chatItem.insertAdjacentHTML('beforeEnd', thinkingHTML);
+
   axios({
     url: 'https://api.fastgpt.in/api/v1/chat/completions',
     method: 'post',
@@ -116,16 +141,17 @@ function getReturn1(req_content) {
     }
   }).then(function (response) {
     let content = response.data.choices[0].message.content;
-    // console.log(content);
     let newHTML = '\
   <div class="message ai-message" id="start-message">\
   <div class="p1">' + marked.parse(content) + '</div>\
-  </div>'
-    //console.log(marked.parse(content))
-    let innnn = document.querySelectorAll(".chat-item")
-    innnn[0].insertAdjacentHTML('beforeEnd', newHTML)
-    // let p = document.querySelectorAll(".ai-message p")
-    // p[p.length - 1].innerHTML = marked.parse(content);
+  </div>';
+    // 替换“思考中……”提示为真正回答
+    let thinkingMsg = chatItem.querySelector(`#${thinkingId}`);
+    if (thinkingMsg) {
+      thinkingMsg.outerHTML = newHTML;
+    } else {
+      chatItem.insertAdjacentHTML('beforeEnd', newHTML);
+    }
   })
 }
 
