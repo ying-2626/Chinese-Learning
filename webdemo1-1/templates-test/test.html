@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 
 <head>
   <title>HTML5+JS实现文字转语音朗读功能</title>
@@ -88,15 +88,16 @@
     }
     //清空文本框
     function cls() {
-      document.getElementById("texts").value = ""; 清空文本框
+      document.getElementById("texts").value = ""; //清空文本框
     }
     //检查文本框是否为空
     function myCheckFunc() {
       let x;
       x = document.getElementById("texts").value;
       try {
-        if (x === "")
-          throw "文本框为空";
+        if (x === "") {
+          throw "文本框不能为空，请输入要转换的文字！";
+        }
       } catch (error) {
         alert("提示" + error);
       }
