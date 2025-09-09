@@ -21,7 +21,8 @@
 
     const SERVER_ENGINE_TYPE = "16k_zh"; // 中文标准版
     const VOICE_ID = crypto.randomUUID(); // 生成唯一音频流标识
-    const REF_TEXT = document.getElementById("evalText")?.innerText || "你好";
+    //添加声调评测标识
+    const REF_TEXT =  "{::cmd{F_TDET=true}}"+document.getElementById("evalText")?.innerText || "你好";
     const TIMESTAMP = Math.floor(Date.now() / 1000);
     const NONCE = Math.floor(Math.random() * 1000000000);
     const EXPIRED = TIMESTAMP + 86400; // 1 天有效期
@@ -119,6 +120,7 @@
             Phone: phoneItem.Phone,
             PronAccuracy: phoneItem.PronAccuracy
           })
+          // 遍历Tone,若Valid=false,则无效；若Valid=Ture,提取RefTone和HypothesisTone进行比对。如果比对结果是不相等，则说明该Word的韵母声调错误，一定要明确指出该字的声调错误。
           然后对这位汉语学习者给出练习建议。
           注意：
           1. 分析和建议各控制在300字以内
@@ -126,6 +128,8 @@
           3. 如果没有音素得分有可能是因为漏读了
           4. 避免列举具体数字
           5. 开头直接分析就行，不需要引入语
+          6. 需要从音素的声母、韵母，整体的准确度、流利度等多个维度进行分析
+          7. 如果单字的Tone:Valid=true说明启用了声调评测，启用时你才需要额外分析声调是否正确，HypothesisTone为-1代表该字的声调读错了
     `
 
     axios({
