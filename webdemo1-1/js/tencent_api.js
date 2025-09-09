@@ -213,17 +213,65 @@
 
       evalText.innerHTML = coloredText; // 直接修改 HTML
 
+      // 移除之前的事件监听器（如果存在）
+      if (evalText._compositionListener) {
+        evalText.removeEventListener("compositionend", evalText._compositionListener);
+      }
+      if (evalText._inputListener) {
+        evalText.removeEventListener("input", evalText._inputListener);
+      }
 
-      evalText.addEventListener("input", function (event) {
-        // 获取当前文本（去除 HTML 结构）
-        let plainText = evalText.innerText;
-
-        // 重新渲染为黑色（确保所有字符都是黑色）
-        evalText.innerHTML = `<span style="color: black;">${plainText}</span>`;
-
-        // 设置光标位置到文本末尾
+      // 定义组合输入结束后的处理函数
+      const compositionEndHandler = function (event) {
+        // 获取纯文本内容
+        let plainText = evalText.textContent;
+        // 重置为黑色
+        evalText.textContent = plainText;
+        // 设置光标位置
         setCursorToEnd(evalText);
+      };
+
+      // 定义普通输入处理函数（英文/数字等）
+      const inputHandler = function (event) {
+        // 防止组合输入时触发
+        if (evalText._isComposing) return;
+        // 获取纯文本内容
+        let plainText = evalText.textContent;
+        // 重置为黑色
+        evalText.textContent = plainText;
+        // 设置光标位置
+        setCursorToEnd(evalText);
+      };
+
+      // 组合输入开始标志
+      evalText.addEventListener("compositionstart", () => {
+        evalText._isComposing = true;
       });
+
+      // 组合输入结束标志
+      evalText.addEventListener("compositionend", () => {
+        evalText._isComposing = false;
+        // 延迟执行以确保最终字符已提交
+        setTimeout(() => {
+          compositionEndHandler();
+        }, 0);
+      });
+
+      // 保存监听器引用以便后续移除
+      evalText._compositionListener = compositionEndHandler;
+      evalText._inputListener = inputHandler;
+
+      // 添加事件监听器
+      evalText.addEventListener("compositionstart", () => {
+        evalText._isComposing = true;
+      });
+      evalText.addEventListener("compositionend", () => {
+        evalText._isComposing = false;
+        setTimeout(() => {
+          compositionEndHandler();
+        }, 0);
+      });
+      evalText.addEventListener("input", inputHandler);
 
       // 光标移动到文本末尾（避免光标跳动）
       function setCursorToEnd(el) {
