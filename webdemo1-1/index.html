@@ -241,10 +241,13 @@
                         const API_SECRET = "ZTVjYzEwOGJkZjczNmIyMjJkYjgxOGE1";
                         const API_KEY = "9939e98c7aa76c1660cb2023ef9fc120";
                     </script>
-
-                    <script src="js/vendor/fast-xml-parser.min.js"></script>
-                    <script src="js/vendor/crypto-js.js"></script>
+                    <script src="https://cdn.jsdelivr.net/npm/xml-js@1.6.11/dist/xml-js.min.js"></script>
+                    <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
                     <script src="dist/index.umd.js"></script>
+                    <!-- 原本地引用 -->
+                    <!-- <script src="dist/index.umd.js"></script> -->
+                    <!-- CDN 替换 (RecordRTC) -->
+                    <script src="https://cdn.jsdelivr.net/npm/recordrtc@5.6.2/RecordRTC.min.js"></script>
                     <script src="./js/tencent_api.js"></script>
                     <!-- <script src="eval-index.js"></script> -->
                 </div>
@@ -311,7 +314,7 @@
                 <div class="toolchoice1">
                     <div class="toolchoice11">
                         <div class="toolchoice111">
-                            MagicSchool
+                            MagicTools
                         </div>
                     </div>
                 </div>
