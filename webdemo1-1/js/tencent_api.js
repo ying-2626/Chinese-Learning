@@ -120,7 +120,7 @@
             Phone: phoneItem.Phone,
             PronAccuracy: phoneItem.PronAccuracy
           })
-          // 遍历Tone,若Valid=false,则无效；若Valid=Ture,提取RefTone和HypothesisTone进行比对。如果比对结果是不相等，则说明该Word的韵母声调错误，一定要明确指出该字的声调错误。
+          // 遍历Tone,若Valid=false,则无效；若Valid=Ture,提取RefTone和HypothesisTone进行比对。如果比对结果是不相等，则说明该字的韵母声调错误，一定要明确指出该字的声调错误。
           然后对这位汉语学习者给出练习建议。
           注意：
           1. 分析和建议各控制在300字以内
@@ -181,6 +181,49 @@
       document.getElementById("total_score").innerText =
         jsonData.result.SuggestedScore;
 
+      // 计算声母分、韵母分和声调分
+      let initialScore = 0; // 声母分
+      let finalScore = 0;   // 韵母分
+      let toneScore = 0;    // 声调分
+      let wordCount = jsonData.result.Words.length;
+
+      // 计算声母分和韵母分
+      let initialTotal = 0;
+      let finalTotal = 0;
+      let toneCorrect = 0;
+
+      for (let i = 0; i < wordCount; i++) {
+        let word = jsonData.result.Words[i];
+        
+        // 累加声母分（每个词的第一个音素）
+        if (word.PhoneInfos.length > 0) {
+          initialTotal += word.PhoneInfos[0].PronAccuracy;
+        }
+        
+        // 累加韵母分（每个词的第二个音素）
+        if (word.PhoneInfos.length > 1) {
+          finalTotal += word.PhoneInfos[1].PronAccuracy;
+        }
+        
+        // 计算声调分
+        if (word.Tone && word.Tone.Valid) {
+          if (word.Tone.HypothesisTone !== -1) {
+            toneCorrect++;
+          }
+        }
+      }
+
+      // 计算平均分
+      if (wordCount > 0) {
+        initialScore = initialTotal / wordCount;
+        finalScore = finalTotal / wordCount;
+        toneScore = (toneCorrect / wordCount) * 100;
+      }
+
+      // 显示分数
+      document.getElementById("initial_score").innerText = initialScore.toFixed(2);
+      document.getElementById("final_score").innerText = finalScore.toFixed(2);
+      document.getElementById("tone_score").innerText = toneScore.toFixed(2);
 
       //单字PronAccuracy低于60标红，60-80标黄
       const evalText = document.getElementById("evalText");
@@ -282,21 +325,6 @@
         selection.removeAllRanges();
         selection.addRange(range);
       }
-
-      // let text = evalText.innerText;
-      // let coloredText = "";
-
-      // text.split("").forEach((char, index) => {
-      //     let randomColor = `rgb(${Math.random()*255}, ${Math.random()*255}, ${Math.random()*255})`;
-      //     coloredText += `<span style="color: ${randomColor}">${char}</span>`;
-      // });
-
-      // evalText.innerHTML = coloredText; // 直接修改 HTML
-
-
-      // evalText.addEventListener("input", applyColors);
-      // document.getElementById("evalText").innerText =
-
     }
   }
 
