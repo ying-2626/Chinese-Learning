@@ -152,27 +152,7 @@
             <div class="output-box" id="result_output">
                 <br />
 
-                <div style="display: flex; gap: 20px; align-items: start;">
-
-                    <!-- <div class="left" style="border: 3px solid #007bff; padding: 20px; border-radius: 15px; box-shadow: 2px 2px 10px #cccccc; width: 300px; background-color: #f7f7f7;">
-                    <p style="border-bottom: 2px solid #007bff; padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">准确度：<span id="accuracy_score" style="font-weight: bold; color: #007bff;">0</span></p>
-                    <p style="border-bottom: 2px solid #007bff; padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">流畅度：<span id="fluency_score" style="font-weight: bold; color: #007bff;">0</span></p>
-                    <p style="border-bottom: 2px solid #007bff; padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">完整度：<span id="integrity_score" style="font-weight: bold; color: #007bff;">0</span></p>
-
-                    <p style="margin: 0; color: #333; font-size: 18px;">总分：<span id="total_score" style="font-weight: bold; color: #007bff;">0</span></p>
-                    
-            </div>
-
-        
-            <textarea class="suggestion-box" readonly 
-            style="border: 3px solid #28a745; padding: 20px; border-radius: 15px; 
-           box-shadow: 2px 2px 10px #cccccc; width: 300px; height: 150px; 
-           background-color: #f7f7f7; font-size: 16px; color: #333;">
-            改进建议：
-            </textarea>
-
-            </div> -->
-                    <div style="display: flex; gap: 20px; align-items: stretch;">
+                <div style="display: flex; gap: 20px; align-items: stretch;">
                         <!-- 评分框 -->
                         <div class="left" style="border: 3px solid #007bff; padding: 20px; border-radius: 15px; 
     box-shadow: 2px 2px 10px #cccccc; width: 300px; background-color: #f7f7f7;
@@ -190,7 +170,20 @@
                                 完整度：<span id="integrity_score" style="font-weight: bold; color: #007bff;">0</span>
                             </p>
 
-                            <p style="margin: 0; color: #333; font-size: 18px;">
+                            <!-- 新增条件渲染 -->
+                            <p id="initial_score_wrapper" style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
+                                声母分：<span id="initial_score" style="font-weight: bold; color: #007bff;">0</span>
+                            </p>
+
+                            <p id="final_score_wrapper" style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
+                                韵母分：<span id="final_score" style="font-weight: bold; color: #007bff;">0</span>
+                            </p>
+
+                            <p id="tone_score_wrapper" style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
+                                声调分：<span id="tone_score" style="font-weight: bold; color: #007bff;">0</span>
+                            </p>
+
+                            <p style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
                                 总分：<span id="total_score" style="font-weight: bold; color: #007bff;">0</span>
                             </p>
                         </div>
@@ -434,4 +427,26 @@
     translate.language.setLocal('chinese_simplified'); //设置本地语种（当前网页的语种）。如果不设置，默认自动识别当前网页显示文字的语种。 可填写如 'english'、'chinese_simplified' 等，具体参见文档下方关于此的说明。
     translate.service.use('client.edge'); //设置机器翻译服务通道，直接客户端本身，不依赖服务端 。相关说明参考 http://translate.zvo.cn/43086.html
     translate.execute();//进行翻译 
+
+    // 新增实时显示控制逻辑
+    document.addEventListener('DOMContentLoaded', function () {
+        function updateScoreDisplay() {
+            const selectedMode = document.querySelector('input[name="group"]:checked').nextSibling.textContent.trim();
+            const hide = selectedMode === '读段落';
+            ['initial', 'final', 'tone'].forEach(type => {
+                const element = document.getElementById(`${type}_score_wrapper`);
+                if (element) {
+                    element.style.display = hide ? 'none' : 'block';
+                }
+            });
+        }
+
+        // 初始化显示状态
+        updateScoreDisplay();
+
+        // 监听单选按钮变化
+        document.querySelectorAll('input[name="group"]').forEach(radio => {
+            radio.addEventListener('change', updateScoreDisplay);
+        });
+    });
 </script>
