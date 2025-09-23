@@ -37,9 +37,9 @@ let token = localStorage.getItem('token');
 
 let Authorization = 'Bearer fastgpt-zqwHxu6FNdgPMOHiSngQkwZmITk9CDHpiPPQknc70ZNOxdIsFKZZvQEc3BkO71P'
 let textarea1 = document.querySelector(".chat-input");
-let textarea2 = document.querySelector(".voice-input");
+//let textarea2 = document.querySelector(".voice-input");
 let img1 = document.querySelector(".input-container img");
-let img2 = document.querySelector(".voice-container img");
+//let img2 = document.querySelector(".voice-container img");
 /*设置监听器，当输入框中有内容时，纸飞机变为彩色，否则为灰色*/
 /*textarea1--*/
 textarea1.addEventListener("input", function () {
@@ -49,13 +49,14 @@ textarea1.addEventListener("input", function () {
     img1.src = "img/纸飞机（灰色版）.png"
   }
 });
-textarea2.addEventListener('input', function () {
+/*textarea2.addEventListener('input', function () {
   if (textarea2.value.length > 0) {
     img2.src = "img/纸飞机（彩色版）.png"
   } else {
     img2.src = "img/纸飞机（灰色版）.png"
   }
-});
+});*/
+
 /*设置监听器，当点击纸飞机时/回车，将输入框中的内容发送给后端，并将返回的内容显示在聊天框中*/
 function isAllWhitespace(text) {
   return /^\s*$/.test(text);
@@ -178,7 +179,7 @@ textarea1.addEventListener("keydown", function (e) {
 
   }
 })
-textarea2.addEventListener("keydown", function (e) {
+/*textarea2.addEventListener("keydown", function (e) {
   if (e.key === 'Enter') {
     if (isAllWhitespace(textarea2.value)) {
       // console.log("请先输入内容");
@@ -199,7 +200,7 @@ textarea2.addEventListener("keydown", function (e) {
     }
 
   }
-})
+})*/
 img1.addEventListener("click", function () {
   if (isAllWhitespace(textarea1.value)) {
     // console.log("请先输入内容");
@@ -219,7 +220,7 @@ img1.addEventListener("click", function () {
 
   }
 })
-img2.addEventListener("click", function () {
+/*img2.addEventListener("click", function () {
   if (isAllWhitespace(textarea2.value)) {
     // console.log("请先输入内容");
     return
@@ -235,27 +236,27 @@ img2.addEventListener("click", function () {
     getReturn(textarea2.value)
     textarea2.value = ''
   }
-})
+})*/
 img1.addEventListener("mouseover", function () {
   if (isAllWhitespace(textarea1.value)) {
     let please = document.querySelectorAll(".pleaseinput")[1]
     please.style.display = "block"
   }
 })
-img2.addEventListener("mouseover", function () {
+/*img2.addEventListener("mouseover", function () {
   if (isAllWhitespace(textarea2.value)) {
     let please = document.querySelectorAll(".pleaseinput")[0]
     please.style.display = "block"
   }
-})
+})*/
 img1.addEventListener("mouseout", function () {
   let please = document.querySelectorAll(".pleaseinput")[1]
   please.style.display = "none"
 })
-img2.addEventListener("mouseout", function () {
+/*img2.addEventListener("mouseout", function () {
   let please = document.querySelectorAll(".pleaseinput")[0]
   please.style.display = "none"
-})
+})*/
 
 //点击侧边栏选项功能实现
 document.addEventListener('DOMContentLoaded', function () {
@@ -468,3 +469,4 @@ function generate() {
   moduleItems[2].style.display = 'block';
   moduleItems[3].style.display = 'none';
 }
+

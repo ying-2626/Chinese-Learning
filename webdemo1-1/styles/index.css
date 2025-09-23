@@ -93,7 +93,8 @@ html {
     /*     overflow-y: scroll;
     允许垂直滚动 */
     overflow-x: hidden;
-
+    /* 增加 z-index 确保侧边栏在最顶层 */
+    z-index: 1000;
 }
 
 .side-header {
@@ -193,7 +194,6 @@ html {
 
 
 .main-container {
-
     /* 图片路径 */
     background-size: cover;
     /* 图片填充方式 */
@@ -201,13 +201,22 @@ html {
     /* 图片定位 */
     background-repeat: no-repeat;
     /* 禁止图片重复 */
-    width: calc(100% - 300px);
-    /*内部设置20px的padding*/
+    width: calc(100% - 260px); /* 修改宽度 */
     padding: 0 20px 20px 20px;
     position: absolute;
     top: 0;
     bottom: 0;
     right: 0;
+    /* 增加 z-index 确保主容器在侧边栏之下 */
+    z-index: 999;
+}
+
+.module.voice2 iframe {
+    width: calc(100% - 100px);
+    height: 350px;
+    margin-left: 200px;
+    z-index: 100000;
+    position: relative;
 }
 
 .module {
@@ -538,7 +547,7 @@ html {
 .AllTools {
     position: absolute;
     top: 331px;
-    left: 30px;
+    left: 280px; /* 修改左侧距离 */
     right: 60px;
     display: flex;
     flex-wrap: wrap;
@@ -596,7 +605,7 @@ html {
 .tool-display {
     /* display: none; */
     background-color: #e5e7ed;
-    z-index: 199999;
+    z-index: 9999;
     left: 270px;
     top: 0;
     bottom: 0;
