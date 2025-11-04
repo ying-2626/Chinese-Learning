@@ -56,7 +56,7 @@ function uploadData() {
   }
   // 根据模式动态生成 payload
   let payload = {};
-  if (selectedMode === "读单词") {
+  if (selectedMode === "读汉字") {
     payload = {
       "ScoreCoeff": "2.0",
       // 评价苛刻指数。取值为[1.0 - 4.0]范围内的浮点数，用于平滑不同年龄段的分数。
