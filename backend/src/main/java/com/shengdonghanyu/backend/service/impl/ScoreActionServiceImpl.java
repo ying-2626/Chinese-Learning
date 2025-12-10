@@ -72,7 +72,7 @@ public class ScoreActionServiceImpl implements ScoreActionService {
         }
 
         try {
-            File dir = new File("/var/www/html/audio");
+            File dir = new File("/www/wwwroot/web/audios");
             if (!dir.exists() && !dir.mkdirs()) {
                 throw new MyException(EnumExceptionType.INSERT_FAILED);
             }
@@ -83,7 +83,7 @@ public class ScoreActionServiceImpl implements ScoreActionService {
             File dest = new File(dir, filename);
             audioFile.transferTo(dest);
 
-            return "https://shengdonghanyu.com" + "/audio/" + filename;
+            return "https://shengdonghanyu.com" + "/audios/" + filename;
         } catch (Exception e) {
             throw new MyException(EnumExceptionType.INSERT_FAILED);
         }
