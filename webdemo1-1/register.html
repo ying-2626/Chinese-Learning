@@ -42,6 +42,7 @@
 
         <a href="login.html">已有账户？点击这里登录</a>
     </div>
+    <script src="js/config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         //检查两次输入密码是否一致
@@ -59,39 +60,44 @@
 
         let GetCode = document.querySelector('.GetCode');
         let re = /^\w+@[a-zA-Z0-9]{2,10}(?:\.[a-z]{2,4}){1,3}$/;
-        GetCode.addEventListener('click', function () {
+        GetCode.addEventListener('click', function (e) {
+            e.preventDefault(); // Prevent form submission
             let email = document.querySelector('.email').value;
             // alert(email)
             // alert(typeof (email));
             //GetCode时检查输入邮箱是否合法
             if (re.test(email)) {
-                alert('code has been sent to your email');
+                // alert('code has been sent to your email');
             } else {
                 alert('please enter a valid email');
+                return;
             }
             //GetCode时发送请求
             axios({
-                url: 'https://shengdonghanyu.com:8080/GetCode',
+                url: CONFIG.BACKEND_API + '/user/sendCode',
                 method: 'post',
-                data: email,
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+                params: {
+                    email: email
+                },
+                withCredentials: true
             }).then(function (response) {
                 console.log(response);
-                if (response.data.code == 200) {
-                    localStorage.setItem("code", response.data.message);
-                    //alert(response.data.message);
+                if (response.data.code === 0) {
+                    alert('Code sent successfully to ' + email);
                 } else {
-                    alert(response.data.result);
+                    alert(response.data.message);
                 }
-            })
+            }).catch(function (error) {
+                console.error(error);
+                alert("Failed to send code: " + (error.response?.data?.message || error.message));
+            });
 
         })
 
 
         //注册时发送请求
         let loginButton = document.querySelector('.button');
+        /*
         function base64Encode(str) {
             // 将字符串转换为Uint8Array
             const utf8 = new Uint8Array(str.length);
@@ -101,47 +107,54 @@
             // 使用btoa()进行Base64编码
             return btoa(String.fromCharCode.apply(null, utf8));
         }
+        */
         function dologin() {
-            //检查验证码是否正确
             let input_code = document.querySelector('.code').value;
-            let code = localStorage.getItem("code");
-            if (input_code != code) {
-                alert('please enter the correct code');
-                return;
-            } else {
-                //获取User信息
-                let user_name = document.querySelector('.username');
-                let password = document.querySelector('.password');
-                let password_encoded = base64Encode(password.value);
-                console.log(JSON.stringify({
-                    "user_name": user_name.value,
-                    "user_password": password_encoded,
-                    "user_id": null,
-                    "user_email": document.querySelector('.email').value
-                }))
-                axios({
-                    url: 'https://shengdonghanyu.com:8080/Register',
-                    method: 'post',
-                    data: JSON.stringify({
-                        "user_name": user_name.value,
-                        "user_password": password_encoded,
-                        "user_id": null,
-                        "user_email": document.querySelector('.email').value
-                    }),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                }).then(function (response) {
-                    console.log(response);
-                    if (response.data.code == 200) {
-                        window.location.href = 'index.html';
-                        localStorage.setItem("token", JSON.stringify(response.data))
-                    } else {
-                        alert(response.data.result);
-                    }
-                })
-            }
-
+            let email = document.querySelector('.email').value;
+            let user_name = document.querySelector('.username');
+            let password = document.querySelector('.password');
+            
+            // Verify Code first
+            axios({
+                url: CONFIG.BACKEND_API + '/user/verifyCode',
+                method: 'post',
+                params: {
+                    email: email,
+                    code: input_code
+                },
+                withCredentials: true
+            }).then(function(verifyResponse) {
+                if (verifyResponse.data.code === 0) {
+                     // Code verified, proceed to signup
+                     axios({
+                        url: CONFIG.BACKEND_API + '/user/signup',
+                        method: 'post',
+                        params: {
+                            username: user_name.value,
+                            email: email,
+                            password: password.value
+                        },
+                        withCredentials: true
+                    }).then(function (response) {
+                        console.log(response);
+                        if (response.data.code === 0) {
+                            alert("Registration successful!");
+                            window.location.href = 'index.html';
+                            localStorage.setItem("user_info", JSON.stringify(response.data.result));
+                        } else {
+                            alert(response.data.message);
+                        }
+                    }).catch(function (error) {
+                        console.error(error);
+                        alert("Registration failed: " + (error.response?.data?.message || error.message));
+                    });
+                } else {
+                    alert("Verification failed: " + verifyResponse.data.message);
+                }
+            }).catch(function(error) {
+                 console.error(error);
+                 alert("Verification error: " + (error.response?.data?.message || error.message));
+            });
         }
 
     </script>
