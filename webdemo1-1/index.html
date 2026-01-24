@@ -7,11 +7,21 @@
     <title>声动汉语</title>
     <link rel="stylesheet" href="./styles/index.css">
     <link rel="icon" href="./img/side_logo.png">
-    </link>
+
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown-light.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Config -->
     <script src="js/config.js"></script>
+
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xml-js@1.6.11/dist/xml-js.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
+    <script src="dist/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/recordrtc@5.6.2/RecordRTC.min.js"></script>
+
     <style>
         @media (max-width: 767px) {
             body {
@@ -25,67 +35,26 @@
             max-width: 980px;
             margin: 0 auto;
             padding: 45px;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+        }
+
+        /* Ensure sidebar styles work with dynamic content */
+        .side-container {
+            /* Styles should be in index.css, but verifying layout */
         }
     </style>
 </head>
 
 <body>
     <!-- 侧边导航栏 -->
-    <div class="side-container">
-        <div class="side-header">
-            <img src="./img/logo.png" alt="logo" class="logo">
-        </div>
-
-        <div class="side-content">
-            <!-- 添加了语音测评模块 -->
-            <div class="side-footer speech-evaluation">
-                <img src="./img/speech_evaluation(color).png" alt="" class="sidelogo">
-                <p>语音测评</p>
-            </div>
-            <div class="side-footer Voice">
-                <img src="./img/voice(color).png" alt="" class="sidelogo">
-                <p>语音交互</p>
-            </div>
-            <div class="side-footer chat-bot">
-                <img src="./img/chat(color).png" alt="" class="sidelogo">
-                <p>聊天机器</p>
-            </div>
-            <div class="side-footer magic-tool">
-                <img src="./img/magictool(color).png" alt="" class="sidelogo">
-                <p>工具</p>
-            </div>
-            <div class="side-footer history">
-                <img src="./img/history(color).png" alt="" class="sidelogo">
-                <p>历史聊天</p>
-            </div>
-
-            <div class="Dividing-line"></div>
-            <div class="side-footer Love">
-                <img src="./img/love(color).png" alt="" class="sidelogo">
-                <p>喜欢♥</p>
-            </div>
-            <a href="entry.html" style="display:block; color:inherit; text-decoration:none;">
-                <div class="side-footer share">
-                    <img src="./img/share(color).png" alt="" class="sidelogo">
-                    <p>回到首页</p>
-                </div>
-            </a>
-            <a href="https://v.wjx.cn/vm/wcgDtu5.aspx#" style="display:block; color:inherit; text-decoration:none;">
-                <div class="side-footer use">
-                    <img src="./img/use(color).png" alt="" class="sidelogo">
-                    <p>使用反馈</p>
-                </div>
-            </a>
-            <div id="translate"></div>
-        </div>
-
-    </div>
+    <div class="side-container" id="sidebar"></div>
     <!-- 侧边导航栏结束 -->
 
     <!-- 主体内容 -->
     <div class="main-container">
-        <!-- 加入语音测评页面 -->
-        <div class="module speech-evaluation" id="speech-evaluation">
+        <!-- 语音测评页面 -->
+        <div class="module speech-evaluation" id="speech-evaluation" style="display:none;">
             <div id="evalText" contenteditable="true"
                 style="width: 500px; height: 130px; font-size: 16px; padding: 10px; border: 2px solid #007bff; border-radius: 5px; outline: none; transition: border 0.3s; box-sizing: border-box; background-color: White; margin-top: 30px; overflow: auto;">
                 输入你想要朗读的内容
@@ -93,24 +62,17 @@
 
             <br><br>
 
-            <label>
-                <input type="radio" name="group" checked> 读汉字
-            </label>
-            <label>
-                <input type="radio" name="group"> 读句子
-            </label>
-            <label>
-                <input type="radio" name="group"> 读段落
-            </label>
+            <label><input type="radio" name="group" checked> 读汉字</label>
+            <label><input type="radio" name="group"> 读句子</label>
+            <label><input type="radio" name="group"> 读段落</label>
 
-            <br><br>
+            <br><br><br>
 
-            <br />
             <button id="btn_control"
                 style="padding: 6px 20px; font-size: 16px; border: none; border-radius: 5px; background-color: #007bff; color: white; cursor: pointer;">开始录音</button>
+
             <div class="output-box" id="result_output">
                 <br />
-
                 <div style="display: flex; gap: 20px; align-items: stretch;">
                     <!-- 评分框 -->
                     <div class="left" style="border: 3px solid #007bff; padding: 20px; border-radius: 15px; 
@@ -120,31 +82,24 @@
                         <p style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
                             准确度：<span id="accuracy_score" style="font-weight: bold; color: #007bff;">0</span>
                         </p>
-
                         <p style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
                             流畅度：<span id="fluency_score" style="font-weight: bold; color: #007bff;">0</span>
                         </p>
-
                         <p style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
                             完整度：<span id="integrity_score" style="font-weight: bold; color: #007bff;">0</span>
                         </p>
-
-                        <!-- 新增条件渲染 -->
                         <p id="initial_score_wrapper"
                             style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
                             声母分：<span id="initial_score" style="font-weight: bold; color: #007bff;">0</span>
                         </p>
-
                         <p id="final_score_wrapper"
                             style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
                             韵母分：<span id="final_score" style="font-weight: bold; color: #007bff;">0</span>
                         </p>
-
                         <p id="tone_score_wrapper"
                             style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
                             声调分：<span id="tone_score" style="font-weight: bold; color: #007bff;">0</span>
                         </p>
-
                         <p style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
                             总分：<span id="total_score" style="font-weight: bold; color: #007bff;">0</span>
                         </p>
@@ -157,246 +112,120 @@
                 </textarea>
                 </div>
 
-
-
-                <style>
-                    /* 样式设置 */
-                    body {
-                        font-family: Arial, sans-serif;
-                        margin: 20px;
-                        background-color: #f4f4f9;
-                    }
-
-                    h2 {
-                        text-align: center;
-                        color: #333;
-                    }
-
-                    .suggestion-box {
-                        width: 100%;
-                        height: 150px;
-                        padding: 10px;
-                        border: 1px solid #ccc;
-                        border-radius: 5px;
-                        background-color: #f9f9f9;
-                        font-family: Arial, sans-serif;
-                        font-size: 14px;
-                        color: #333;
-                        resize: none;
-                        /* 不允许用户调整大小 */
-                        overflow: auto;
-                        /* 允许出现滚动条 */
-                    }
-                </style>
-
-
-
-                <script>
-                    const APPID = CONFIG.XUNFEI.APPID;
-                    const API_SECRET = CONFIG.XUNFEI.API_SECRET;
-                    const API_KEY = CONFIG.XUNFEI.API_KEY;
-                </script>
-                <script src="https://cdn.jsdelivr.net/npm/xml-js@1.6.11/dist/xml-js.min.js"></script>
-                <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
-                <script src="dist/index.umd.js"></script>
-                <!-- 原本地引用 -->
-                <!-- <script src="dist/index.umd.js"></script> -->
-                <!-- CDN 替换 (RecordRTC) -->
-                <script src="https://cdn.jsdelivr.net/npm/recordrtc@5.6.2/RecordRTC.min.js"></script>
-                <script src="./js/tencent_api.js"></script>
-                <!-- <script src="eval-index.js"></script> -->
+                <!-- Hidden helper for parser -->
+                <div id="right" style="display:none;">
+                    <div id="result"></div>
+                </div>
             </div>
         </div>
-    </div>
 
-
-    <!-- voice板块 -->
-    <div class="module voice2" id="voice">
-        <iframe src="https://www.light4ai.com/sentio/7bf25f70-fc9f-4d25-8fb9-ce24dd281346"
-            style="width: 120%; min-height: 700px; margin-left: 220px;" frameborder="0" allow="microphone">
-        </iframe>
-
-        <!-- ai输入框（voice板块） -->
-        <!--<div class="voice-container">
-                <div class="pleaseinput">请输入你的问题</div>
-                <textarea cols="30" rows="5" class="voice-input" placeholder="Please input your question..."></textarea>
-                <div>
-                    <button class="start-btn">开始录音</button>
-                    <button class="stop-btn">停止录音</button>
-                </div>
-
-                <img src="./img/纸飞机（灰色版）.png" alt="">
-            </div>-->
-    </div>
-    <!-- chatbot板块 -->
-    <div class="module chatbot2">
-        <!-- ai输入框（chatbot板块） -->
-        <div class="input-container">
-            <div class="pleaseinput">请输入你的问题</div>
-            <textarea cols="30" rows="5" class="chat-input" placeholder="Please input your question..."></textarea>
-            <img src="img/纸飞机（灰色版）.png" alt="">
+        <!-- Voice板块 -->
+        <div class="module voice" id="voice" style="display:none;">
+            <iframe src="https://www.light4ai.com/sentio/7bf25f70-fc9f-4d25-8fb9-ce24dd281346"
+                style="width: 120%; min-height: 700px; margin-left: 220px;" frameborder="0" allow="microphone">
+            </iframe>
         </div>
-        <!-- 遮挡层 -->
-        <div class="cover-container"></div>
-        <!-- ai回答框（chatbot板块） -->
-        <div class="chat-item">
-            <div class="message ai-message" id="start-message">
-                <div class="p1">
-                    请输入你的问题，输入问题后，AI将给出答案
-                </div>
 
+        <!-- Chatbot板块 -->
+        <div class="module chatbot2" id="chat-bot" style="display:none;">
+            <div class="input-container">
+                <div class="pleaseinput" style="display:none;">请输入你的问题</div>
+                <textarea cols="30" rows="5" class="chat-input" placeholder="Please input your question..."></textarea>
+                <img src="img/纸飞机（灰色版）.png" alt="">
             </div>
-        </div>
-    </div>
-    <!-- magic tool板块 -->
-    <div class="module magic-tool2">
-        <!-- cover层 -->
-        <div class="tool-cover"></div>
-        <!-- 工具选择栏 -->
-        <div class="toolchoice">
-            <div class="toolchoice1">
-                <div class="toolchoice11">
-                    <div class="toolchoice111">
-                        MagicTools
+            <div class="cover-container"></div>
+            <div class="chat-item">
+                <div class="message ai-message" id="start-message">
+                    <div class="p1">
+                        请输入你的问题，输入问题后，AI将给出答案
                     </div>
                 </div>
             </div>
-            <div class="toolchoice2">
-                <button>
-                    <img src="img/icon-all.png" alt="">
-                    All</button>
-                <button>Planning</button>
-                <button>Content</button>
-                <button>Questions</button>
-                <button>Intellectual Prep</button>
-                <button>Student Support</button>
-                <button>Communication</button>
-                <button>Community Tools</button>
-                <button>Admin</button>
-            </div>
         </div>
-        <!-- 工具标题 -->
-        <div class="AllToolsword">
-            All Tools
-        </div>
-        <!-- 工具展示栏 -->
-        <div class="AllTools">
-            <div class="tools Tool1" onclick="window.location.href='https://typing-word.ttentau.top'">
-                <img src="SVG/单词本.svg" alt="">
-                <div class="h1p">单词本</div>
-                <div class="h2p">根据您学习的主题提供HSK 1-6级中文单词的记背和检测</div>
-            </div>
-            <div class="tools Content">
-                <img src="SVG/演讲家.svg" alt="">
-                <div class="h1p">演讲家</div>
-                <div class="h2p">基于您需要的话题和要求，进行AI生成的演讲稿撰写</div>
-            </div>
-            <div class="tools Questions">
-                <img src="SVG/语法.svg" alt="">
-                <div class="h1p">语法家</div>
-                <div class="h2p">为您讲解语法点，纠正您句子中的语法错误</div>
-            </div>
-            <div class="tools Intellectual Prep">
-                <img src="SVG/阅读.svg" alt="">
-                <div class="h1p">阅读家</div>
-                <div class="h2p">根据您提供的主题和HSK水平，由AI生成相应的中文阅读材料和题目</div>
-            </div>
-            <div class="tools">
-                <img src="SVG/朗读.svg" alt="">
-                <div class="h1p">朗读家</div>
-                <div class="h2p">基于您给的文本进行朗读反馈，您可根据需要调节朗读语速，同时自由跟读。</div>
-            </div>
-            <div class="tools">
-                <img src="SVG/写作生成.svg" alt="">
-                <div class="h1p">写作生成</div>
-                <div class="h2p">根据您的话题和要求，生成写作提示、文本分析、文本范例</div>
-            </div>
-            <div class="tools">
-                <img src="SVG/文化.svg" alt="">
-                <div class="h1p">文化体验</div>
-                <div class="h2p">根据您关注的文化主题，提供相应的中华传统文化习俗介绍和相关文化知识讲解</div>
-            </div>
-            <div class="tools Planning">
-                <img src="SVG/中外互译.svg" alt="">
-                <div class="h1p">中外互译</div>
-                <div class="h2p">根据您选择的语言提供中文译文</div>
-            </div>
 
+        <!-- Magic Tool板块 -->
+        <div class="module magic-tool2" id="magic-tool" style="display:none;">
+            <div class="tool-cover"></div>
+            <div class="toolchoice">
+                <div class="toolchoice1">
+                    <div class="toolchoice11">
+                        <div class="toolchoice111">MagicTools</div>
+                    </div>
+                </div>
+                <div class="toolchoice2">
+                    <button><img src="img/icon-all.png" alt=""> All</button>
+                    <button>Planning</button>
+                    <button>Content</button>
+                    <button>Questions</button>
+                    <button>Intellectual Prep</button>
+                    <button>Student Support</button>
+                    <button>Communication</button>
+                    <button>Community Tools</button>
+                    <button>Admin</button>
+                </div>
+            </div>
+            <div class="AllToolsword">All Tools</div>
+            <div class="AllTools">
+                <div class="tools Tool1" onclick="window.location.href='https://typing-word.ttentau.top'">
+                    <img src="SVG/单词本.svg" alt="">
+                    <div class="h1p">单词本</div>
+                    <div class="h2p">根据您学习的主题提供HSK 1-6级中文单词的记背和检测</div>
+                </div>
+                <div class="tools Content">
+                    <img src="SVG/演讲家.svg" alt="">
+                    <div class="h1p">演讲家</div>
+                    <div class="h2p">基于您需要的话题和要求，进行AI生成的演讲稿撰写</div>
+                </div>
+                <div class="tools Questions">
+                    <img src="SVG/语法.svg" alt="">
+                    <div class="h1p">语法家</div>
+                    <div class="h2p">为您讲解语法点，纠正您句子中的语法错误</div>
+                </div>
+                <div class="tools Intellectual Prep">
+                    <img src="SVG/阅读.svg" alt="">
+                    <div class="h1p">阅读家</div>
+                    <div class="h2p">提供不同难度的阅读材料</div>
+                </div>
+                <div class="tools Intellectual Prep">
+                    <img src="SVG/文化.svg" alt="">
+                    <div class="h1p">文化家</div>
+                    <div class="h2p">提供中国文化相关的知识</div>
+                </div>
+                <div class="tools Intellectual Prep">
+                    <img src="SVG/中外互译.svg" alt="">
+                    <div class="h1p">中外互译</div>
+                    <div class="h2p">提供中外互译功能</div>
+                </div>
+                <div class="tools Intellectual Prep">
+                    <img src="SVG/写作生成.svg" alt="">
+                    <div class="h1p">写作生成</div>
+                    <div class="h2p">提供写作生成功能</div>
+                </div>
+                <div class="tools Intellectual Prep">
+                    <img src="SVG/朗读.svg" alt="">
+                    <div class="h1p">朗读家</div>
+                    <div class="h2p">提供朗读功能</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History 板块 (Placeholder if needed) -->
+        <div class="module history" id="history" style="display:none;">
+            <h2>历史聊天记录</h2>
+            <p>暂无记录</p>
         </div>
 
     </div>
-    <!-- history板块 -->
-    <div class="module history2">
 
+    <!-- Modules Scripts -->
+    <script src="js/components/Sidebar.js"></script>
+    <script src="js/modules/Chatbot.js"></script>
+    <script src="js/modules/SpeechEval.js"></script>
+    <script src="js/modules/MagicTool.js"></script>
+    <script src="js/modules/History.js"></script>
 
-    </div>
-    <!-- love板块 -->
-    <div class="module love2">
-
-        <img src="img/love放图1.png" class="loveimg" alt="" style="width: 100%;">
-    </div>
-    </div>
-    <div style="display: none;" class="tool-display">
-        <div class="back-btn" onclick="closeToolDisplay()">
-            返回
-        </div>
-        <div class="tool-display-content">
-            <h2>
-            </h2>
-            <p></p>
-            <div>
-                年级水平<br>
-                <input type="text">
-            </div>
-            <div>
-                用户角色<br>
-                <input type="text">
-            </div>
-            <div>
-                问题主要内容<br>
-                <textarea type="text" class="content111">
-                </textarea>
-            </div>
-            <div>
-                辅助内容<br>
-                <textarea type="text">
-                </textarea>
-            </div>
-            <button class="generate-btn" onclick="generate()">生成</button>
-        </div>
-    </div>
-
+    <!-- Main Script -->
+    <script src="js/index.js"></script>
 </body>
 
 </html>
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="js/index.js"></script>
-<script src="https://cdn.staticfile.net/translate.js/3.5.1/translate.js"></script>
-<script>
-    translate.language.setLocal('chinese_simplified'); //设置本地语种（当前网页的语种）。如果不设置，默认自动识别当前网页显示文字的语种。 可填写如 'english'、'chinese_simplified' 等，具体参见文档下方关于此的说明。
-    translate.service.use('client.edge'); //设置机器翻译服务通道，直接客户端本身，不依赖服务端 。相关说明参考 http://translate.zvo.cn/43086.html
-    translate.execute();//进行翻译 
-
-    // 新增实时显示控制逻辑
-    document.addEventListener('DOMContentLoaded', function () {
-        function updateScoreDisplay() {
-            const selectedMode = document.querySelector('input[name="group"]:checked').nextSibling.textContent.trim();
-            const hide = selectedMode === '读段落';
-            ['initial', 'final', 'tone'].forEach(type => {
-                const element = document.getElementById(`${type}_score_wrapper`);
-                if (element) {
-                    element.style.display = hide ? 'none' : 'block';
-                }
-            });
-        }
-
-        // 初始化显示状态
-        updateScoreDisplay();
-
-        // 监听单选按钮变化
-        document.querySelectorAll('input[name="group"]').forEach(radio => {
-            radio.addEventListener('change', updateScoreDisplay);
-        });
-    });
-</script>
