@@ -126,7 +126,7 @@ class SpeechEvalModule {
               7. 如果单字的Tone:Valid=true说明启用了声调评测，启用时你才需要额外分析声调是否正确，HypothesisTone为-1代表该字的声调读错了
         `
 
-        axios({
+        return axios({
             url: 'https://api.fastgpt.in/api/v1/chat/completions',
             method: 'post',
             data: JSON.stringify({
@@ -153,10 +153,52 @@ class SpeechEvalModule {
             } else {
                 console.error("未找到 .suggestion-box 元素");
             }
+            return content;
         });
     }
 
-    renderResult(resultData) {
+    mergeAudioChunks() {
+        const totalLength = this.audioChunks.reduce((acc, chunk) => acc + chunk.byteLength, 0);
+        const result = new Uint8Array(totalLength);
+        let offset = 0;
+        for (const chunk of this.audioChunks) {
+            result.set(new Uint8Array(chunk), offset);
+            offset += chunk.byteLength;
+        }
+        return result.buffer;
+    }
+
+    addWavHeader(samples) {
+        const dataLength = samples.byteLength;
+        const buffer = new ArrayBuffer(44 + dataLength);
+        const view = new DataView(buffer);
+
+        function writeString(view, offset, string) {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        }
+
+        writeString(view, 0, 'RIFF');
+        view.setUint32(4, 36 + dataLength, true);
+        writeString(view, 8, 'WAVE');
+        writeString(view, 12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true);
+        view.setUint16(22, 1, true);
+        view.setUint32(24, 16000, true);
+        view.setUint32(28, 32000, true);
+        view.setUint16(32, 2, true);
+        view.setUint16(34, 16, true);
+        writeString(view, 36, 'data');
+        view.setUint32(40, dataLength, true);
+
+        new Uint8Array(buffer, 44).set(new Uint8Array(samples));
+
+        return buffer;
+    }
+
+    renderResult(resultData, isFinal = false) {
         // 识别结束
         let jsonData = JSON.parse(resultData);
         if (jsonData.result != null) {
@@ -241,7 +283,42 @@ class SpeechEvalModule {
                 }))
             }));
             const jsonString = JSON.stringify(analysisData, null, 2);
-            this.getAnalysis(jsonString);
+
+            if (isFinal) {
+                // 1. Get Analysis
+                const analysisPromise = this.getAnalysis(jsonString);
+
+                // 2. Upload Audio
+                const pcmBuffer = this.mergeAudioChunks();
+                const wavBuffer = this.addWavHeader(pcmBuffer);
+                const audioBlob = new Blob([wavBuffer], { type: 'audio/wav' });
+                const audioUploadPromise = ScoreService.uploadAudioFile(audioBlob);
+
+                Promise.all([analysisPromise, audioUploadPromise])
+                    .then(([advice, audioUrl]) => {
+                        // 3. Create Score Action
+                        const scoreData = {
+                            audioUrl: audioUrl,
+                            accuracy: jsonData.result.PronAccuracy,
+                            fluency: jsonData.result.PronFluency * 100,
+                            completeness: jsonData.result.PronCompletion * 100,
+                            initialSoundScore: initialScore,
+                            finalSoundScore: finalScore,
+                            toneScore: toneScore,
+                            totalScore: jsonData.result.SuggestedScore,
+                            advice: advice
+                        };
+                        return ScoreService.createScoreAction(scoreData);
+                    })
+                    .then(res => {
+                        console.log("Score saved successfully:", res);
+                        // alert("评分已保存！");
+                    })
+                    .catch(err => {
+                        console.error("Failed to save score:", err);
+                        // alert("保存评分失败: " + err.message);
+                    });
+            }
 
             evalText.innerHTML = coloredText;
 
@@ -313,10 +390,12 @@ class SpeechEvalModule {
         };
 
         this.iseWS.onmessage = (e) => {
-            console.log("收到消息:", JSON.parse(e.data));
-            this.renderResult(e.data);
+            const data = JSON.parse(e.data);
+            console.log("收到消息:", data);
+            const isFinal = data.final === 1;
+            this.renderResult(e.data, isFinal);
 
-            if (JSON.parse(e.data).final === 1) {
+            if (isFinal) {
                 this.iseWS.close();
             }
         };
