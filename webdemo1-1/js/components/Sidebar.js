@@ -11,9 +11,9 @@ class Sidebar {
             { id: 'history', name: '历史聊天', icon: 'history', module: 'history' },
         ];
         this.bottomItems = [
-             { id: 'love', name: '喜欢♥', icon: 'love', action: 'love' },
-             { id: 'home', name: '回到首页', icon: 'share', link: 'entry.html' },
-             { id: 'feedback', name: '使用反馈', icon: 'use', link: 'https://v.wjx.cn/vm/wcgDtu5.aspx#' }
+            { id: 'love', name: '喜欢♥', icon: 'love', action: 'love' },
+            { id: 'home', name: '回到首页', icon: 'share', link: 'entry.html' },
+            { id: 'feedback', name: '使用反馈', icon: 'use', link: 'https://v.wjx.cn/vm/wcgDtu5.aspx#' }
         ];
         this.init();
     }
@@ -31,7 +31,7 @@ class Sidebar {
         `;
 
         let contentHtml = '<div class="side-content">';
-        
+
         // Main items
         this.items.forEach(item => {
             contentHtml += `
@@ -89,23 +89,18 @@ class Sidebar {
                 if (moduleId) {
                     // Hide all modules
                     moduleItems.forEach(m => m.style.display = 'none');
-                    
+
                     // Show target module
-                    const targetModule = document.querySelector(`.${moduleId}`); // Assuming class name matches module id or passed in
-                    // In the original code, it used index mapping which is brittle. 
-                    // Let's try to find by ID or Class.
-                    // Original code: var correspondingModule = moduleItems[index]; 
-                    // But index includes bottom items too?
-                    // The original code had: if (index <= 5) check.
-                    
-                    // Better approach: use data-module attribute to find the element
+                    // Use specific selector to avoid selecting sidebar items themselves (which might have the same class name)
+                    // We target elements that have both .module class and the specific module class
+                    const targetModule = document.querySelector(`.module.${moduleId}`);
+
                     if (targetModule) {
                         targetModule.style.display = 'block';
                     } else {
-                         // Fallback for original index-based logic if needed, but let's try to rely on class/id
-                         // The original HTML had IDs like id="speech-evaluation", id="voice", etc.
-                         const targetById = document.getElementById(moduleId) || document.querySelector(`.${moduleId}`);
-                         if (targetById) targetById.style.display = 'block';
+                        // Fallback: Try by ID if class selector fails
+                        const targetById = document.getElementById(moduleId);
+                        if (targetById) targetById.style.display = 'block';
                     }
 
                     // Update Icons (Color vs White)
@@ -113,11 +108,11 @@ class Sidebar {
                         const base = logo.getAttribute('data-base');
                         logo.src = `./img/${base}(color).png`;
                     });
-                    
+
                     const activeLogo = item.querySelector('.sidelogo');
                     if (activeLogo) {
-                         const base = activeLogo.getAttribute('data-base');
-                         activeLogo.src = `./img/${base}(fff).png`;
+                        const base = activeLogo.getAttribute('data-base');
+                        activeLogo.src = `./img/${base}(fff).png`;
                     }
                 }
             });
