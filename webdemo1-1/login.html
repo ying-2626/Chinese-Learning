@@ -25,9 +25,11 @@
             <a href="register.html">新用户？立即注册</a>
             <a href="entry.html">回到首页</a>
     </div>
+    <script src="js/config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         let loginButton = document.querySelector('.button');
+        /*
         function base64Encode(str) {
             // 将字符串转换为Uint8Array
             const utf8 = new Uint8Array(str.length);
@@ -37,31 +39,35 @@
             // 使用btoa()进行Base64编码
             return btoa(String.fromCharCode.apply(null, utf8));
         }
+        */
         function dologin() {
             //获取User信息
             let user_name = document.querySelector('.username');
             let password = document.querySelector('.password');
-            let password_encoded = base64Encode(password.value);
+            // let password_encoded = base64Encode(password.value);
+            
             axios({
-                url: 'https://shengdonghanyu.com:8080/Login',
+                url: CONFIG.BACKEND_API + '/user/login',
                 method: 'post',
-                data: JSON.stringify({
-                    "user_name": user_name.value,
-                    "user_password": password_encoded
-                }),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+                params: {
+                    "username": user_name.value,
+                    "password": password.value
+                },
+                withCredentials: true // Important for Session-based auth
             }).then(function (response) {
                 console.log(response.data.message);
-                if (response.data.code == 200) {
+                if (response.data.code === 0) { // Backend success code is 0
                     //alert(response.data)
                     window.location.href = 'index.html';
-                    localStorage.setItem("token", JSON.stringify(response.data));
+                    // Store user info if needed, though session handles auth
+                    localStorage.setItem("user_info", JSON.stringify(response.data.result));
                 } else {
                     alert(response.data.message);
                 }
-            })
+            }).catch(function (error) {
+                console.error(error);
+                alert("Login failed: " + (error.response?.data?.message || error.message));
+            });
         }
     </script>
 
