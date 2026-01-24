@@ -11,7 +11,7 @@ class Sidebar {
             { id: 'history', name: '历史聊天', icon: 'history', module: 'history' },
         ];
         this.bottomItems = [
-            { id: 'love', name: '喜欢♥', icon: 'love', action: 'love' },
+            { id: 'love', name: '喜欢♥', icon: 'love', module: 'love' },
             { id: 'home', name: '回到首页', icon: 'share', link: 'entry.html' },
             { id: 'feedback', name: '使用反馈', icon: 'use', link: 'https://v.wjx.cn/vm/wcgDtu5.aspx#' }
         ];
@@ -21,6 +21,14 @@ class Sidebar {
     init() {
         this.render();
         this.bindEvents();
+
+        // Default to first item active
+        if (this.items.length > 0) {
+            const firstItem = this.container.querySelector(`.side-footer.${this.items[0].id}`);
+            if (firstItem) {
+                firstItem.click();
+            }
+        }
     }
 
     render() {
