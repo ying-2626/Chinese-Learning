@@ -35,7 +35,7 @@ let token = localStorage.getItem('token');
 //   }
 // })  
 
-let Authorization = 'Bearer fastgpt-zqwHxu6FNdgPMOHiSngQkwZmITk9CDHpiPPQknc70ZNOxdIsFKZZvQEc3BkO71P'
+let Authorization = CONFIG.FASTGPT.API_KEY
 let textarea1 = document.querySelector(".chat-input");
 //let textarea2 = document.querySelector(".voice-input");
 let img1 = document.querySelector(".input-container img");

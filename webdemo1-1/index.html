@@ -11,6 +11,7 @@
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown-light.min.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="js/config.js"></script>
     <style>
         @media (max-width: 767px) {
             body {
@@ -111,112 +112,112 @@
                 <br />
 
                 <div style="display: flex; gap: 20px; align-items: stretch;">
-                        <!-- 评分框 -->
-                        <div class="left" style="border: 3px solid #007bff; padding: 20px; border-radius: 15px; 
+                    <!-- 评分框 -->
+                    <div class="left" style="border: 3px solid #007bff; padding: 20px; border-radius: 15px; 
     box-shadow: 2px 2px 10px #cccccc; width: 300px; background-color: #f7f7f7;
     display: flex; flex-direction: column; justify-content: space-between; min-height: 150px;">
 
-                            <p style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
-                                准确度：<span id="accuracy_score" style="font-weight: bold; color: #007bff;">0</span>
-                            </p>
+                        <p style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
+                            准确度：<span id="accuracy_score" style="font-weight: bold; color: #007bff;">0</span>
+                        </p>
 
-                            <p style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
-                                流畅度：<span id="fluency_score" style="font-weight: bold; color: #007bff;">0</span>
-                            </p>
+                        <p style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
+                            流畅度：<span id="fluency_score" style="font-weight: bold; color: #007bff;">0</span>
+                        </p>
 
-                            <p style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
-                                完整度：<span id="integrity_score" style="font-weight: bold; color: #007bff;">0</span>
-                            </p>
+                        <p style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
+                            完整度：<span id="integrity_score" style="font-weight: bold; color: #007bff;">0</span>
+                        </p>
 
-                            <!-- 新增条件渲染 -->
-                            <p id="initial_score_wrapper" style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
-                                声母分：<span id="initial_score" style="font-weight: bold; color: #007bff;">0</span>
-                            </p>
+                        <!-- 新增条件渲染 -->
+                        <p id="initial_score_wrapper"
+                            style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
+                            声母分：<span id="initial_score" style="font-weight: bold; color: #007bff;">0</span>
+                        </p>
 
-                            <p id="final_score_wrapper" style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
-                                韵母分：<span id="final_score" style="font-weight: bold; color: #007bff;">0</span>
-                            </p>
+                        <p id="final_score_wrapper"
+                            style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
+                            韵母分：<span id="final_score" style="font-weight: bold; color: #007bff;">0</span>
+                        </p>
 
-                            <p id="tone_score_wrapper" style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
-                                声调分：<span id="tone_score" style="font-weight: bold; color: #007bff;">0</span>
-                            </p>
+                        <p id="tone_score_wrapper"
+                            style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
+                            声调分：<span id="tone_score" style="font-weight: bold; color: #007bff;">0</span>
+                        </p>
 
-                            <p style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
-                                总分：<span id="total_score" style="font-weight: bold; color: #007bff;">0</span>
-                            </p>
-                        </div>
+                        <p style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
+                            总分：<span id="total_score" style="font-weight: bold; color: #007bff;">0</span>
+                        </p>
+                    </div>
 
-                        <textarea class="suggestion-box" readonly style="border: 3px solid #007bff; padding: 20px; border-radius: 15px; 
+                    <textarea class="suggestion-box" readonly style="border: 3px solid #007bff; padding: 20px; border-radius: 15px; 
             box-shadow: 2px 2px 10px #cccccc; width: 300px; background-color: #f7f7f7; 
             font-size: 16px; color: #333; min-height: 150px; flex-grow: 1;">
 改进建议：
                 </textarea>
-                    </div>
-
-
-
-                    <style>
-                        /* 样式设置 */
-                        body {
-                            font-family: Arial, sans-serif;
-                            margin: 20px;
-                            background-color: #f4f4f9;
-                        }
-
-                        h2 {
-                            text-align: center;
-                            color: #333;
-                        }
-
-                        .suggestion-box {
-                            width: 100%;
-                            height: 150px;
-                            padding: 10px;
-                            border: 1px solid #ccc;
-                            border-radius: 5px;
-                            background-color: #f9f9f9;
-                            font-family: Arial, sans-serif;
-                            font-size: 14px;
-                            color: #333;
-                            resize: none;
-                            /* 不允许用户调整大小 */
-                            overflow: auto;
-                            /* 允许出现滚动条 */
-                        }
-                    </style>
-
-
-
-                    <script>
-                        const APPID = "78836aa7";
-                        const API_SECRET = "ZTVjYzEwOGJkZjczNmIyMjJkYjgxOGE1";
-                        const API_KEY = "9939e98c7aa76c1660cb2023ef9fc120";
-                    </script>
-                    <script src="https://cdn.jsdelivr.net/npm/xml-js@1.6.11/dist/xml-js.min.js"></script>
-                    <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
-                    <script src="dist/index.umd.js"></script>
-                    <!-- 原本地引用 -->
-                    <!-- <script src="dist/index.umd.js"></script> -->
-                    <!-- CDN 替换 (RecordRTC) -->
-                    <script src="https://cdn.jsdelivr.net/npm/recordrtc@5.6.2/RecordRTC.min.js"></script>
-                    <script src="./js/tencent_api.js"></script>
-                    <!-- <script src="eval-index.js"></script> -->
                 </div>
+
+
+
+                <style>
+                    /* 样式设置 */
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 20px;
+                        background-color: #f4f4f9;
+                    }
+
+                    h2 {
+                        text-align: center;
+                        color: #333;
+                    }
+
+                    .suggestion-box {
+                        width: 100%;
+                        height: 150px;
+                        padding: 10px;
+                        border: 1px solid #ccc;
+                        border-radius: 5px;
+                        background-color: #f9f9f9;
+                        font-family: Arial, sans-serif;
+                        font-size: 14px;
+                        color: #333;
+                        resize: none;
+                        /* 不允许用户调整大小 */
+                        overflow: auto;
+                        /* 允许出现滚动条 */
+                    }
+                </style>
+
+
+
+                <script>
+                    const APPID = CONFIG.XUNFEI.APPID;
+                    const API_SECRET = CONFIG.XUNFEI.API_SECRET;
+                    const API_KEY = CONFIG.XUNFEI.API_KEY;
+                </script>
+                <script src="https://cdn.jsdelivr.net/npm/xml-js@1.6.11/dist/xml-js.min.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
+                <script src="dist/index.umd.js"></script>
+                <!-- 原本地引用 -->
+                <!-- <script src="dist/index.umd.js"></script> -->
+                <!-- CDN 替换 (RecordRTC) -->
+                <script src="https://cdn.jsdelivr.net/npm/recordrtc@5.6.2/RecordRTC.min.js"></script>
+                <script src="./js/tencent_api.js"></script>
+                <!-- <script src="eval-index.js"></script> -->
             </div>
         </div>
+    </div>
 
 
-        <!-- voice板块 -->
-        <div class="module voice2" id="voice">
-            <iframe
-                    src="https://www.light4ai.com/sentio/7bf25f70-fc9f-4d25-8fb9-ce24dd281346"
-                    style="width: 120%; min-height: 700px; margin-left: 220px;"
-                    frameborder="0"
-                    allow="microphone">
-            </iframe>
+    <!-- voice板块 -->
+    <div class="module voice2" id="voice">
+        <iframe src="https://www.light4ai.com/sentio/7bf25f70-fc9f-4d25-8fb9-ce24dd281346"
+            style="width: 120%; min-height: 700px; margin-left: 220px;" frameborder="0" allow="microphone">
+        </iframe>
 
-            <!-- ai输入框（voice板块） -->
-            <!--<div class="voice-container">
+        <!-- ai输入框（voice板块） -->
+        <!--<div class="voice-container">
                 <div class="pleaseinput">请输入你的问题</div>
                 <textarea cols="30" rows="5" class="voice-input" placeholder="Please input your question..."></textarea>
                 <div>
@@ -226,114 +227,114 @@
 
                 <img src="./img/纸飞机（灰色版）.png" alt="">
             </div>-->
+    </div>
+    <!-- chatbot板块 -->
+    <div class="module chatbot2">
+        <!-- ai输入框（chatbot板块） -->
+        <div class="input-container">
+            <div class="pleaseinput">请输入你的问题</div>
+            <textarea cols="30" rows="5" class="chat-input" placeholder="Please input your question..."></textarea>
+            <img src="img/纸飞机（灰色版）.png" alt="">
         </div>
-        <!-- chatbot板块 -->
-        <div class="module chatbot2">
-            <!-- ai输入框（chatbot板块） -->
-            <div class="input-container">
-                <div class="pleaseinput">请输入你的问题</div>
-                <textarea cols="30" rows="5" class="chat-input" placeholder="Please input your question..."></textarea>
-                <img src="img/纸飞机（灰色版）.png" alt="">
+        <!-- 遮挡层 -->
+        <div class="cover-container"></div>
+        <!-- ai回答框（chatbot板块） -->
+        <div class="chat-item">
+            <div class="message ai-message" id="start-message">
+                <div class="p1">
+                    请输入你的问题，输入问题后，AI将给出答案
+                </div>
+
             </div>
-            <!-- 遮挡层 -->
-            <div class="cover-container"></div>
-            <!-- ai回答框（chatbot板块） -->
-            <div class="chat-item">
-                <div class="message ai-message" id="start-message">
-                    <div class="p1">
-                        请输入你的问题，输入问题后，AI将给出答案
+        </div>
+    </div>
+    <!-- magic tool板块 -->
+    <div class="module magic-tool2">
+        <!-- cover层 -->
+        <div class="tool-cover"></div>
+        <!-- 工具选择栏 -->
+        <div class="toolchoice">
+            <div class="toolchoice1">
+                <div class="toolchoice11">
+                    <div class="toolchoice111">
+                        MagicTools
                     </div>
-
                 </div>
+            </div>
+            <div class="toolchoice2">
+                <button>
+                    <img src="img/icon-all.png" alt="">
+                    All</button>
+                <button>Planning</button>
+                <button>Content</button>
+                <button>Questions</button>
+                <button>Intellectual Prep</button>
+                <button>Student Support</button>
+                <button>Communication</button>
+                <button>Community Tools</button>
+                <button>Admin</button>
             </div>
         </div>
-        <!-- magic tool板块 -->
-        <div class="module magic-tool2">
-            <!-- cover层 -->
-            <div class="tool-cover"></div>
-            <!-- 工具选择栏 -->
-            <div class="toolchoice">
-                <div class="toolchoice1">
-                    <div class="toolchoice11">
-                        <div class="toolchoice111">
-                            MagicTools
-                        </div>
-                    </div>
-                </div>
-                <div class="toolchoice2">
-                    <button>
-                        <img src="img/icon-all.png" alt="">
-                        All</button>
-                    <button>Planning</button>
-                    <button>Content</button>
-                    <button>Questions</button>
-                    <button>Intellectual Prep</button>
-                    <button>Student Support</button>
-                    <button>Communication</button>
-                    <button>Community Tools</button>
-                    <button>Admin</button>
-                </div>
+        <!-- 工具标题 -->
+        <div class="AllToolsword">
+            All Tools
+        </div>
+        <!-- 工具展示栏 -->
+        <div class="AllTools">
+            <div class="tools Tool1" onclick="window.location.href='https://typing-word.ttentau.top'">
+                <img src="SVG/单词本.svg" alt="">
+                <div class="h1p">单词本</div>
+                <div class="h2p">根据您学习的主题提供HSK 1-6级中文单词的记背和检测</div>
             </div>
-            <!-- 工具标题 -->
-            <div class="AllToolsword">
-                All Tools
+            <div class="tools Content">
+                <img src="SVG/演讲家.svg" alt="">
+                <div class="h1p">演讲家</div>
+                <div class="h2p">基于您需要的话题和要求，进行AI生成的演讲稿撰写</div>
             </div>
-            <!-- 工具展示栏 -->
-            <div class="AllTools">
-                <div class="tools Tool1" onclick="window.location.href='https://typing-word.ttentau.top'">
-                    <img src="SVG/单词本.svg" alt="">
-                    <div class="h1p">单词本</div>
-                    <div class="h2p">根据您学习的主题提供HSK 1-6级中文单词的记背和检测</div>
-                </div>
-                <div class="tools Content">
-                    <img src="SVG/演讲家.svg" alt="">
-                    <div class="h1p">演讲家</div>
-                    <div class="h2p">基于您需要的话题和要求，进行AI生成的演讲稿撰写</div>
-                </div>
-                <div class="tools Questions">
-                    <img src="SVG/语法.svg" alt="">
-                    <div class="h1p">语法家</div>
-                    <div class="h2p">为您讲解语法点，纠正您句子中的语法错误</div>
-                </div>
-                <div class="tools Intellectual Prep">
-                    <img src="SVG/阅读.svg" alt="">
-                    <div class="h1p">阅读家</div>
-                    <div class="h2p">根据您提供的主题和HSK水平，由AI生成相应的中文阅读材料和题目</div>
-                </div>
-                <div class="tools">
-                    <img src="SVG/朗读.svg" alt="">
-                    <div class="h1p">朗读家</div>
-                    <div class="h2p">基于您给的文本进行朗读反馈，您可根据需要调节朗读语速，同时自由跟读。</div>
-                </div>
-                <div class="tools">
-                    <img src="SVG/写作生成.svg" alt="">
-                    <div class="h1p">写作生成</div>
-                    <div class="h2p">根据您的话题和要求，生成写作提示、文本分析、文本范例</div>
-                </div>
-                <div class="tools">
-                    <img src="SVG/文化.svg" alt="">
-                    <div class="h1p">文化体验</div>
-                    <div class="h2p">根据您关注的文化主题，提供相应的中华传统文化习俗介绍和相关文化知识讲解</div>
-                </div>
-                <div class="tools Planning">
-                    <img src="SVG/中外互译.svg" alt="">
-                    <div class="h1p">中外互译</div>
-                    <div class="h2p">根据您选择的语言提供中文译文</div>
-                </div>
-
+            <div class="tools Questions">
+                <img src="SVG/语法.svg" alt="">
+                <div class="h1p">语法家</div>
+                <div class="h2p">为您讲解语法点，纠正您句子中的语法错误</div>
+            </div>
+            <div class="tools Intellectual Prep">
+                <img src="SVG/阅读.svg" alt="">
+                <div class="h1p">阅读家</div>
+                <div class="h2p">根据您提供的主题和HSK水平，由AI生成相应的中文阅读材料和题目</div>
+            </div>
+            <div class="tools">
+                <img src="SVG/朗读.svg" alt="">
+                <div class="h1p">朗读家</div>
+                <div class="h2p">基于您给的文本进行朗读反馈，您可根据需要调节朗读语速，同时自由跟读。</div>
+            </div>
+            <div class="tools">
+                <img src="SVG/写作生成.svg" alt="">
+                <div class="h1p">写作生成</div>
+                <div class="h2p">根据您的话题和要求，生成写作提示、文本分析、文本范例</div>
+            </div>
+            <div class="tools">
+                <img src="SVG/文化.svg" alt="">
+                <div class="h1p">文化体验</div>
+                <div class="h2p">根据您关注的文化主题，提供相应的中华传统文化习俗介绍和相关文化知识讲解</div>
+            </div>
+            <div class="tools Planning">
+                <img src="SVG/中外互译.svg" alt="">
+                <div class="h1p">中外互译</div>
+                <div class="h2p">根据您选择的语言提供中文译文</div>
             </div>
 
         </div>
-        <!-- history板块 -->
-        <div class="module history2">
+
+    </div>
+    <!-- history板块 -->
+    <div class="module history2">
 
 
-        </div>
-        <!-- love板块 -->
-        <div class="module love2">
+    </div>
+    <!-- love板块 -->
+    <div class="module love2">
 
-            <img src="img/love放图1.png" class="loveimg" alt="" style="width: 100%;">
-        </div>
+        <img src="img/love放图1.png" class="loveimg" alt="" style="width: 100%;">
+    </div>
     </div>
     <div style="display: none;" class="tool-display">
         <div class="back-btn" onclick="closeToolDisplay()">
@@ -366,6 +367,7 @@
     </div>
 
 </body>
+
 </html>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>

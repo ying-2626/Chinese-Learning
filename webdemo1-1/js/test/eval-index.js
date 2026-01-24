@@ -19,8 +19,8 @@
     // 如果换api，这里是要改的地方
     var url = "wss://ise-api.xfyun.cn/v2/open-ise";
     var host = "ise-api.xfyun.cn";
-    var apiKey = "9939e98c7aa76c1660cb2023ef9fc120";
-    var apiSecret = "ZTVjYzEwOGJkZjczNmIyMjJkYjgxOGE1";
+    var apiKey = CONFIG.XUNFEI.API_KEY;
+    var apiSecret = CONFIG.XUNFEI.API_SECRET;
     var date = new Date().toGMTString();
     var algorithm = "hmac-sha256";
     var headers = "host date request-line";

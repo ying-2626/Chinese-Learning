@@ -109,7 +109,7 @@
   }
 
   //调用fastgpt分析朗读结果
-  let Authorization = 'Bearer fastgpt-zqwHxu6FNdgPMOHiSngQkwZmITk9CDHpiPPQknc70ZNOxdIsFKZZvQEc3BkO71P'
+  let Authorization = CONFIG.FASTGPT.API_KEY
   //generate 分析
   function getAnalysis(req_content) {
 
