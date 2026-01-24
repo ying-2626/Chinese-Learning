@@ -49,7 +49,7 @@ class MagicToolModule {
 
     filterTools(category) {
         if (category.includes("All")) {
-            this.tools.forEach(tool => tool.style.display = 'inline-block');
+            this.tools.forEach(tool => tool.style.display = '');
         } else {
             this.tools.forEach(tool => {
                 // The original code matched by class name.
@@ -61,7 +61,7 @@ class MagicToolModule {
                 
                 const matchClass = category.split(" ")[0];
                 if (tool.classList.contains(matchClass)) {
-                    tool.style.display = 'inline-block';
+                    tool.style.display = '';
                 } else {
                     tool.style.display = 'none';
                 }
