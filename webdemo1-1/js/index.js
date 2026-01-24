@@ -9,6 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const sidebar = new Sidebar('sidebar');
 
   // 2. Initialize Modules
+  // Love Module (handles .love section)
+  const love = new LoveModule();
+
   // Chatbot Module (handles .chatbot2 section)
   const chatbot = new ChatbotModule();
 

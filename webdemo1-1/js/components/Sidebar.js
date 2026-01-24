@@ -65,7 +65,7 @@ class Sidebar {
                 `;
             } else {
                 contentHtml += `
-                    <div class="side-footer ${item.id}">
+                    <div class="side-footer ${item.id}" data-module="${item.module}" data-id="${item.id}">
                         <img src="./img/${item.icon}(color).png" alt="" class="sidelogo" data-base="${item.icon}">
                         <p>${item.name}</p>
                     </div>
@@ -104,11 +104,21 @@ class Sidebar {
                     const targetModule = document.querySelector(`.module.${moduleId}`);
 
                     if (targetModule) {
-                        targetModule.style.display = 'block';
+                        if (moduleId === 'love') {
+                            targetModule.style.display = 'flex';
+                        } else {
+                            targetModule.style.display = 'block';
+                        }
                     } else {
                         // Fallback: Try by ID if class selector fails
                         const targetById = document.getElementById(moduleId);
-                        if (targetById) targetById.style.display = 'block';
+                        if (targetById) {
+                            if (moduleId === 'love') {
+                                targetById.style.display = 'flex';
+                            } else {
+                                targetById.style.display = 'block';
+                            }
+                        }
                     }
 
                     // Update Icons (Color vs White)
