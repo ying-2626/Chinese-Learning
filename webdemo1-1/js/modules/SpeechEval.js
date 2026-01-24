@@ -30,21 +30,9 @@ class SpeechEvalModule {
 
         this.recorder.onFrameRecorded = ({ isLastFrame, frameBuffer }) => {
             if (this.iseWS && this.iseWS.readyState === this.iseWS.OPEN) {
-                this.iseWS.send(
-                    JSON.stringify({
-                        business: {
-                            aue: "raw",
-                            cmd: "auw",
-                            aus: isLastFrame ? 4 : 2,
-                        },
-                        data: {
-                            status: isLastFrame ? 2 : 1,
-                            data: this.toBase64(frameBuffer),
-                            data_type: 1
-                        },
-                    })
-                );
+                this.iseWS.send(frameBuffer);
                 if (isLastFrame) {
+                    this.iseWS.send(JSON.stringify({ type: "end" }));
                     this.changeBtnStatus("CLOSING");
                 }
             }
@@ -65,30 +53,43 @@ class SpeechEvalModule {
     }
 
     getWebSocketUrl() {
-        var url = "wss://ise-api.xfyun.cn/v2/open-ise";
-        var host = "ise-api.xfyun.cn";
-        var apiKey = CONFIG.XUNFEI.API_KEY;
-        var apiSecret = CONFIG.XUNFEI.API_SECRET;
-        var date = new Date().toGMTString();
-        var algorithm = "hmac-sha256";
-        var headers = "host date request-line";
-        var signatureOrigin = `host: ${host}\ndate: ${date}\nGET /v2/open-ise HTTP/1.1`;
-        var signatureSha = CryptoJS.HmacSHA256(signatureOrigin, apiSecret);
-        var signature = CryptoJS.enc.Base64.stringify(signatureSha);
-        var authorizationOrigin = `api_key="${apiKey}", algorithm="${algorithm}", headers="${headers}", signature="${signature}"`;
-        var authorization = btoa(authorizationOrigin);
-        url = `${url}?authorization=${authorization}&date=${date}&host=${host}`;
-        return url;
-    }
+        const APPID = CONFIG.TENCENT.APPID;
+        const SECRET_ID = CONFIG.TENCENT.SECRET_ID;
+        const SECRET_KEY = CONFIG.TENCENT.SECRET_KEY;
 
-    toBase64(buffer) {
-        var binary = "";
-        var bytes = new Uint8Array(buffer);
-        var len = bytes.byteLength;
-        for (var i = 0; i < len; i++) {
-            binary += String.fromCharCode(bytes[i]);
+        const SERVER_ENGINE_TYPE = "16k_zh"; // 中文标准版
+        const VOICE_ID = crypto.randomUUID(); // 生成唯一音频流标识
+        //添加声调评测标识
+        const REF_TEXT = "{::cmd{F_TDET=true}}" + (document.getElementById("evalText")?.innerText || "你好");
+        const TIMESTAMP = Math.floor(Date.now() / 1000);
+        const NONCE = Math.floor(Math.random() * 1000000000);
+        const EXPIRED = TIMESTAMP + 86400; // 1 天有效期
+
+        let selectedMode = "读单词";
+        const checkedRadio = document.querySelector('input[type="radio"][name="group"]:checked');
+        if (checkedRadio && checkedRadio.nextSibling) {
+            selectedMode = checkedRadio.nextSibling.textContent.trim();
         }
-        return window.btoa(binary);
+
+        console.log("mode is: ", selectedMode);
+        let EVAL_MODE = 0
+        if (selectedMode === "读句子") {
+            EVAL_MODE = 1
+        } else if (selectedMode === "读单词") {
+            EVAL_MODE = 0
+        } else if (selectedMode === "读段落") {
+            EVAL_MODE = 2
+        }
+
+        const SCORE_COEFF = 1.0; // 评分严格度
+
+        const params = `eval_mode=${EVAL_MODE}&expired=${EXPIRED}&nonce=${NONCE}&ref_text=${REF_TEXT}&score_coeff=${SCORE_COEFF}&secretid=${SECRET_ID}&server_engine_type=${SERVER_ENGINE_TYPE}&text_mode=0&timestamp=${TIMESTAMP}&voice_format=1&voice_id=${VOICE_ID}`;
+
+        const SIGNATURE_STRING = `soe.cloud.tencent.com/soe/api/${APPID}?${params}`;
+        const SIGNATURE = CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA1(SIGNATURE_STRING, SECRET_KEY));
+        const ENCODED_SIGNATURE = encodeURIComponent(SIGNATURE);
+
+        return `wss://soe.cloud.tencent.com/soe/api/${APPID}?${params}&signature=${ENCODED_SIGNATURE}`;
     }
 
     changeBtnStatus(status) {
@@ -104,92 +105,197 @@ class SpeechEvalModule {
         }
     }
 
+    getAnalysis(req_content) {
+        const Authorization = CONFIG.FASTGPT.API_KEY;
+        const prompt = `你是一位中文口语老师，以下是口语测评数据，请分析并给出评价。数据包括一句里每个字的音素和音素得分：({
+              Word: item.Word,
+              // 遍历 PhoneInfos 并提取 Phone 和 PronAccuracy
+              PhoneInfos: item.PhoneInfos.map(phoneItem => ({
+                Phone: phoneItem.Phone,
+                PronAccuracy: phoneItem.PronAccuracy
+              })
+              // 遍历Tone,若Valid=false,则无效；若Valid=Ture,提取RefTone和HypothesisTone进行比对。如果比对结果是不相等，则说明该字的韵母声调错误，一定要明确指出该字的声调错误。
+              然后对这位汉语学习者给出练习建议。
+              注意：
+              1. 分析和建议各控制在300字以内
+              2. 输出应该模仿老师的语言风格，避免出现markdown等特殊格式的字符，并以“你”来称呼对方
+              3. 如果没有音素得分有可能是因为漏读了
+              4. 避免列举具体数字
+              5. 开头直接分析就行，不需要引入语
+              6. 需要从音素的声母、韵母，整体的准确度、流利度等多个维度进行分析
+              7. 如果单字的Tone:Valid=true说明启用了声调评测，启用时你才需要额外分析声调是否正确，HypothesisTone为-1代表该字的声调读错了
+        `
+
+        axios({
+            url: 'https://api.fastgpt.in/api/v1/chat/completions',
+            method: 'post',
+            data: JSON.stringify({
+                "chatId": "111",
+                "stream": false,
+                "detail": false,
+                "messages": [
+                    {
+                        "content": req_content + prompt,
+                        "role": "user"
+                    }
+                ]
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': Authorization
+            }
+        }).then(function (response) {
+            let content = response.data.choices[0].message.content;
+            let suggestionBox = document.querySelector(".suggestion-box");
+
+            if (suggestionBox) {
+                suggestionBox.value = content;
+            } else {
+                console.error("未找到 .suggestion-box 元素");
+            }
+        });
+    }
+
     renderResult(resultData) {
         // 识别结束
         let jsonData = JSON.parse(resultData);
-        console.log(jsonData.data);
+        if (jsonData.result != null) {
 
-        if (jsonData.data && jsonData.data.data) {
-            let data = window.atob(jsonData.data.data);
-            let grade = parser.parse(data, {
-                attributeNamePrefix: "",
-                ignoreAttributes: false,
-            });
-            console.log(grade);
+            document.getElementById("accuracy_score").innerText =
+                jsonData.result.PronAccuracy;
+            document.getElementById("fluency_score").innerText =
+                jsonData.result.PronFluency * 100;
+            document.getElementById("integrity_score").innerText =
+                jsonData.result.PronCompletion * 100;
+            document.getElementById("total_score").innerText =
+                jsonData.result.SuggestedScore;
 
-            const readSentence = grade?.xml_result?.read_sentence?.rec_paper?.read_chapter;
+            // 计算声母分、韵母分和声调分
+            let initialScore = 0; // 声母分
+            let finalScore = 0;   // 韵母分
+            let toneScore = 0;    // 声调分
+            let wordCount = jsonData.result.Words.length;
 
-            const setText = (id, text) => {
-                const el = document.getElementById(id);
-                if (el) el.innerText = text;
-            };
+            // 计算声母分和韵母分
+            let initialTotal = 0;
+            let finalTotal = 0;
+            let toneCorrect = 0;
 
-            setText("accuracy_score", readSentence?.accuracy_score);
-            setText("fluency_score", readSentence?.fluency_score);
-            setText("integrity_score", readSentence?.integrity_score);
-            setText("phone_score", readSentence?.phone_score || 0);
-            setText("tone_score", readSentence?.tone_score || 0);
-            setText("emotion_score", readSentence?.emotion_score || 0);
-            setText("total_score", readSentence?.total_score);
+            for (let i = 0; i < wordCount; i++) {
+                let word = jsonData.result.Words[i];
 
-            if (readSentence?.syll) setText("syll", readSentence.syll);
+                // 累加声母分（每个词的第一个音素）
+                if (word.PhoneInfos.length > 0) {
+                    initialTotal += word.PhoneInfos[0].PronAccuracy;
+                }
 
-            // Detailed result rendering
-            let sentence = readSentence?.word || [];
-            let resultStr = "";
-            sentence.forEach((item) => {
-                if (item?.word) {
-                    item.word.forEach((wt) => {
-                        let flag = false;
-                        if (wt.syll?.phone) {
-                            flag = wt.syll.phone.some((pt) => pt?.perr_msg != 0);
-                        } else {
-                            wt.syll.forEach((st) => {
-                                if (Array.isArray(st?.phone)) {
-                                    flag = st.phone.some((pt) => pt?.perr_msg != 0);
-                                }
-                            });
-                        }
-                        if (flag) {
-                            resultStr += `<span class="err">${wt.content}</span>`;
-                        } else {
-                            resultStr += wt.content;
-                        }
-                    });
-                } else if (item?.syll) {
-                    let flag = false;
-                    if (item.syll?.phone) {
-                        flag = item.syll.phone.some((pt) => pt?.perr_msg != 0);
-                    } else {
-                        item.syll.forEach((st) => {
-                            if (Array.isArray(st?.phone)) {
-                                flag = st.phone.some((pt) => pt?.perr_msg != 0);
-                            }
-                        });
-                    }
-                    if (flag) {
-                        resultStr += `<span class="err">${item.content}</span>`;
-                    } else {
-                        resultStr += item.content;
+                // 累加韵母分（每个词的第二个音素）
+                if (word.PhoneInfos.length > 1) {
+                    finalTotal += word.PhoneInfos[1].PronAccuracy;
+                }
+
+                // 计算声调分
+                if (word.Tone && word.Tone.Valid) {
+                    if (word.Tone.HypothesisTone !== -1) {
+                        toneCorrect++;
                     }
                 }
-            });
-            if (resultStr) {
-                const rightDiv = document.getElementById("right");
-                const resultDiv = document.getElementById("result");
-                if (rightDiv) rightDiv.style.display = "block";
-                if (resultDiv) resultDiv.innerHTML = resultStr;
-            } else {
-                const rightDiv = document.getElementById("right");
-                if (rightDiv) rightDiv.style.display = "none";
             }
-        }
-        if (jsonData.code === 0 && jsonData.data.status === 2) {
-            this.iseWS.close();
-        }
-        if (jsonData.code !== 0) {
-            this.iseWS.close();
-            console.error(jsonData);
+
+            // 计算平均分
+            if (wordCount > 0) {
+                initialScore = initialTotal / wordCount;
+                finalScore = finalTotal / wordCount;
+                toneScore = (toneCorrect / wordCount) * 100;
+            }
+
+            // 显示分数
+            document.getElementById("initial_score").innerText = initialScore.toFixed(2);
+            document.getElementById("final_score").innerText = finalScore.toFixed(2);
+            document.getElementById("tone_score").innerText = toneScore.toFixed(2);
+
+            //单字PronAccuracy低于60标红，60-80标黄
+            const evalText = document.getElementById("evalText");
+            let coloredText = "";
+            for (let i = 0; i < jsonData.result.Words.length; i++) {
+                let word = jsonData.result.Words[i].Word
+                let word_accuracy = jsonData.result.Words[i].PronAccuracy
+                let randomColor = `rgb(0, 0, 0)`;
+                if (word != "*") {
+                    if (word_accuracy < 60) {
+                        randomColor = `rgb(255, 0, 0)`;
+                    } else if (word_accuracy >= 60 && word_accuracy < 80) {
+                        randomColor = `rgb(255, 165, 0)`;
+                    }
+                    coloredText += `<span style="color: ${randomColor}">${word}</span>`;
+                }
+            }
+
+            // 遍历words并提取每个字的信息
+            const analysisData = jsonData.result.Words.map(item => ({
+                Word: item.Word,
+                // 遍历 PhoneInfos 并提取 Phone 和 PronAccuracy
+                PhoneInfos: item.PhoneInfos.map(phoneItem => ({
+                    Phone: phoneItem.Phone,
+                    PronAccuracy: phoneItem.PronAccuracy
+                }))
+            }));
+            const jsonString = JSON.stringify(analysisData, null, 2);
+            this.getAnalysis(jsonString);
+
+            evalText.innerHTML = coloredText;
+
+            // 移除之前的事件监听器（如果存在）
+            if (evalText._compositionListener) {
+                evalText.removeEventListener("compositionend", evalText._compositionListener);
+            }
+            if (evalText._inputListener) {
+                evalText.removeEventListener("input", evalText._inputListener);
+            }
+
+            // 定义组合输入结束后的处理函数
+            const compositionEndHandler = function (event) {
+                let plainText = evalText.textContent;
+                evalText.textContent = plainText;
+                setCursorToEnd(evalText);
+            };
+
+            // 定义普通输入处理函数（英文/数字等）
+            const inputHandler = function (event) {
+                if (evalText._isComposing) return;
+                let plainText = evalText.textContent;
+                evalText.textContent = plainText;
+                setCursorToEnd(evalText);
+            };
+
+            // 组合输入开始标志
+            evalText.addEventListener("compositionstart", () => {
+                evalText._isComposing = true;
+            });
+
+            // 组合输入结束标志
+            evalText.addEventListener("compositionend", () => {
+                evalText._isComposing = false;
+                setTimeout(() => {
+                    compositionEndHandler();
+                }, 0);
+            });
+
+            // 保存监听器引用以便后续移除
+            evalText._compositionListener = compositionEndHandler;
+            evalText._inputListener = inputHandler;
+
+            evalText.addEventListener("input", inputHandler);
+
+            // 光标移动到文本末尾（避免光标跳动）
+            function setCursorToEnd(el) {
+                let range = document.createRange();
+                let selection = window.getSelection();
+                range.selectNodeContents(el);
+                range.collapse(false);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
         }
     }
 
@@ -197,46 +303,22 @@ class SpeechEvalModule {
         const websocketUrl = this.getWebSocketUrl();
         if ("WebSocket" in window) {
             this.iseWS = new WebSocket(websocketUrl);
-        } else if ("MozWebSocket" in window) {
-            this.iseWS = new MozWebSocket(websocketUrl);
         } else {
             alert("浏览器不支持WebSocket");
             return;
         }
         this.changeBtnStatus("CONNECTING");
-
-        this.iseWS.onopen = (e) => {
-            // 开始录音
-            this.recorder.start({
-                sampleRate: 16000,
-                frameSize: 1280,
-            });
-            var params = {
-                common: {
-                    app_id: CONFIG.XUNFEI.APPID,
-                },
-                business: {
-                    category: "read_sentence",
-                    rstcd: "utf8",
-                    group: "pupil",
-                    sub: "ise",
-                    tte: "utf-8",
-                    cmd: "ssb",
-                    auf: "audio/L16;rate=16000",
-                    ent: "en_vip",
-                    aus: 1,
-                    aue: "raw",
-                    text: "\uFEFF" + (document.getElementById("evalText")?.innerText || "where are you"), // Changed to evalText innerText
-                },
-                data: {
-                    status: 0,
-                },
-            };
-            this.iseWS.send(JSON.stringify(params));
+        this.iseWS.onopen = () => {
+            this.recorder.start({ sampleRate: 16000, frameSize: 1280 });
         };
 
         this.iseWS.onmessage = (e) => {
+            console.log("收到消息:", JSON.parse(e.data));
             this.renderResult(e.data);
+
+            if (JSON.parse(e.data).final === 1) {
+                this.iseWS.close();
+            }
         };
 
         this.iseWS.onerror = (e) => {
@@ -244,8 +326,7 @@ class SpeechEvalModule {
             this.recorder.stop();
             this.changeBtnStatus("CLOSED");
         };
-
-        this.iseWS.onclose = (e) => {
+        this.iseWS.onclose = () => {
             this.recorder.stop();
             this.changeBtnStatus("CLOSED");
         };
