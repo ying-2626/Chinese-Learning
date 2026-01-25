@@ -8,20 +8,19 @@ import org.springframework.web.filter.CorsFilter;
 
 import java.util.Collections;
 
-
 @Configuration
 public class CorsConfig {
 
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        //1.允许任何来源
-        corsConfiguration.setAllowedOrigins(Collections.singletonList("*"));
-        //2.允许任何请求头
+        // 1.允许任何来源
+        corsConfiguration.addAllowedOriginPattern("*");
+        // 2.允许任何请求头
         corsConfiguration.addAllowedHeader(CorsConfiguration.ALL);
-        //3.允许任何方法
+        // 3.允许任何方法
         corsConfiguration.addAllowedMethod(CorsConfiguration.ALL);
-        //4.允许凭证
+        // 4.允许凭证
         corsConfiguration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
