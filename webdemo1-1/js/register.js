@@ -26,6 +26,11 @@ GetCode.addEventListener('click', function (e) {
         return;
     }
     //GetCode时发送请求
+    GetCode.disabled = true;
+    GetCode.textContent = "发送中...";
+    GetCode.style.backgroundColor = '#ccc';
+    GetCode.style.cursor = 'not-allowed';
+
     axios({
         url: CONFIG.BACKEND_API + '/user/sendCode',
         method: 'post',
@@ -37,12 +42,18 @@ GetCode.addEventListener('click', function (e) {
         console.log(response);
         if (response.data.code === 0) {
             alert('Code sent successfully to ' + email);
+            // Optional: Start a countdown here
         } else {
             alert(response.data.message);
         }
     }).catch(function (error) {
         console.error(error);
         alert("Failed to send code: " + (error.response?.data?.message || error.message));
+    }).finally(function () {
+        GetCode.disabled = false;
+        GetCode.textContent = "获取验证码"; // Or restore original text
+        GetCode.style.backgroundColor = ''; // Restore original style
+        GetCode.style.cursor = 'pointer';
     });
 
 })
@@ -66,7 +77,7 @@ function dologin() {
     let email = document.querySelector('.email').value;
     let user_name = document.querySelector('.username');
     let password = document.querySelector('.password');
-    
+
     // Verify Code first
     axios({
         url: CONFIG.BACKEND_API + '/user/verifyCode',
@@ -76,10 +87,10 @@ function dologin() {
             code: input_code
         },
         withCredentials: true
-    }).then(function(verifyResponse) {
+    }).then(function (verifyResponse) {
         if (verifyResponse.data.code === 0) {
-             // Code verified, proceed to signup
-             axios({
+            // Code verified, proceed to signup
+            axios({
                 url: CONFIG.BACKEND_API + '/user/signup',
                 method: 'post',
                 params: {
@@ -104,8 +115,8 @@ function dologin() {
         } else {
             alert("Verification failed: " + verifyResponse.data.message);
         }
-    }).catch(function(error) {
-         console.error(error);
-         alert("Verification error: " + (error.response?.data?.message || error.message));
+    }).catch(function (error) {
+        console.error(error);
+        alert("Verification error: " + (error.response?.data?.message || error.message));
     });
 }
