@@ -319,16 +319,34 @@ class SpeechEvalModule {
                 }
             }
 
-            // 遍历words并提取每个字的信息
-            const analysisData = jsonData.result.Words.map(item => ({
-                Word: item.Word,
-                // 遍历 PhoneInfos 并提取 Phone 和 PronAccuracy
-                PhoneInfos: item.PhoneInfos.map(phoneItem => ({
-                    Phone: phoneItem.Phone,
-                    PronAccuracy: phoneItem.PronAccuracy
-                }))
-            }));
-            const jsonString = JSON.stringify(analysisData, null, 2);
+            // 准备传给 AI 的分析数据
+            let analysisRequestData = {};
+
+            if (selectedMode === '读段落') {
+                // 段落模式：包含整体分数，简化 Words 数据（避免 Token 过长）
+                analysisRequestData = {
+                    TotalScore: jsonData.result.SuggestedScore,
+                    Accuracy: jsonData.result.PronAccuracy,
+                    Fluency: jsonData.result.PronFluency * 100,
+                    Integrity: jsonData.result.PronCompletion * 100,
+                    Words: jsonData.result.Words.map(item => ({
+                        Word: item.Word,
+                        PronAccuracy: item.PronAccuracy
+                    }))
+                };
+            } else {
+                // 句子/汉字模式：包含详细的音素信息
+                analysisRequestData = jsonData.result.Words.map(item => ({
+                    Word: item.Word,
+                    PhoneInfos: item.PhoneInfos ? item.PhoneInfos.map(phoneItem => ({
+                        Phone: phoneItem.Phone,
+                        PronAccuracy: phoneItem.PronAccuracy
+                    })) : [],
+                    Tone: item.Tone // 包含声调信息以便 Prompt 使用
+                }));
+            }
+
+            const jsonString = JSON.stringify(analysisRequestData, null, 2);
 
             if (isFinal) {
                 // 1. Get Analysis
