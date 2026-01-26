@@ -118,13 +118,8 @@ class SpeechEvalModule {
         const selectedMode = selectedModeElement ? selectedModeElement.value : '读句子'; // Default to Sentence if not found
 
         let prompt;
-        // Import PROMPTS if module system allows, or define here if not using modules fully yet.
-        // Assuming global access or defined in config.js/prompts.js loaded before this.
-        // Since we created prompts.js, we need to ensure it's loaded. 
-        // For now, I will inline the logic to match the existing style, 
-        // but referencing the "PROMPTS" object if I can ensure it's available.
-        // Given the environment, I'll use a safer approach: check if PROMPTS exists, else fallback.
 
+        // Use global PROMPTS object
         if (typeof PROMPTS !== 'undefined') {
             if (selectedMode === '读段落') {
                 prompt = PROMPTS.PARAGRAPH;
@@ -240,59 +235,70 @@ class SpeechEvalModule {
         // 识别结束
         let jsonData = JSON.parse(resultData);
         if (jsonData.result != null) {
+            let initialScore = 0;
+            let finalScore = 0;
+            let toneScore = 0;
 
-            document.getElementById("accuracy_score").innerText =
-                jsonData.result.PronAccuracy;
-            document.getElementById("fluency_score").innerText =
-                jsonData.result.PronFluency * 100;
-            document.getElementById("integrity_score").innerText =
-                jsonData.result.PronCompletion * 100;
-            document.getElementById("total_score").innerText =
-                jsonData.result.SuggestedScore;
+            // 显示整体分数
+            document.getElementById("accuracy_score").innerText = jsonData.result.PronAccuracy.toFixed(2);
+            document.getElementById("fluency_score").innerText = (jsonData.result.PronFluency * 100).toFixed(2);
+            document.getElementById("integrity_score").innerText = (jsonData.result.PronCompletion * 100).toFixed(2);
+            document.getElementById("total_score").innerText = jsonData.result.SuggestedScore.toFixed(2);
 
-            // 计算声母分、韵母分和声调分
-            let initialScore = 0; // 声母分
-            let finalScore = 0;   // 韵母分
-            let toneScore = 0;    // 声调分
-            let wordCount = jsonData.result.Words.length;
+            // Determine mode
+            const selectedModeElement = document.querySelector('input[name="group"]:checked');
+            const selectedMode = selectedModeElement ? selectedModeElement.value : '读句子';
 
-            // 计算声母分和韵母分
-            let initialTotal = 0;
-            let finalTotal = 0;
-            let toneCorrect = 0;
+            if (selectedMode !== '读段落') {
+                // Show wrappers if hidden
+                document.getElementById("initial_score_wrapper").style.display = "block";
+                document.getElementById("final_score_wrapper").style.display = "block";
+                document.getElementById("tone_score_wrapper").style.display = "block";
 
-            for (let i = 0; i < wordCount; i++) {
-                let word = jsonData.result.Words[i];
+                // 计算声母分、韵母分和声调分
+                let wordCount = jsonData.result.Words.length;
+                let initialTotal = 0;
+                let finalTotal = 0;
+                let toneCorrect = 0;
 
-                // 累加声母分（每个词的第一个音素）
-                if (word.PhoneInfos.length > 0) {
-                    initialTotal += word.PhoneInfos[0].PronAccuracy;
-                }
+                for (let i = 0; i < wordCount; i++) {
+                    let word = jsonData.result.Words[i];
 
-                // 累加韵母分（每个词的第二个音素）
-                if (word.PhoneInfos.length > 1) {
-                    finalTotal += word.PhoneInfos[1].PronAccuracy;
-                }
+                    // 累加声母分（每个词的第一个音素）
+                    if (word.PhoneInfos && word.PhoneInfos.length > 0) {
+                        initialTotal += word.PhoneInfos[0].PronAccuracy;
+                    }
 
-                // 计算声调分
-                if (word.Tone && word.Tone.Valid) {
-                    if (word.Tone.HypothesisTone !== -1) {
-                        toneCorrect++;
+                    // 累加韵母分（每个词的第二个音素）
+                    if (word.PhoneInfos && word.PhoneInfos.length > 1) {
+                        finalTotal += word.PhoneInfos[1].PronAccuracy;
+                    }
+
+                    // 计算声调分
+                    if (word.Tone && word.Tone.Valid) {
+                        if (word.Tone.HypothesisTone !== -1) {
+                            toneCorrect++;
+                        }
                     }
                 }
-            }
 
-            // 计算平均分
-            if (wordCount > 0) {
-                initialScore = initialTotal / wordCount;
-                finalScore = finalTotal / wordCount;
-                toneScore = (toneCorrect / wordCount) * 100;
-            }
+                // 计算平均分
+                if (wordCount > 0) {
+                    initialScore = initialTotal / wordCount;
+                    finalScore = finalTotal / wordCount;
+                    toneScore = (toneCorrect / wordCount) * 100;
+                }
 
-            // 显示分数
-            document.getElementById("initial_score").innerText = initialScore.toFixed(2);
-            document.getElementById("final_score").innerText = finalScore.toFixed(2);
-            document.getElementById("tone_score").innerText = toneScore.toFixed(2);
+                // 显示分数
+                document.getElementById("initial_score").innerText = initialScore.toFixed(2);
+                document.getElementById("final_score").innerText = finalScore.toFixed(2);
+                document.getElementById("tone_score").innerText = toneScore.toFixed(2);
+            } else {
+                // 段落模式下隐藏声韵调分数 UI
+                document.getElementById("initial_score_wrapper").style.display = "none";
+                document.getElementById("final_score_wrapper").style.display = "none";
+                document.getElementById("tone_score_wrapper").style.display = "none";
+            }
 
             //单字PronAccuracy低于60标红，60-80标黄
             const evalText = document.getElementById("evalText");

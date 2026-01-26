@@ -45,7 +45,8 @@ function uploadData() {
   }
   const sessionId = generateSessionId(); // 生成唯一 SessionId
   // 获取当前选中的模式
-  const selectedMode = document.querySelector('input[name="group"]:checked').value;
+  const selectedModeElement = document.querySelector('input[name="group"]:checked');
+  const selectedMode = selectedModeElement ? selectedModeElement.value : '读汉字'; // 默认为读汉字
   // 获取用户输入的文本
   const text = document.getElementById("evalText").value.trim();
 
