@@ -102,9 +102,29 @@ function dologin() {
             }).then(function (response) {
                 console.log(response);
                 if (response.data.code === 0) {
-                    alert("Registration successful!");
-                    window.location.href = 'index.html';
-                    localStorage.setItem("user_info", JSON.stringify(response.data.result));
+                    alert("注册成功！正在自动登录...");
+                    // Auto Login
+                    axios({
+                        url: CONFIG.BACKEND_API + '/user/login',
+                        method: 'post',
+                        params: {
+                            "username": user_name.value,
+                            "password": password.value
+                        },
+                        withCredentials: true
+                    }).then(function (loginResponse) {
+                        if (loginResponse.data.code === 0) {
+                            localStorage.setItem("user_info", JSON.stringify(loginResponse.data.result));
+                            window.location.href = 'index.html';
+                        } else {
+                            alert("自动登录失败，请手动登录: " + loginResponse.data.message);
+                            window.location.href = 'login.html';
+                        }
+                    }).catch(function (loginError) {
+                        console.error(loginError);
+                        alert("自动登录出错: " + (loginError.response?.data?.message || loginError.message));
+                        window.location.href = 'login.html';
+                    });
                 } else {
                     alert(response.data.message);
                 }

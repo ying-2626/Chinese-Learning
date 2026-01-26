@@ -5,6 +5,7 @@ class SpeechEvalModule {
         this.btnControl = document.getElementById("btn_control");
         this.iseWS = null;
         this.recorder = null;
+        this.audioChunks = []; // Initialize audioChunks
 
         this.init();
     }
@@ -25,10 +26,14 @@ class SpeechEvalModule {
     bindEvents() {
         this.recorder.onStart = () => {
             console.log("onStart");
+            this.audioChunks = [];
             this.changeBtnStatus("OPEN");
         }
 
         this.recorder.onFrameRecorded = ({ isLastFrame, frameBuffer }) => {
+            if (frameBuffer) {
+                this.audioChunks.push(frameBuffer);
+            }
             if (this.iseWS && this.iseWS.readyState === this.iseWS.OPEN) {
                 this.iseWS.send(frameBuffer);
                 if (isLastFrame) {
@@ -268,6 +273,8 @@ class SpeechEvalModule {
                         randomColor = `rgb(255, 0, 0)`;
                     } else if (word_accuracy >= 60 && word_accuracy < 80) {
                         randomColor = `rgb(255, 165, 0)`;
+                    } else {
+                        randomColor = `rgb(34, 139, 34)`; // Green for >= 80
                     }
                     coloredText += `<span style="color: ${randomColor}">${word}</span>`;
                 }
