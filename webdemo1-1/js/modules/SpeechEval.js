@@ -112,24 +112,57 @@ class SpeechEvalModule {
 
     getAnalysis(req_content) {
         const Authorization = CONFIG.FASTGPT.API_KEY;
-        const prompt = `你是一位中文口语老师，以下是口语测评数据，请分析并给出评价。数据包括一句里每个字的音素和音素得分：({
-              Word: item.Word,
-              // 遍历 PhoneInfos 并提取 Phone 和 PronAccuracy
-              PhoneInfos: item.PhoneInfos.map(phoneItem => ({
-                Phone: phoneItem.Phone,
-                PronAccuracy: phoneItem.PronAccuracy
-              })
-              // 遍历Tone,若Valid=false,则无效；若Valid=Ture,提取RefTone和HypothesisTone进行比对。如果比对结果是不相等，则说明该字的韵母声调错误，一定要明确指出该字的声调错误。
-              然后对这位汉语学习者给出练习建议。
-              注意：
-              1. 分析和建议各控制在300字以内
-              2. 输出应该模仿老师的语言风格，避免出现markdown等特殊格式的字符，并以“你”来称呼对方
-              3. 如果没有音素得分有可能是因为漏读了
-              4. 避免列举具体数字
-              5. 开头直接分析就行，不需要引入语
-              6. 需要从音素的声母、韵母，整体的准确度、流利度等多个维度进行分析
-              7. 如果单字的Tone:Valid=true说明启用了声调评测，启用时你才需要额外分析声调是否正确，HypothesisTone为-1代表该字的声调读错了
-        `
+
+        // Determine mode from UI (radio buttons)
+        const selectedModeElement = document.querySelector('input[name="group"]:checked');
+        const selectedMode = selectedModeElement ? selectedModeElement.value : '读句子'; // Default to Sentence if not found
+
+        let prompt;
+        // Import PROMPTS if module system allows, or define here if not using modules fully yet.
+        // Assuming global access or defined in config.js/prompts.js loaded before this.
+        // Since we created prompts.js, we need to ensure it's loaded. 
+        // For now, I will inline the logic to match the existing style, 
+        // but referencing the "PROMPTS" object if I can ensure it's available.
+        // Given the environment, I'll use a safer approach: check if PROMPTS exists, else fallback.
+
+        if (typeof PROMPTS !== 'undefined') {
+            if (selectedMode === '读段落') {
+                prompt = PROMPTS.PARAGRAPH;
+            } else {
+                prompt = PROMPTS.DEFAULT;
+            }
+        } else {
+            // Fallback if PROMPTS not loaded
+            if (selectedMode === '读段落') {
+                prompt = `你是一位中文口语老师，以下是口语测评数据，请分析并给出评价。数据包括整体的准确度、流利度、完整度以及总分。
+                  然后对这位汉语学习者给出练习建议。
+                  注意：
+                  1. 分析和建议各控制在300字以内
+                  2. 输出应该模仿老师的语言风格，避免出现markdown等特殊格式的字符，并以“你”来称呼对方
+                  3. 重点分析整体的朗读效果，如停顿、语速、情感表达等
+                  4. 避免列举具体数字
+                  5. 开头直接分析就行，不需要引入语
+                  6. 由于是段落朗读，请更多关注语流音变和整体语感`;
+            } else {
+                prompt = `你是一位中文口语老师，以下是口语测评数据，请分析并给出评价。数据包括一句里每个字的音素和音素得分：({
+                      Word: item.Word,
+                      // 遍历 PhoneInfos 并提取 Phone 和 PronAccuracy
+                      PhoneInfos: item.PhoneInfos.map(phoneItem => ({
+                        Phone: phoneItem.Phone,
+                        PronAccuracy: phoneItem.PronAccuracy
+                      })
+                      // 遍历Tone,若Valid=false,则无效；若Valid=Ture,提取RefTone和HypothesisTone进行比对。如果比对结果是不相等，则说明该字的韵母声调错误，一定要明确指出该字的声调错误。
+                      然后对这位汉语学习者给出练习建议。
+                      注意：
+                      1. 分析和建议各控制在300字以内
+                      2. 输出应该模仿老师的语言风格，避免出现markdown等特殊格式的字符，并以“你”来称呼对方
+                      3. 如果没有音素得分有可能是因为漏读了
+                      4. 避免列举具体数字
+                      5. 开头直接分析就行，不需要引入语
+                      6. 需要从音素的声母、韵母，整体的准确度、流利度等多个维度进行分析
+                      7. 如果单字的Tone:Valid=true说明启用了声调评测，启用时你才需要额外分析声调是否正确，HypothesisTone为-1代表该字的声调读错了`;
+            }
+        }
 
         return axios({
             url: 'https://api.fastgpt.in/api/v1/chat/completions',
