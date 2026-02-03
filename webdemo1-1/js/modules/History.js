@@ -104,10 +104,10 @@ class HistoryModule {
                     </div>
 
                     <div class="sub-scores">
-                        <span>声母: <strong>${action.initialSoundScore.toFixed(1)}</strong></span>
-                        <span>韵母: <strong>${action.finalSoundScore.toFixed(1)}</strong></span>
-                        <span>声调: <strong>${action.toneScore.toFixed(1)}</strong></span>
-                    </div>
+                    <span>声母: <strong>${(action.initialSoundScore || 0).toFixed(1)}</strong></span>
+                    <span>韵母: <strong>${(action.finalSoundScore || 0).toFixed(1)}</strong></span>
+                    <span>声调: <strong>${(action.toneScore || 0).toFixed(1)}</strong></span>
+                </div>
 
                     <div class="advice-section">
                         <div class="advice-title">💡 改进建议</div>

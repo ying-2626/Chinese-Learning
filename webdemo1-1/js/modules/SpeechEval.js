@@ -70,20 +70,21 @@ class SpeechEvalModule {
         const NONCE = Math.floor(Math.random() * 1000000000);
         const EXPIRED = TIMESTAMP + 86400; // 1 天有效期
 
-        let selectedMode = "读单词";
+        let selectedMode = "读汉字";
         const checkedRadio = document.querySelector('input[type="radio"][name="group"]:checked');
-        if (checkedRadio && checkedRadio.nextSibling) {
-            selectedMode = checkedRadio.nextSibling.textContent.trim();
+        if (checkedRadio) {
+            selectedMode = checkedRadio.value || checkedRadio.nextSibling.textContent.trim();
         }
 
         console.log("mode is: ", selectedMode);
         let EVAL_MODE = 0
         if (selectedMode === "读句子") {
             EVAL_MODE = 1
-        } else if (selectedMode === "读单词") {
-            EVAL_MODE = 0
         } else if (selectedMode === "读段落") {
             EVAL_MODE = 2
+        } else {
+            // 默认为读汉字/读单词
+            EVAL_MODE = 0
         }
 
         const SCORE_COEFF = 1.0; // 评分严格度
@@ -247,14 +248,11 @@ class SpeechEvalModule {
 
             // Determine mode
             const selectedModeElement = document.querySelector('input[name="group"]:checked');
-            const selectedMode = selectedModeElement ? selectedModeElement.value : '读句子';
+            const selectedMode = selectedModeElement ? (selectedModeElement.value || selectedModeElement.nextSibling.textContent.trim()) : '读句子';
+
+            console.log(`[SpeechEval] Render Mode: ${selectedMode}, IsFinal: ${isFinal}`);
 
             if (selectedMode !== '读段落') {
-                // Show wrappers if hidden
-                document.getElementById("initial_score_wrapper").style.display = "block";
-                document.getElementById("final_score_wrapper").style.display = "block";
-                document.getElementById("tone_score_wrapper").style.display = "block";
-
                 // 计算声母分、韵母分和声调分
                 let wordCount = jsonData.result.Words.length;
                 let initialTotal = 0;
@@ -276,6 +274,7 @@ class SpeechEvalModule {
 
                     // 计算声调分
                     if (word.Tone && word.Tone.Valid) {
+                        // -1 表示未检测到有效声调或发音错误
                         if (word.Tone.HypothesisTone !== -1) {
                             toneCorrect++;
                         }
@@ -285,14 +284,22 @@ class SpeechEvalModule {
                 // 计算平均分
                 if (wordCount > 0) {
                     initialScore = initialTotal / wordCount;
+                    // 如果大部分字都有声韵母，这样计算没问题；如果有很多零声母字，分母应该调整吗？
+                    // 暂时保持原逻辑，但添加日志
                     finalScore = finalTotal / wordCount;
                     toneScore = (toneCorrect / wordCount) * 100;
                 }
+
+                console.log(`[SpeechEval] Calculated Scores -> Initial: ${initialScore}, Final: ${finalScore}, Tone: ${toneScore}, WordCount: ${wordCount}`);
 
                 // 显示分数
                 document.getElementById("initial_score").innerText = initialScore.toFixed(2);
                 document.getElementById("final_score").innerText = finalScore.toFixed(2);
                 document.getElementById("tone_score").innerText = toneScore.toFixed(2);
+
+                document.getElementById("initial_score_wrapper").style.display = "block";
+                document.getElementById("final_score_wrapper").style.display = "block";
+                document.getElementById("tone_score_wrapper").style.display = "block";
             } else {
                 // 段落模式下隐藏声韵调分数 UI
                 document.getElementById("initial_score_wrapper").style.display = "none";
@@ -335,15 +342,22 @@ class SpeechEvalModule {
                     }))
                 };
             } else {
-                // 句子/汉字模式：包含详细的音素信息
-                analysisRequestData = jsonData.result.Words.map(item => ({
-                    Word: item.Word,
-                    PhoneInfos: item.PhoneInfos ? item.PhoneInfos.map(phoneItem => ({
-                        Phone: phoneItem.Phone,
-                        PronAccuracy: phoneItem.PronAccuracy
-                    })) : [],
-                    Tone: item.Tone // 包含声调信息以便 Prompt 使用
-                }));
+                // 句子/汉字模式：包含整体分数和详细的音素信息
+                analysisRequestData = {
+                    TotalScore: jsonData.result.SuggestedScore,
+                    Accuracy: jsonData.result.PronAccuracy,
+                    Fluency: jsonData.result.PronFluency * 100,
+                    Integrity: jsonData.result.PronCompletion * 100,
+                    Words: jsonData.result.Words.map(item => ({
+                        Word: item.Word,
+                        PronAccuracy: item.PronAccuracy,
+                        PhoneInfos: item.PhoneInfos ? item.PhoneInfos.map(phoneItem => ({
+                            Phone: phoneItem.Phone,
+                            PronAccuracy: phoneItem.PronAccuracy
+                        })) : [],
+                        Tone: item.Tone
+                    }))
+                };
             }
 
             const jsonString = JSON.stringify(analysisRequestData, null, 2);
