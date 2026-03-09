@@ -1,8 +1,6 @@
 const CONFIG = {
-    // 自动判断环境，优先使用 localhost 以避免跨域 Cookie 问题
-    BACKEND_API: window.location.hostname === '127.0.0.1'
-        ? 'http://127.0.0.1:8088'
-        : 'http://localhost:8088',
+    // 部署到服务器后使用域名
+    BACKEND_API: 'https://shengdonghanyu.com',
     FASTGPT: {
         API_KEY: 'YOUR_FASTGPT_API_KEY'
     },
