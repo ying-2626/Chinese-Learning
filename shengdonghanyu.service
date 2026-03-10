@@ -1,0 +1,15 @@
+[Unit]
+Description=声动汉语后端服务
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu
+ExecStart=/usr/bin/java -jar /home/ubuntu/backend-0.0.1-SNAPSHOT.jar
+Restart=always
+RestartSec=10
+Environment="JAVA_OPTS=-Xmx512m -Xms256m"
+
+[Install]
+WantedBy=multi-user.target
