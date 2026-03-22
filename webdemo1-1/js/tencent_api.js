@@ -13,10 +13,7 @@
   let iseWS;
 
   function getWebSocketUrl() {
-    const APPID = "1347318735";
-    //TODO：这里填入
-    const SECRET_ID = "AKIDHPM6g3JNE1ax61jDTWO3XZO0Riz2rTr2"
-    const SECRET_KEY = "1oPs79h292hARUJwMYYjogT3a8cxGPL3"
+    const { APPID, SECRET_ID, SECRET_KEY } = CONFIG.TENCENT;
 
 
     const SERVER_ENGINE_TYPE = "16k_zh"; // 中文标准版
