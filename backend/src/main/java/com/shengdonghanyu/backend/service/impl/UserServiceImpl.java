@@ -138,7 +138,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         redisUtils.set(email, code, 900);
         try {
             //调用 messageUtil.sendMail 方法发送验证邮件，包括发件人 sender、收件人 email、标题 VERIFICATION_TITLE、邮件内容等信息
-            messageUtil.sendMail(sender, email, "生动汉语 验证码", messageUtil.signUp(email, code),null, jms);
+            messageUtil.sendMail(sender, email, "声动汉语 验证码", messageUtil.signUp(email, code),null, jms);
         } catch (Exception e) {
             e.printStackTrace();
             throw new MyException(EnumExceptionType.SEND_EMAIL_FAILED);
