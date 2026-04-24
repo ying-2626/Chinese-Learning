@@ -1,6 +1,6 @@
 class HistoryModule {
     constructor() {
-        this.container = document.getElementById("history");
+        this.container = document.querySelector("#history .history-container");
         this.init();
     }
 
@@ -13,7 +13,7 @@ class HistoryModule {
         this.container.innerHTML = '<div class="loading-spinner">加载中...</div>';
 
         if (typeof ScoreService === 'undefined') {
-            this.container.innerHTML = '<div class="error-message">服务未初始化</div>';
+            this.renderNotLoggedInState();
             return;
         }
 
@@ -27,8 +27,22 @@ class HistoryModule {
             })
             .catch(error => {
                 console.error("Failed to load history:", error);
-                this.container.innerHTML = `<div class="error-message">加载失败: ${error.message}</div>`;
+                this.renderNotLoggedInState();
             });
+    }
+
+    renderNotLoggedInState() {
+        this.container.innerHTML = `
+            <div class="not-logged-in-state">
+                <i class="ph ph-user-circle" style="font-size: 64px; color: #12b4e3; margin-bottom: 20px;"></i>
+                <h3>未登录状态</h3>
+                <p>请先登录后查看历史记录</p>
+                <button class="login-btn" onclick="window.location.href='login.html'">
+                    <i class="ph ph-sign-in"></i>
+                    前往登录
+                </button>
+            </div>
+        `;
     }
 
     renderEmptyState() {
