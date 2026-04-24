@@ -8,12 +8,13 @@ class Sidebar {
             { id: 'voice', name: '语音交互', icon: 'voice', module: 'voice' },
             { id: 'chat-bot', name: '聊天机器', icon: 'chat', module: 'chatbot2' },
             { id: 'magic-tool', name: '工具', icon: 'magictool', module: 'magic-tool2' },
+            { id: 'custom-learning', name: '个性化学习', icon: 'magictool', module: 'custom-learning' },
+            { id: 'exam-service', name: '考试冲刺', icon: 'speech_evaluation', module: 'exam-service' },
             { id: 'history', name: '历史聊天', icon: 'history', module: 'history' },
         ];
         this.bottomItems = [
             { id: 'love', name: '喜欢♥', icon: 'love', module: 'love' },
-            { id: 'home', name: '回到首页', icon: 'share', link: 'entry.html' },
-            { id: 'feedback', name: '使用反馈', icon: 'use', link: 'https://v.wjx.cn/vm/wcgDtu5.aspx#' }
+            { id: 'home', name: '回到首页', icon: 'share', link: 'entry.html' }
         ];
         this.init();
     }

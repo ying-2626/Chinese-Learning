@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="./styles/index.css">
     <link rel="icon" href="./img/side_logo.png">
 
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web@2.0.3"></script>
+
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown-light.min.css">
 
@@ -225,10 +228,270 @@
             </div>
         </div>
 
-        <!-- History 板块 (Placeholder if needed) -->
+        <!-- 个性化学习方案定制板块 - 购买后功能页面 -->
+        <div class="module custom-learning" id="custom-learning" style="display:none;">
+            <div class="learning-dashboard">
+                <div class="dashboard-header">
+                    <h2>我的个性化学习方案</h2>
+                    <div class="user-plan-info">
+                        <span class="plan-badge">进阶版</span>
+                        <span class="plan-expire">有效期至：2025-12-31</span>
+                    </div>
+                </div>
+
+                <!-- 学习档案和统计区域 -->
+                <div class="profile-stats-container">
+                    <!-- 用户信息展示 -->
+                    <div class="user-profile-section">
+                        <div class="section-header-with-action">
+                            <h3>个人档案</h3>
+                            <button class="edit-profile-btn" onclick="editProfile()">
+                                <i class="ph ph-pencil-simple"></i>
+                                修改
+                            </button>
+                        </div>
+                        <div class="profile-card">
+                            <div class="profile-avatar">
+                                <i class="ph ph-user-circle"></i>
+                            </div>
+                            <div class="profile-info">
+                                <div class="profile-row">
+                                    <span class="profile-label">母语背景</span>
+                                    <span class="profile-value">英语 (美国)</span>
+                                </div>
+                                <div class="profile-row">
+                                    <span class="profile-label">当前水平</span>
+                                    <span class="profile-value">HSK 2级</span>
+                                </div>
+                                <div class="profile-row">
+                                    <span class="profile-label">学习目标</span>
+                                    <span class="profile-value">通过HSK 3级考试</span>
+                                </div>
+                                <div class="profile-row">
+                                    <span class="profile-label">学习方向</span>
+                                    <span class="profile-value">考试冲刺</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 学习进度统计卡片 -->
+                    <div class="stats-column">
+                        <div class="stat-mini-card">
+                            <i class="ph ph-chart-pie-slice mini-icon-svg"></i>
+                            <div class="mini-info">
+                                <span class="mini-value">68%</span>
+                                <span class="mini-label">总体完成度</span>
+                            </div>
+                        </div>
+                        <div class="stat-mini-card">
+                            <i class="ph ph-check-circle mini-icon-svg"></i>
+                            <div class="mini-info">
+                                <span class="mini-value">45</span>
+                                <span class="mini-label">已完成课时</span>
+                            </div>
+                        </div>
+                        <div class="stat-mini-card">
+                            <i class="ph ph-book-open mini-icon-svg"></i>
+                            <div class="mini-info">
+                                <span class="mini-value">21</span>
+                                <span class="mini-label">剩余课时</span>
+                            </div>
+                        </div>
+                        <div class="stat-mini-card">
+                            <i class="ph ph-fire mini-icon-svg"></i>
+                            <div class="mini-info">
+                                <span class="mini-value">12天</span>
+                                <span class="mini-label">连续学习</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 功能模块小卡片 -->
+                <div class="feature-modules-section">
+                    <h3>功能模块</h3>
+                    <div class="feature-modules-grid">
+                        <div class="feature-mini-card">
+                            <i class="ph ph-clipboard-text feature-icon-svg"></i>
+                            <h4>水平评估</h4>
+                            <p>查看评估报告</p>
+                        </div>
+                        <div class="feature-mini-card">
+                            <i class="ph ph-trend-up feature-icon-svg"></i>
+                            <h4>月度跟踪</h4>
+                            <p>学习数据分析</p>
+                        </div>
+                        <div class="feature-mini-card">
+                            <i class="ph ph-chalkboard-teacher feature-icon-svg"></i>
+                            <h4>专家答疑</h4>
+                            <p>剩余2次</p>
+                        </div>
+                        <div class="feature-mini-card">
+                            <i class="ph ph-users feature-icon-svg"></i>
+                            <h4>学习社群</h4>
+                            <p>加入交流</p>
+                        </div>
+                        <div class="feature-mini-card">
+                            <i class="ph ph-books feature-icon-svg"></i>
+                            <h4>推荐资源</h4>
+                            <p>个性化推荐</p>
+                        </div>
+                        <div class="feature-mini-card">
+                            <i class="ph ph-target feature-icon-svg"></i>
+                            <h4>学习目标</h4>
+                            <p>调整规划</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 浮动购买按钮 -->
+            <div class="float-buy-btn" onclick="showPurchaseModal('custom-learning')">
+                <i class="ph ph-shopping-cart buy-icon-svg"></i>
+                <span class="buy-text">购买/升级</span>
+            </div>
+        </div>
+
+        <!-- 考试冲刺专项服务板块 - 购买后功能页面 -->
+        <div class="module exam-service" id="exam-service" style="display:none;">
+            <div class="exam-dashboard">
+                <div class="dashboard-header">
+                    <h2>考试冲刺中心</h2>
+                    <div class="exam-tabs">
+                        <button class="exam-tab active" data-exam="hskk">HSKK</button>
+                        <button class="exam-tab" data-exam="putonghua">普通话水平测试</button>
+                    </div>
+                </div>
+
+                <!-- 备考统计卡片 -->
+                <div class="stats-row">
+                    <div class="stat-mini-card">
+                        <i class="ph ph-exam mini-icon-svg"></i>
+                        <div class="mini-info">
+                            <span class="mini-value">15</span>
+                            <span class="mini-label">已完成模考</span>
+                        </div>
+                    </div>
+                    <div class="stat-mini-card">
+                        <i class="ph ph-chart-line mini-icon-svg"></i>
+                        <div class="mini-info">
+                            <span class="mini-value">82%</span>
+                            <span class="mini-label">平均得分</span>
+                        </div>
+                    </div>
+                    <div class="stat-mini-card">
+                        <i class="ph ph-clock mini-icon-svg"></i>
+                        <div class="mini-info">
+                            <span class="mini-value">3天</span>
+                            <span class="mini-label">距考试</span>
+                        </div>
+                    </div>
+                    <div class="stat-mini-card">
+                        <i class="ph ph-warning-circle mini-icon-svg"></i>
+                        <div class="mini-info">
+                            <span class="mini-value">23</span>
+                            <span class="mini-label">待复习错题</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 考试功能卡片 -->
+                <div class="exam-features-grid">
+                    <div class="exam-feature-card">
+                        <div class="exam-card-left">
+                            <i class="ph ph-file-text exam-icon-svg"></i>
+                        </div>
+                        <div class="exam-card-right">
+                            <h3>真题模考</h3>
+                            <p>历年真题，全真模拟</p>
+                            <button class="card-btn">开始模考</button>
+                        </div>
+                    </div>
+                    <div class="exam-feature-card">
+                        <div class="exam-card-left">
+                            <i class="ph ph-desktop exam-icon-svg"></i>
+                        </div>
+                        <div class="exam-card-right">
+                            <h3>机考模拟</h3>
+                            <p>还原真实考试环境</p>
+                            <button class="card-btn">进入模拟</button>
+                        </div>
+                    </div>
+                    <div class="exam-feature-card">
+                        <div class="exam-card-left">
+                            <i class="ph ph-microphone exam-icon-svg"></i>
+                        </div>
+                        <div class="exam-card-right">
+                            <h3>专项语音训练</h3>
+                            <p>针对考试题型强化</p>
+                            <button class="card-btn">开始训练</button>
+                        </div>
+                    </div>
+                    <div class="exam-feature-card">
+                        <div class="exam-card-left">
+                            <i class="ph ph-graduation-cap exam-icon-svg"></i>
+                        </div>
+                        <div class="exam-card-right">
+                            <h3>评分标准解读</h3>
+                            <p>专家解析评分规则</p>
+                            <button class="card-btn">查看解析</button>
+                        </div>
+                    </div>
+                    <div class="exam-feature-card">
+                        <div class="exam-card-left">
+                            <i class="ph ph-robot exam-icon-svg"></i>
+                        </div>
+                        <div class="exam-card-right">
+                            <h3>AI模考测评</h3>
+                            <p>智能评分与分析</p>
+                            <button class="card-btn">立即测评</button>
+                        </div>
+                    </div>
+                    <div class="exam-feature-card">
+                        <div class="exam-card-left">
+                            <i class="ph ph-list-dashes exam-icon-svg"></i>
+                        </div>
+                        <div class="exam-card-right">
+                            <h3>错题分析</h3>
+                            <p>错题本与巩固练习</p>
+                            <button class="card-btn">查看错题</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 浮动购买按钮 -->
+            <div class="float-buy-btn" onclick="showPurchaseModal('exam-service')">
+                <i class="ph ph-shopping-cart buy-icon-svg"></i>
+                <span class="buy-text">购买冲刺包</span>
+            </div>
+        </div>
+
+        <!-- 购买弹窗 -->
+        <div id="purchase-modal" class="purchase-modal" style="display:none;">
+            <div class="modal-overlay" onclick="closePurchaseModal()"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modal-title">购买服务</h3>
+                    <button class="modal-close" onclick="closePurchaseModal()">&times;</button>
+                </div>
+                <div class="modal-body" id="modal-body">
+                    <!-- 动态内容 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 右下角悬浮反馈按钮 -->
+        <a href="https://v.wjx.cn/vm/wcgDtu5.aspx#" target="_blank" class="feedback-float-btn" title="使用反馈">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 11l3 3L22 4"/>
+                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+            </svg>
+        </a>
+
+        <!-- History 板块 -->
         <div class="module history" id="history" style="display:none;">
-            <h2>历史聊天记录</h2>
-            <p>暂无记录</p>
+            <div class="history-container">
+            </div>
         </div>
 
         <!-- Love 板块 (Placeholder) -->
@@ -247,6 +510,128 @@
     <script src="js/modules/MagicTool.js"></script>
     <script src="js/modules/History.js"></script>
     <script src="js/modules/Love.js"></script>
+
+    <!-- Purchase Modal Functions -->
+    <script>
+        // 购买弹窗内容配置
+        const purchaseContent = {
+            'custom-learning': {
+                title: '购买个性化学习方案',
+                content: `
+                    <div class="modal-pricing-cards-container">
+                        <div class="modal-pricing-card" onclick="selectCard(this)">
+                            <h4>基础版</h4>
+                            <div class="price">¥99</div>
+                            <ul>
+                                <li>根据母语背景定制学习方案</li>
+                                <li>汉语水平评估与分级</li>
+                                <li>学习目标规划（考试/商务/日常交流）</li>
+                                <li>专属学习路径设计</li>
+                                <li>配套学习资源推荐</li>
+                            </ul>
+                        </div>
+                        <div class="modal-pricing-card premium" onclick="selectCard(this)">
+                            <h4>进阶版 <span style="background:#ffd700;color:#333;padding:2px 8px;border-radius:8px;font-size:12px;">推荐</span></h4>
+                            <div class="price">¥199</div>
+                            <ul>
+                                <li>包含基础版所有功能</li>
+                                <li>月度学习跟踪与进度分析</li>
+                                <li>学习方案动态调整</li>
+                                <li>专家一对一答疑（每月2次）</li>
+                                <li>专属学习社群权限</li>
+                                <li>学习报告与改进建议</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <button class="modal-buy-btn" onclick="handlePurchase()">立即购买</button>
+                `
+            },
+            'exam-service': {
+                title: '购买考试冲刺包',
+                content: `
+                    <div class="modal-pricing-cards-container">
+                        <div class="modal-pricing-card" onclick="selectCard(this)">
+                            <h4>HSKK 冲刺包</h4>
+                            <div class="price">¥39/科</div>
+                            <ul>
+                                <li>历年真题模考练习</li>
+                                <li>机考模拟环境</li>
+                                <li>HSKK专项语音训练</li>
+                                <li>评分标准深度解读</li>
+                                <li>AI模考测评与评分</li>
+                                <li>智能错题分析</li>
+                            </ul>
+                        </div>
+                        <div class="modal-pricing-card premium" onclick="selectCard(this)">
+                            <h4>普通话水平测试冲刺包</h4>
+                            <div class="price">¥39/科</div>
+                            <ul>
+                                <li>普通话真题模考</li>
+                                <li>机考模拟环境</li>
+                                <li>普通话专项语音训练</li>
+                                <li>评分标准深度解读</li>
+                                <li>AI模考测评与评分</li>
+                                <li>智能错题分析</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <button class="modal-buy-btn" onclick="handlePurchase()">立即购买</button>
+                `
+            }
+        };
+
+        // 显示购买弹窗
+        function showPurchaseModal(type) {
+            const modal = document.getElementById('purchase-modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+            
+            if (purchaseContent[type]) {
+                title.textContent = purchaseContent[type].title;
+                body.innerHTML = purchaseContent[type].content;
+                modal.style.display = 'flex';
+            }
+        }
+
+        // 关闭购买弹窗
+        function closePurchaseModal() {
+            const modal = document.getElementById('purchase-modal');
+            modal.style.display = 'none';
+        }
+
+        // 选择卡片
+        function selectCard(card) {
+            // 移除其他卡片的选中状态
+            document.querySelectorAll('.modal-pricing-card').forEach(c => {
+                c.classList.remove('selected');
+            });
+            // 添加当前卡片的选中状态
+            card.classList.add('selected');
+        }
+
+        // 处理购买
+        function handlePurchase() {
+            const selected = document.querySelector('.modal-pricing-card.selected');
+            if (!selected) {
+                alert('请先选择一个套餐');
+                return;
+            }
+            alert('正在跳转到支付页面...');
+            // 这里可以添加实际的支付逻辑
+        }
+
+        // 考试标签切换
+        document.addEventListener('DOMContentLoaded', function() {
+            const examTabs = document.querySelectorAll('.exam-tab');
+            examTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    examTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    // 这里可以添加切换考试类型的逻辑
+                });
+            });
+        });
+    </script>
 
     <!-- Main Script -->
     <script src="js/index.js"></script>

@@ -121,7 +121,7 @@ class ChatbotModule {
         }).catch(err => {
             console.error(err);
             const thinkingMsg = document.getElementById(thinkingId);
-            if(thinkingMsg) thinkingMsg.innerHTML = '<div class="p1" style="color:red">Error: Failed to get response.</div>';
+            if(thinkingMsg) thinkingMsg.innerHTML = '<div class="p1" style="color:#666">抱歉，获取回复失败，请稍后重试。</div>';
         });
     }
 }
