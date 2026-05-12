@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_图层_1" data-name="图层 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 44 44">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+      }
+
+      .cls-2 {
+        fill: #d0c5c3;
+      }
+
+      .cls-2, .cls-3, .cls-4 {
+        stroke: #12b4e3;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-3 {
+        fill: #f5dad3;
+      }
+
+      .cls-5 {
+        fill: none;
+      }
+
+      .cls-4 {
+        fill: #fff7ed;
+      }
+
+      .cls-6 {
+        mask: url(#mask-1);
+      }
+
+      .cls-7 {
+        mask: url(#mask);
+      }
+    </style>
+    <mask id="mask" x="10" y="9" width="24.1" height="24.15" maskUnits="userSpaceOnUse"/>
+    <mask id="mask-1" x="7.44" y="6.44" width="29.23" height="29.27" maskUnits="userSpaceOnUse"/>
+  </defs>
+  <rect class="cls-1" y="0" width="44" height="44" rx="6" ry="6"/>
+  <g class="cls-7">
+    <g class="cls-6">
+      <rect class="cls-5" x="7.34" y="6.3" width="29.5" height="29.5"/>
+    </g>
+  </g>
+  <rect class="cls-3" x="33.92" y="8.92" width="3.94" height="15.21" transform="translate(-3.45 20.16) rotate(-30)"/>
+  <rect class="cls-3" x="5.79" y="8.38" width="3.94" height="15.21" transform="translate(6.49 33.71) rotate(-150)"/>
+  <path class="cls-2" d="M32.27,14.2s-12.43,4.86-14,5.88-7.89,4.56-8,5.97,.11,4.06,.56,4.96,1.63,3.32,3.38,4.06,8,.17,9.92-.9,6.71-7.66,8.14-8.56,3.62-3.59,3.62-3.59l-3.62-7.8Z"/>
+  <path class="cls-4" d="M11.94,13.07c2.76,1.15,9.53,2.22,11.16,3.46s1.3,2.31,1.13,2.76-.72,.5-2.37,0c-1.91-.58-3.04-1.01-3.04-1.01l3.04,1.01-10.91,5.51-3.62-3.75,4.61-7.98Z"/>
+  <path class="cls-4" d="M20.52,35.8s2.93,.89,6.31-1.08,3.74-5.01,4.36-6.08-2.89-4.85-3.45-5.13c-1.69-.84-4.11-.95-7.21,.51s-2.7,6.2-2.7,6.2c0,0,.51,3.51,2.7,5.58Z"/>
+</svg>
