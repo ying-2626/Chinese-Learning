@@ -49,11 +49,11 @@
       }
 
       const result = await response.json();
-      if (result.code !== 200) {
+      if (result.code !== 0) {
         throw new Error(result.message || '获取连接失败');
       }
 
-      return result.data;
+      return result.result;
     } catch (error) {
       console.error("获取 WebSocket URL 失败:", error);
       alert("连接服务失败，请稍后重试");

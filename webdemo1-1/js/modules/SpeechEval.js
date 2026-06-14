@@ -57,45 +57,53 @@ class SpeechEvalModule {
         };
     }
 
-    getWebSocketUrl() {
-        const APPID = CONFIG.TENCENT.APPID;
-        const SECRET_ID = CONFIG.TENCENT.SECRET_ID;
-        const SECRET_KEY = CONFIG.TENCENT.SECRET_KEY;
-
-        const SERVER_ENGINE_TYPE = "16k_zh"; // 中文标准版
-        const VOICE_ID = crypto.randomUUID(); // 生成唯一音频流标识
-        //添加声调评测标识
-        const REF_TEXT = "{::cmd{F_TDET=true}}" + (document.getElementById("evalText")?.innerText || "你好");
-        const TIMESTAMP = Math.floor(Date.now() / 1000);
-        const NONCE = Math.floor(Math.random() * 1000000000);
-        const EXPIRED = TIMESTAMP + 86400; // 1 天有效期
-
+    async getWebSocketUrl() {
+        const selectedModeElement = document.querySelector('input[type="radio"][name="group"]:checked');
         let selectedMode = "读汉字";
-        const checkedRadio = document.querySelector('input[type="radio"][name="group"]:checked');
-        if (checkedRadio) {
-            selectedMode = checkedRadio.value || checkedRadio.nextSibling.textContent.trim();
+        if (selectedModeElement) {
+            selectedMode = selectedModeElement.value || selectedModeElement.nextSibling.textContent.trim();
         }
 
         console.log("mode is: ", selectedMode);
-        let EVAL_MODE = 0
+        let evalMode = 0;
         if (selectedMode === "读句子") {
-            EVAL_MODE = 1
+            evalMode = 1;
         } else if (selectedMode === "读段落") {
-            EVAL_MODE = 2
+            evalMode = 2;
         } else {
-            // 默认为读汉字/读单词
-            EVAL_MODE = 0
+            evalMode = 0;
         }
 
-        const SCORE_COEFF = 1.0; // 评分严格度
+        const refText = document.getElementById("evalText")?.innerText || "你好";
 
-        const params = `eval_mode=${EVAL_MODE}&expired=${EXPIRED}&nonce=${NONCE}&ref_text=${REF_TEXT}&score_coeff=${SCORE_COEFF}&secretid=${SECRET_ID}&server_engine_type=${SERVER_ENGINE_TYPE}&text_mode=0&timestamp=${TIMESTAMP}&voice_format=1&voice_id=${VOICE_ID}`;
+        try {
+            const response = await fetch(`${CONFIG.BACKEND_API}/api/tencent/soe/websocket-url`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    refText: refText,
+                    evalMode: evalMode,
+                    scoreCoeff: 1.0
+                })
+            });
 
-        const SIGNATURE_STRING = `soe.cloud.tencent.com/soe/api/${APPID}?${params}`;
-        const SIGNATURE = CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA1(SIGNATURE_STRING, SECRET_KEY));
-        const ENCODED_SIGNATURE = encodeURIComponent(SIGNATURE);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
-        return `wss://soe.cloud.tencent.com/soe/api/${APPID}?${params}&signature=${ENCODED_SIGNATURE}`;
+            const result = await response.json();
+            if (result.code !== 0) {
+                throw new Error(result.message || '获取连接失败');
+            }
+
+            return result.result;
+        } catch (error) {
+            console.error("获取 WebSocket URL 失败:", error);
+            alert("连接服务失败，请稍后重试");
+            throw error;
+        }
     }
 
     changeBtnStatus(status) {
@@ -454,39 +462,44 @@ class SpeechEvalModule {
         }
     }
 
-    connectWebSocket() {
-        const websocketUrl = this.getWebSocketUrl();
-        if ("WebSocket" in window) {
-            this.iseWS = new WebSocket(websocketUrl);
-        } else {
-            alert("浏览器不支持WebSocket");
-            return;
-        }
-        this.changeBtnStatus("CONNECTING");
-        this.iseWS.onopen = () => {
-            this.recorder.start({ sampleRate: 16000, frameSize: 1280 });
-        };
-
-        this.iseWS.onmessage = (e) => {
-            const data = JSON.parse(e.data);
-            console.log("收到消息:", data);
-            const isFinal = data.final === 1;
-            this.renderResult(e.data, isFinal);
-
-            if (isFinal) {
-                this.iseWS.close();
+    async connectWebSocket() {
+        try {
+            const websocketUrl = await this.getWebSocketUrl();
+            if ("WebSocket" in window) {
+                this.iseWS = new WebSocket(websocketUrl);
+            } else {
+                alert("浏览器不支持WebSocket");
+                return;
             }
-        };
+            this.changeBtnStatus("CONNECTING");
+            this.iseWS.onopen = () => {
+                this.recorder.start({ sampleRate: 16000, frameSize: 1280 });
+            };
 
-        this.iseWS.onerror = (e) => {
-            console.error(e);
-            this.recorder.stop();
+            this.iseWS.onmessage = (e) => {
+                const data = JSON.parse(e.data);
+                console.log("收到消息:", data);
+                const isFinal = data.final === 1;
+                this.renderResult(e.data, isFinal);
+
+                if (isFinal) {
+                    this.iseWS.close();
+                }
+            };
+
+            this.iseWS.onerror = (e) => {
+                console.error(e);
+                this.recorder.stop();
+                this.changeBtnStatus("CLOSED");
+            };
+            this.iseWS.onclose = () => {
+                this.recorder.stop();
+                this.changeBtnStatus("CLOSED");
+            };
+        } catch (error) {
+            console.error("连接失败:", error);
             this.changeBtnStatus("CLOSED");
-        };
-        this.iseWS.onclose = () => {
-            this.recorder.stop();
-            this.changeBtnStatus("CLOSED");
-        };
+        }
     }
 }
 
