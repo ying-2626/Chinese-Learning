@@ -210,3 +210,9 @@ tencent:
     appid: ${TENCENT_SOE_APPID:}
     secretId: ${TENCENT_SOE_SECRET_ID:}
     secretKey: ${TENCENT_SOE_SECRET_KEY:}
+
+# FastGPT 配置
+fastgpt:
+  api:
+    key: ${FASTGPT_API_KEY:}
+    url: ${FASTGPT_API_URL:https://api.fastgpt.in/api/v1/chat/completions}

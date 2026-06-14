@@ -133,21 +133,14 @@
     }
   }
 
-  //调用fastgpt分析朗读结果 - 应该通过后端代理
-  // TODO: 将 FastGPT 调用迁移到后端，避免暴露 API Key
-  let Authorization = CONFIG.FASTGPT.API_KEY;
-  
-  //generate 分析
   function getAnalysis(req_content) {
 
     const prompt = `你是一位中文口语老师，以下是口语测评数据，请分析并给出评价。数据包括一句里每个字的音素和音素得分：({
           Word: item.Word,
-          // 遍历 PhoneInfos 并提取 Phone 和 PronAccuracy
           PhoneInfos: item.PhoneInfos.map(phoneItem => ({
             Phone: phoneItem.Phone,
             PronAccuracy: phoneItem.PronAccuracy
           })
-          // 遍历Tone,若Valid=false,则无效；若Valid=Ture,提取RefTone和HypothesisTone进行比对。如果比对结果是不相等，则说明该字的韵母声调错误，一定要明确指出该字的声调错误。
           然后对这位汉语学习者给出练习建议。
           注意：
           1. 分析和建议各控制在300字以内
@@ -160,26 +153,28 @@
     `
 
     axios({
-      url: 'https://api.fastgpt.in/api/v1/chat/completions',
+      url: `${CONFIG.BACKEND_API}/api/fastgpt/chat/completions`,
       method: 'post',
       data: JSON.stringify({
-        "chatId": "111", // localStorage.getItem("username"),
+        "chatId": "111",
         "stream": false,
         "detail": false,
         "messages": [
           {
-            "content": req_content + prompt, //TODO
+            "content": req_content + prompt,
             "role": "user"
           }
         ]
       }),
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': Authorization
+        'Content-Type': 'application/json'
       }
     }).then(function (response) {
-      // 获取 AI 返回的内容
-      let content = response.data.choices[0].message.content;
+      const data = response.data;
+      if (data.code !== 0) {
+        throw new Error(data.message || '分析请求失败');
+      }
+      let content = data.result.choices[0].message.content;
 
       // 选中 textarea
       let suggestionBox = document.querySelector(".suggestion-box");

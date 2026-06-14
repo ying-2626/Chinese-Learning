@@ -4,10 +4,7 @@ class ChatbotModule {
         this.input = document.querySelector(".chat-input");
         this.sendBtn = document.querySelector(".input-container img");
         this.chatItem = document.querySelector(".chat-item");
-        this.pleaseInputTip = document.querySelectorAll(".pleaseinput")[0]; // Assuming it's the first or we need to be specific
-        
-        // Use config for authorization
-        this.authorization = CONFIG.FASTGPT.API_KEY;
+        this.pleaseInputTips = document.querySelectorAll(".pleaseinput")[0];
         
         this.init();
     }
@@ -88,10 +85,10 @@ class ChatbotModule {
         this.chatItem.insertAdjacentHTML('beforeend', thinkingHTML);
 
         axios({
-            url: 'https://api.fastgpt.in/api/v1/chat/completions',
+            url: `${CONFIG.BACKEND_API}/api/fastgpt/chat/completions`,
             method: 'post',
             data: JSON.stringify({
-                "chatId": "111", // Should be dynamic based on user
+                "chatId": "111",
                 "stream": false,
                 "detail": false,
                 "messages": [
@@ -102,11 +99,14 @@ class ChatbotModule {
                 ]
             }),
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': this.authorization
+                'Content-Type': 'application/json'
             }
         }).then((response) => {
-            let content = response.data.choices[0].message.content;
+            const data = response.data;
+            if (data.code !== 0) {
+                throw new Error(data.message || '请求失败');
+            }
+            let content = data.result.choices[0].message.content;
             let newHTML = `
                 <div class="message ai-message">
                     <div class="p1">${marked.parse(content)}</div>

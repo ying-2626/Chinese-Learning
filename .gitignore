@@ -1,0 +1,12 @@
+.idea/
+.vscode/
+.gitignore
+webdemo1-1/js/config.js
+webdemo1-1/styles/index.css
+.trae/
+database.sql
+.env.local
+DEPLOYMENT_GUIDE.md
+backend/.env
+.m2/
+**/mvn-settings.xml

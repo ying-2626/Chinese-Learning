@@ -69,11 +69,32 @@ public class TencentSoeProxyController {
         int nonce = (int) (Math.random() * 1000000000);
         String voiceId = UUID.randomUUID().toString();
 
-        // 构建声调评测标识
         String refText = "{::cmd{F_TDET=true}}" + request.getRefText();
 
-        // 构建参数字符串（按字典序排序）
-        String params = String.format(
+        // 签名时使用原始参数（不做 URL 编码）
+        String rawParams = String.format(
+                "eval_mode=%d&expired=%d&nonce=%d&ref_text=%s&score_coeff=%.1f&secretid=%s&server_engine_type=%s&text_mode=0&timestamp=%d&voice_format=1&voice_id=%s",
+                request.getEvalMode(),
+                expired,
+                nonce,
+                refText,
+                request.getScoreCoeff(),
+                secretId,
+                SERVER_ENGINE_TYPE,
+                timestamp,
+                voiceId);
+
+        String signatureString = String.format("soe.cloud.tencent.com/soe/api/%s?%s", appId, rawParams);
+
+        Mac mac = Mac.getInstance("HmacSHA1");
+        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), "HmacSHA1");
+        mac.init(secretKeySpec);
+        byte[] signatureBytes = mac.doFinal(signatureString.getBytes(StandardCharsets.UTF_8));
+        String signature = Base64.getEncoder().encodeToString(signatureBytes);
+        String encodedSignature = URLEncoder.encode(signature, StandardCharsets.UTF_8);
+
+        // 实际请求 URL 中对参数值做 URL 编码
+        String encodedParams = String.format(
                 "eval_mode=%d&expired=%d&nonce=%d&ref_text=%s&score_coeff=%.1f&secretid=%s&server_engine_type=%s&text_mode=0&timestamp=%d&voice_format=1&voice_id=%s",
                 request.getEvalMode(),
                 expired,
@@ -85,20 +106,8 @@ public class TencentSoeProxyController {
                 timestamp,
                 voiceId);
 
-        // 构建签名字符串
-        String signatureString = String.format("soe.cloud.tencent.com/soe/api/%s?%s", appId, params);
-
-        // 计算 HMAC-SHA1 签名
-        Mac mac = Mac.getInstance("HmacSHA1");
-        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), "HmacSHA1");
-        mac.init(secretKeySpec);
-        byte[] signatureBytes = mac.doFinal(signatureString.getBytes(StandardCharsets.UTF_8));
-        String signature = Base64.getEncoder().encodeToString(signatureBytes);
-        String encodedSignature = URLEncoder.encode(signature, StandardCharsets.UTF_8);
-
-        // 构建完整的 WebSocket URL
         return String.format("wss://soe.cloud.tencent.com/soe/api/%s?%s&signature=%s",
-                appId, params, encodedSignature);
+                appId, encodedParams, encodedSignature);
     }
 
     /**
