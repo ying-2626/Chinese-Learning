@@ -40,4 +40,20 @@ public class User implements Serializable {
     @TableLogic
     @TableField(value = "deleted")
     private Integer deleted;
+
+    @ApiModelProperty("母语背景")
+    @TableField(value = "native_language")
+    private String nativeLanguage;
+
+    @ApiModelProperty("当前水平")
+    @TableField(value = "current_level")
+    private String currentLevel;
+
+    @ApiModelProperty("学习目标")
+    @TableField(value = "learning_goal")
+    private String learningGoal;
+
+    @ApiModelProperty("学习方向")
+    @TableField(value = "learning_direction")
+    private String learningDirection;
 }

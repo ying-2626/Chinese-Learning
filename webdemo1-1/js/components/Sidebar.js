@@ -133,6 +133,27 @@ class Sidebar {
                         const base = activeLogo.getAttribute('data-base');
                         activeLogo.src = `./img/${base}(fff).png`;
                     }
+
+                    // Trigger module initialization for modules that need dynamic content
+                    if (moduleId === 'custom-learning' && window.CustomLearningModule) {
+                        if (!window.customLearningModule) {
+                            window.customLearningModule = new CustomLearningModule();
+                        } else {
+                            window.customLearningModule.checkAuth();
+                        }
+                    } else if (moduleId === 'exam-service' && window.ExamServiceModule) {
+                        if (!window.examServiceModule) {
+                            window.examServiceModule = new ExamServiceModule();
+                        } else {
+                            window.examServiceModule.checkAuth();
+                        }
+                    } else if (moduleId === 'history' && window.HistoryModule) {
+                        if (!window.historyModule) {
+                            window.historyModule = new HistoryModule();
+                        } else {
+                            window.historyModule.loadHistory();
+                        }
+                    }
                 }
             });
         });

@@ -407,6 +407,52 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         return user;
     }
+
+    /**
+     * 获取用户学习资料
+     * @return 用户学习资料
+     * @throws MyException 通用异常
+     */
+    @Override
+    public Object getUserProfile() throws MyException {
+        User user = getUserById(sessionUtils.getUserId());
+        Map<String, String> profile = new HashMap<>();
+        profile.put("nativeLanguage", user.getNativeLanguage());
+        profile.put("currentLevel", user.getCurrentLevel());
+        profile.put("learningGoal", user.getLearningGoal());
+        profile.put("learningDirection", user.getLearningDirection());
+        return profile;
+    }
+
+    /**
+     * 更新用户学习资料
+     * @param profile 用户学习资料
+     * @return 更新结果
+     * @throws MyException 通用异常
+     */
+    @Override
+    public UserInfoResponse updateUserProfile(com.shengdonghanyu.backend.controller.user.request.UpdateUserProfileRequest profile) throws MyException {
+        User user = getUserById(sessionUtils.getUserId());
+        
+        if (profile.getNativeLanguage() != null) {
+            user.setNativeLanguage(profile.getNativeLanguage());
+        }
+        if (profile.getCurrentLevel() != null) {
+            user.setCurrentLevel(profile.getCurrentLevel());
+        }
+        if (profile.getLearningGoal() != null) {
+            user.setLearningGoal(profile.getLearningGoal());
+        }
+        if (profile.getLearningDirection() != null) {
+            user.setLearningDirection(profile.getLearningDirection());
+        }
+
+        if (userMapper.updateById(user) == 0) {
+            throw new MyException(EnumExceptionType.UPDATE_FAILED);
+        }
+
+        return new UserInfoResponse(user);
+    }
 //
 //    /**
 //     * 更新一个用户的“发育特点、学习建议”
