@@ -1270,7 +1270,7 @@ input button {
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 240px;
+    left: 0;
     right: 0;
 }
 
@@ -2481,7 +2481,7 @@ input button {
 /* Feedback Float Button */
 .feedback-float-btn {
     position: fixed;
-    bottom: 30px;
+    bottom: 90px;
     right: 30px;
     width: 56px;
     height: 56px;
