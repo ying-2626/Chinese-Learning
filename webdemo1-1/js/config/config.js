@@ -1,7 +1,7 @@
 const CONFIG = {
     BACKEND_API: 'https://shengdonghanyu.com',
     TENCENT: {
-        APPID: "1347318735"
+        APPID: "1418962746"
     }
 };
 

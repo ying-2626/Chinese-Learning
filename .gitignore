@@ -10,3 +10,7 @@ DEPLOYMENT_GUIDE.md
 backend/.env
 .m2/
 **/mvn-settings.xml
+shengdonghanyu.service
+ssl/
+test_soe_api.sh
+backend/mvn-settings.xml
