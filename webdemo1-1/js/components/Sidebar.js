@@ -5,8 +5,8 @@ class Sidebar {
         this.options = options;
         this.items = [
             { id: 'speech-evaluation', name: '语音测评', icon: 'speech_evaluation', module: 'speech-evaluation' },
-            { id: 'voice', name: '语音交互', icon: 'voice', module: 'voice' },
-            { id: 'chat-bot', name: '聊天机器', icon: 'chat', module: 'chatbot2' },
+            { id: 'voice', name: '数字人交互', icon: 'voice', module: 'voice' },
+            { id: 'chat-bot', name: '聊天对话', icon: 'chat', module: 'chatbot2' },
             { id: 'magic-tool', name: '工具', icon: 'magictool', module: 'magic-tool2' },
             { id: 'custom-learning', name: '个性化学习', icon: 'magictool', module: 'custom-learning' },
             { id: 'exam-service', name: '考试冲刺', icon: 'speech_evaluation', module: 'exam-service' },

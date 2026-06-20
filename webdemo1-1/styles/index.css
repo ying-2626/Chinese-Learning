@@ -1264,6 +1264,239 @@ input button {
     to { transform: rotate(360deg); }
 }
 
+.chat-layout {
+    display: flex;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.chat-sidebar {
+    width: 220px;
+    background: #f7f8fa;
+    border-right: 1px solid #e8e8e8;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.chat-sidebar-header {
+    padding: 12px;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.chat-new-btn {
+    width: 100%;
+    padding: 10px;
+    background: #12b4e3;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background 0.2s;
+}
+
+.chat-new-btn:hover {
+    background: #0fa3cf;
+}
+
+.chat-session-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+.chat-empty-tip {
+    text-align: center;
+    color: #aaa;
+    font-size: 13px;
+    padding: 30px 10px;
+}
+
+.chat-session-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 4px;
+    transition: background 0.2s;
+}
+
+.chat-session-item:hover {
+    background: #e8e8e8;
+}
+
+.chat-session-item.active {
+    background: #12b4e3;
+    color: #fff;
+}
+
+.chat-session-item.active .chat-session-delete {
+    color: #fff;
+}
+
+.chat-session-title {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 13px;
+}
+
+.chat-session-delete {
+    background: none;
+    border: none;
+    color: #aaa;
+    cursor: pointer;
+    padding: 2px 4px;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+}
+
+.chat-session-item:hover .chat-session-delete {
+    opacity: 1;
+}
+
+.chat-session-delete:hover {
+    color: #dc3545;
+}
+
+.chat-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.chat-messages .message {
+    position: relative;
+    display: flex;
+    width: 100%;
+    margin: 0;
+}
+
+.chat-messages .message .p1 {
+    position: relative;
+    max-width: 70%;
+    padding: 10px 14px;
+    border-radius: 16px;
+    font-size: 14px;
+    line-height: 1.6;
+    word-break: break-word;
+}
+
+.chat-messages .user-message {
+    justify-content: flex-end;
+}
+
+.chat-messages .user-message .p1 {
+    background: #12b4e3;
+    color: #fff;
+    text-align: left;
+}
+
+.chat-messages .ai-message {
+    justify-content: flex-start;
+}
+
+.chat-messages .ai-message .p1 {
+    background: #fff;
+    color: #333;
+    text-align: left;
+    border: 1px solid #eee;
+}
+
+.chat-messages .ai-message .p1 p {
+    margin: 0.3em 0;
+}
+
+.chat-messages .ai-message .p1 ul,
+.chat-messages .ai-message .p1 ol {
+    padding-left: 1.5em;
+}
+
+.chat-loading {
+    text-align: center;
+    color: #aaa;
+    padding: 40px;
+    font-size: 14px;
+}
+
+.chat-input-area {
+    padding: 12px 20px;
+    border-top: 1px solid #e8e8e8;
+    background: #fff;
+}
+
+.chat-input-area .input-container {
+    position: relative;
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    background: #f9f9f9;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    box-shadow: none;
+    transform: none;
+    left: auto;
+    top: auto;
+    z-index: 1;
+}
+
+.chat-input-area .chat-input {
+    position: relative;
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 12px 16px;
+    font-size: 14px;
+    background: transparent;
+    height: auto;
+    width: auto;
+    transform: none;
+    left: auto;
+    top: auto;
+}
+
+.chat-input-area .chat-send-btn {
+    position: relative;
+    width: 28px;
+    height: 28px;
+    margin-right: 10px;
+    cursor: pointer;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.chat-input-area .pleaseinput {
+    position: absolute;
+    right: -10px;
+    bottom: 45px;
+}
+
 .audio-player audio {
     width: 100%;
     height: 40px;
