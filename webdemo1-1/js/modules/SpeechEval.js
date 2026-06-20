@@ -123,6 +123,23 @@ class SpeechEvalModule {
         const selectedModeElement = document.querySelector('input[name="group"]:checked');
         const selectedMode = selectedModeElement ? selectedModeElement.value : '读句子';
 
+        let suggestionBox = document.querySelector(".suggestion-box");
+        if (suggestionBox) {
+            suggestionBox.value = "正在分析你的录音，请稍候...";
+            suggestionBox.disabled = true;
+        }
+
+        let loadingDots = 0;
+        const loadingInterval = setInterval(() => {
+            if (!suggestionBox) {
+                suggestionBox = document.querySelector(".suggestion-box");
+            }
+            if (suggestionBox && suggestionBox.disabled) {
+                loadingDots = (loadingDots + 1) % 4;
+                suggestionBox.value = "正在分析你的录音" + ".".repeat(loadingDots) + "   ".repeat(3 - loadingDots);
+            }
+        }, 500);
+
         let prompt;
 
         if (typeof PROMPTS !== 'undefined') {
@@ -182,14 +199,24 @@ class SpeechEvalModule {
                 throw new Error(data.message || '分析请求失败');
             }
             let content = data.result.choices[0].message.content;
+            clearInterval(loadingInterval);
             let suggestionBox = document.querySelector(".suggestion-box");
 
             if (suggestionBox) {
                 suggestionBox.value = content;
+                suggestionBox.disabled = false;
             } else {
                 console.error("未找到 .suggestion-box 元素");
             }
             return content;
+        }).catch(err => {
+            clearInterval(loadingInterval);
+            let suggestionBox = document.querySelector(".suggestion-box");
+            if (suggestionBox) {
+                suggestionBox.value = "分析失败，请重试";
+                suggestionBox.disabled = false;
+            }
+            throw err;
         });
     }
 
