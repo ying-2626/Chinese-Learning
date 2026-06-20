@@ -125,12 +125,12 @@ class HistoryModule {
 
                     <div class="advice-section">
                         <div class="advice-title">💡 改进建议</div>
-                        <div class="advice-content">${advice}</div>
+                        <div class="advice-content markdown-body">${typeof marked !== 'undefined' ? marked.parse(advice) : advice}</div>
                     </div>
 
                     ${action.audioUrl ? `
                         <div class="audio-player">
-                            <audio controls src="${action.audioUrl}"></audio>
+                            <audio controls src="${action.audioUrl.replace('http://localhost:8088', CONFIG.BACKEND_API)}"></audio>
                         </div>
                     ` : ''}
                 </div>

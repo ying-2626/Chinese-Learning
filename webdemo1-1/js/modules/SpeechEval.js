@@ -120,15 +120,11 @@ class SpeechEvalModule {
     }
 
     getAnalysis(req_content) {
-        const Authorization = CONFIG.FASTGPT.API_KEY;
-
-        // Determine mode from UI (radio buttons)
         const selectedModeElement = document.querySelector('input[name="group"]:checked');
-        const selectedMode = selectedModeElement ? selectedModeElement.value : '读句子'; // Default to Sentence if not found
+        const selectedMode = selectedModeElement ? selectedModeElement.value : '读句子';
 
         let prompt;
 
-        // Use global PROMPTS object
         if (typeof PROMPTS !== 'undefined') {
             if (selectedMode === '读段落') {
                 prompt = PROMPTS.PARAGRAPH;
@@ -136,40 +132,35 @@ class SpeechEvalModule {
                 prompt = PROMPTS.DEFAULT;
             }
         } else {
-            // Fallback if PROMPTS not loaded
             if (selectedMode === '读段落') {
                 prompt = `你是一位中文口语老师，以下是口语测评数据，请分析并给出评价。数据包括整体的准确度、流利度、完整度以及总分。
                   然后对这位汉语学习者给出练习建议。
                   注意：
                   1. 分析和建议各控制在300字以内
-                  2. 输出应该模仿老师的语言风格，避免出现markdown等特殊格式的字符，并以“你”来称呼对方
+                  2. 输出应该模仿老师的语言风格，避免出现markdown等特殊格式的字符，并以"你"来称呼对方
                   3. 重点分析整体的朗读效果，如停顿、语速、情感表达等
                   4. 避免列举具体数字
                   5. 开头直接分析就行，不需要引入语
                   6. 由于是段落朗读，请更多关注语流音变和整体语感`;
             } else {
-                prompt = `你是一位中文口语老师，以下是口语测评数据，请分析并给出评价。数据包括一句里每个字的音素和音素得分：({
-                      Word: item.Word,
-                      // 遍历 PhoneInfos 并提取 Phone 和 PronAccuracy
-                      PhoneInfos: item.PhoneInfos.map(phoneItem => ({
-                        Phone: phoneItem.Phone,
-                        PronAccuracy: phoneItem.PronAccuracy
-                      })
-                      // 遍历Tone,若Valid=false,则无效；若Valid=Ture,提取RefTone和HypothesisTone进行比对。如果比对结果是不相等，则说明该字的韵母声调错误，一定要明确指出该字的声调错误。
-                      然后对这位汉语学习者给出练习建议。
+                prompt = `你是一位中文口语老师，以下是口语测评数据，请分析并给出评价。数据包括一句里每个字的音素和音素得分。
+                      分析步骤：
+                      1. 整体评价：根据总分、准确度、流利度、完整度给出鼓励性评价
+                      2. 共性问题归纳：找出所有低分字中反复出现的共性问题，统一说明（如多个字声调未识别、声母普遍偏弱等），不要逐字重复
+                      3. 逐字分析：只对有独特问题的字单独分析，共性问题不要重复
+                      4. 练习建议：针对问题给出简洁建议
                       注意：
                       1. 分析和建议各控制在300字以内
-                      2. 输出应该模仿老师的语言风格，避免出现markdown等特殊格式的字符，并以“你”来称呼对方
-                      3. 如果没有音素得分有可能是因为漏读了
+                      2. 输出应该模仿老师的语言风格，避免出现markdown等特殊格式的字符，并以"你"来称呼对方
+                      3. 避免重复：共性问题只说一次，不要每个字都复制粘贴相同的分析
                       4. 避免列举具体数字
                       5. 开头直接分析就行，不需要引入语
-                      6. 需要从音素的声母、韵母，整体的准确度、流利度等多个维度进行分析
-                      7. 如果单字的Tone:Valid=true说明启用了声调评测，启用时你才需要额外分析声调是否正确，HypothesisTone为-1代表该字的声调读错了`;
+                      6. 如果单字的Tone:Valid=true说明启用了声调评测，HypothesisTone为-1代表声调读错`;
             }
         }
 
         return axios({
-            url: 'https://api.fastgpt.in/api/v1/chat/completions',
+            url: `${CONFIG.BACKEND_API}/api/fastgpt/chat/completions`,
             method: 'post',
             data: JSON.stringify({
                 "chatId": "111",
@@ -183,11 +174,14 @@ class SpeechEvalModule {
                 ]
             }),
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': Authorization
+                'Content-Type': 'application/json'
             }
         }).then(function (response) {
-            let content = response.data.choices[0].message.content;
+            const data = response.data;
+            if (data.code !== 0) {
+                throw new Error(data.message || '分析请求失败');
+            }
+            let content = data.result.choices[0].message.content;
             let suggestionBox = document.querySelector(".suggestion-box");
 
             if (suggestionBox) {
@@ -371,39 +365,38 @@ class SpeechEvalModule {
             const jsonString = JSON.stringify(analysisRequestData, null, 2);
 
             if (isFinal) {
-                // 1. Get Analysis
-                const analysisPromise = this.getAnalysis(jsonString);
+                try {
+                    const analysisPromise = this.getAnalysis(jsonString);
 
-                // 2. Upload Audio
-                const pcmBuffer = this.mergeAudioChunks();
-                const wavBuffer = this.addWavHeader(pcmBuffer);
-                const audioBlob = new Blob([wavBuffer], { type: 'audio/wav' });
-                const audioUploadPromise = ScoreService.uploadAudioFile(audioBlob);
+                    const pcmBuffer = this.mergeAudioChunks();
+                    const wavBuffer = this.addWavHeader(pcmBuffer);
+                    const audioBlob = new Blob([wavBuffer], { type: 'audio/wav' });
+                    const audioUploadPromise = ScoreService.uploadAudioFile(audioBlob);
 
-                Promise.all([analysisPromise, audioUploadPromise])
-                    .then(([advice, audioUrl]) => {
-                        // 3. Create Score Action
-                        const scoreData = {
-                            audioUrl: audioUrl,
-                            accuracy: jsonData.result.PronAccuracy,
-                            fluency: jsonData.result.PronFluency * 100,
-                            completeness: jsonData.result.PronCompletion * 100,
-                            initialSoundScore: initialScore,
-                            finalSoundScore: finalScore,
-                            toneScore: toneScore,
-                            totalScore: jsonData.result.SuggestedScore,
-                            advice: advice
-                        };
-                        return ScoreService.createScoreAction(scoreData);
-                    })
-                    .then(res => {
-                        console.log("Score saved successfully:", res);
-                        // alert("评分已保存！");
-                    })
-                    .catch(err => {
-                        console.error("Failed to save score:", err);
-                        // alert("保存评分失败: " + err.message);
-                    });
+                    Promise.all([analysisPromise, audioUploadPromise])
+                        .then(([advice, audioUrl]) => {
+                            const scoreData = {
+                                audioUrl: audioUrl,
+                                accuracy: jsonData.result.PronAccuracy,
+                                fluency: jsonData.result.PronFluency * 100,
+                                completeness: jsonData.result.PronCompletion * 100,
+                                initialSoundScore: initialScore,
+                                finalSoundScore: finalScore,
+                                toneScore: toneScore,
+                                totalScore: jsonData.result.SuggestedScore,
+                                advice: advice
+                            };
+                            return ScoreService.createScoreAction(scoreData);
+                        })
+                        .then(res => {
+                            console.log("Score saved successfully:", res);
+                        })
+                        .catch(err => {
+                            console.error("Failed to save score:", err);
+                        });
+                } catch (err) {
+                    console.error("Analysis failed:", err);
+                }
             }
 
             evalText.innerHTML = coloredText;

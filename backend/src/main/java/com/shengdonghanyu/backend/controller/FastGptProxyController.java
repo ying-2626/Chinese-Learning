@@ -28,15 +28,18 @@ public class FastGptProxyController {
 
     @PostMapping("/chat/completions")
     public Result chatCompletions(@RequestBody String requestBody) {
-        if (apiKey.isEmpty()) {
+        String trimmedKey = apiKey.trim();
+        if (trimmedKey.isEmpty()) {
             log.error("FastGPT API Key 未设置");
             return Result.fail("服务配置错误，请联系管理员");
         }
 
         try {
+            log.info("FastGPT API 请求, key前缀: {}, key长度: {}", trimmedKey.substring(0, Math.min(15, trimmedKey.length())), trimmedKey.length());
+
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("Authorization", apiKey);
+            headers.set("Authorization", trimmedKey);
 
             HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
             ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.POST, entity, String.class);

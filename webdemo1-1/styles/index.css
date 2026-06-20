@@ -966,6 +966,38 @@ input button {
     line-height: 1.5;
 }
 
+.advice-content.markdown-body {
+    background: transparent !important;
+    color: #664d03;
+    font-size: 0.95em;
+}
+
+.advice-content.markdown-body h1,
+.advice-content.markdown-body h2,
+.advice-content.markdown-body h3,
+.advice-content.markdown-body h4,
+.advice-content.markdown-body h5,
+.advice-content.markdown-body h6 {
+    color: #856404;
+    border-bottom: none;
+    margin-top: 0.8em;
+    margin-bottom: 0.4em;
+}
+
+.advice-content.markdown-body strong {
+    color: #664d03;
+}
+
+.advice-content.markdown-body ul,
+.advice-content.markdown-body ol {
+    padding-left: 1.5em;
+}
+
+.advice-content.markdown-body p {
+    margin-top: 0.3em;
+    margin-bottom: 0.3em;
+}
+
 .audio-player audio {
     width: 100%;
     height: 40px;
