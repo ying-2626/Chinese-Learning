@@ -16,6 +16,11 @@ class ChatbotModule {
 
     getHeaders() {
         const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+        return { 'session': userInfo.sessionId };
+    }
+
+    getJsonHeaders() {
+        const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
         return { 'Content-Type': 'application/json', 'session': userInfo.sessionId };
     }
 
@@ -197,13 +202,15 @@ class ChatbotModule {
                 url: CONFIG.BACKEND_API + '/chat/sessions',
                 method: 'post',
                 data: { title: '新对话' },
-                headers: this.getHeaders(),
+                headers: this.getJsonHeaders(),
                 withCredentials: true
             });
             if (resp.data.code === 0) {
                 const session = resp.data.result;
                 this.sessions.unshift(session);
                 this.switchSession(session.id);
+            } else {
+                console.error('创建会话返回错误:', resp.data);
             }
         } catch (e) {
             console.error('创建会话失败:', e);
@@ -281,7 +288,7 @@ class ChatbotModule {
                 url: CONFIG.BACKEND_API + '/chat/sessions/' + this.currentSessionId + '/messages',
                 method: 'post',
                 data: { role: 'user', content: content },
-                headers: this.getHeaders(),
+                headers: this.getJsonHeaders(),
                 withCredentials: true
             }).catch(() => {});
 
@@ -289,7 +296,7 @@ class ChatbotModule {
                 url: CONFIG.BACKEND_API + '/chat/sessions/' + this.currentSessionId + '/messages',
                 method: 'post',
                 data: { role: 'assistant', content: aiContent },
-                headers: this.getHeaders(),
+                headers: this.getJsonHeaders(),
                 withCredentials: true
             }).catch(() => {});
 
@@ -300,7 +307,7 @@ class ChatbotModule {
                     url: CONFIG.BACKEND_API + '/chat/sessions/' + this.currentSessionId,
                     method: 'put',
                     data: { title: title },
-                    headers: this.getHeaders(),
+                    headers: this.getJsonHeaders(),
                     withCredentials: true
                 }).catch(() => {});
                 this.renderSessionList();
