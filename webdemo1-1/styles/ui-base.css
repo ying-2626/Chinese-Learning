@@ -1,0 +1,39 @@
+/* Presentation only. Page content and existing interactions stay in their original files. */
+:root {
+  --ui-accent: #2563eb;
+  --ui-ink: #20242c;
+  --ui-muted: #747b88;
+  --ui-border: rgba(39, 45, 59, .09);
+  --ui-shadow: 0 4px 20px rgba(25, 35, 50, .035);
+  --ui-glass: rgba(255, 255, 255, .78);
+  --ui-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+body[class^="ui-"] { box-sizing: border-box; color: var(--ui-ink); font-family: var(--ui-font); }
+body[class^="ui-"] *,
+body[class^="ui-"] *::before,
+body[class^="ui-"] *::after { box-sizing: border-box; }
+body[class^="ui-"] :where(h1, h2, h3, h4, p, a, span, li, input, button, textarea, select, label, strong, div) {
+  font-family: var(--ui-font);
+}
+body[class^="ui-"] :where(button, input, textarea, select) { accent-color: var(--ui-accent); }
+body[class^="ui-"] :where(a, button, input, textarea, select, [contenteditable]):focus-visible {
+  outline: 3px solid rgba(8, 102, 223, .45);
+  outline-offset: 4px;
+}
+body[class^="ui-"] :where(button, a) { -webkit-tap-highlight-color: transparent; }
+body[class^="ui-"] :where(button:disabled) { cursor: not-allowed; opacity: .55; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  body[class^="ui-"] *, body[class^="ui-"] *::before, body[class^="ui-"] *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  :root { --ui-glass: #fff; }
+}

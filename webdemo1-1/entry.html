@@ -1,14 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>entry</title>
     <link rel="stylesheet" href="styles/entry.css">
+    <link rel="stylesheet" href="styles/ui-base.css">
+    <link rel="stylesheet" href="styles/entry-refresh.css">
+    <link rel="stylesheet" href="styles/ui-motion.css?v=20260921">
+    <link rel="stylesheet" href="styles/liquid-glass.css?v=20260921">
 </head>
 
-<body>
+<body class="ui-entry">
     <div class="header-container">
         <img src="img/logo.png" alt="shengdonghanyu logo">
         <ul class="headerul">
@@ -24,19 +28,28 @@
             <a href="register.html" class="login-button">注册 </a>
         </span>
     </div>
-    <h1 class="color-title">声动汉语</h1>
-    <h1 class="main-title">AI多模型汉语二语学习<br>与普通话推广平台 &nbsp;</h1>
-    <div class="logo-container">
-        <img src="img/华东师范大学.PNG" alt="chatgpt logo" class="logo">
-        <img src="img/科大讯飞.PNG" alt="typing logo" class="logo">
-        <img src="img/chatgpt.png" alt="chatgpt logo" class="logo">
-        <img src="img/fastgpt.PNG" alt="typing logo" class="logo">
-    </div>
-    <div class="index-button-container">
-        <div>
-            <span><a href="index.html"><strong>免费试用</strong></a></span>
+    <section class="entry-hero" aria-labelledby="entry-title">
+        <div class="hero-copy">
+            <h1 class="color-title">声动汉语</h1>
+            <h1 class="main-title" id="entry-title">AI多模型汉语二语学习<br>与普通话推广平台 &nbsp;</h1>
+            <div class="logo-container">
+                <img src="img/华东师范大学.PNG" alt="chatgpt logo" class="logo">
+                <img src="img/科大讯飞.PNG" alt="typing logo" class="logo">
+                <img src="img/chatgpt.png" alt="chatgpt logo" class="logo">
+                <img src="img/fastgpt.PNG" alt="typing logo" class="logo">
+            </div>
+            <div class="index-button-container">
+                <div>
+                    <span><a href="index.html"><strong>免费试用</strong></a></span>
+                </div>
+            </div>
         </div>
-    </div>
+        <div class="hero-preview">
+            <span class="span2">
+                <img src="img/主页.png" alt="">
+            </span>
+        </div>
+    </section>
     <h2 class="h21">TRUSTED BY 1000+ INTERNATIONAL LEARNERS FROM 70+ COUNTRIES</h2>
     <div class="wrap" id="wrap">
         <div class="slide" id="slide">
@@ -51,11 +64,13 @@
             </ul>
         </div>
     </div>
-    <h2 class="h22">Featured by Personalized & Detailed Learning</h2>
-    <!--<div class="middle-text">
-        speech-evaluation & chatbot interaction & various magic-tools
-    </div>-->
-    <h1 class="h11">声动汉语使用教程</h1>
+    <div class="tutorial-heading">
+        <h2 class="h22">Featured by Personalized & Detailed Learning</h2>
+        <!--<div class="middle-text">
+            speech-evaluation & chatbot interaction & various magic-tools
+        </div>-->
+        <h1 class="h11">声动汉语使用教程</h1>
+    </div>
     <div class="video">
         <!--<iframe src="https://player.bilibili.com/player.html?aid=56850347&cid=99299213&page=1&danmaku=0" scrolling="no"
             border="0" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>-->
@@ -63,7 +78,7 @@
             allowfullscreen="true"> </iframe>
     </div>
     <div class="bottom-block">
-        <span class="span1">
+        <div class="span1">
 
             <h3 class="h32">
                 网站功能介绍
@@ -94,10 +109,8 @@
                     </div>
                 </li>
             </ul>
-        </span>
-        <span class="span2">
-            <img src="img/主页.png" alt="">
-        </span>
+        </div>
+
     </div>
 
     <div class="testimonial-container">
@@ -117,7 +130,7 @@
             </div>
         </div>
     </div>
-    <div class="login-container" style="margin-left: 20px; padding-left: 20px;">
+    <div class="login-container entry-audience" style="margin-left: 20px; padding-left: 20px;">
         <div class="login-container">
             <div class="text-content" style="margin-left: 20px; padding-left: 20px;">
                 <h2 style="color: #0056b3; font-size: 28px; margin-bottom: 15px;">​​为什么选择声动汉语？​ ✨</h2>
@@ -164,7 +177,10 @@
             International Chinese Insitute
             <br>East China Normal University</br>
         </div>
+    </div>
+    <script defer src="js/ui-motion.js?v=20260921-ui"></script>
+    <script defer src="js/liquid-glass.js?v=20260921-ui"></script>
+    <script src="js/entry.js?v=20260921-ui"></script>
 </body>
 
 </html>
-<script src="js/entry.js"></script>

@@ -1,0 +1,188 @@
+html:has(.ui-auth) { display: block; height: auto; min-height: 100%; }
+body.ui-auth {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 100svh;
+  height: auto;
+  margin: 0;
+  padding: 40px clamp(24px, 8vw, 150px);
+  background-color: #edf3fb;
+  background-size: cover !important;
+  background-position: center;
+}
+.ui-auth .form-container {
+  position: relative;
+  inset: auto;
+  transform: none;
+  width: 420px;
+  max-width: 100%;
+  padding: 36px;
+  border: 1px solid rgba(255, 255, 255, .9);
+  border-radius: 28px;
+  background: var(--ui-glass);
+  -webkit-backdrop-filter: blur(28px) saturate(125%);
+  backdrop-filter: blur(28px) saturate(125%);
+  box-shadow: 0 18px 60px rgba(30, 54, 89, .12), inset 0 1px 0 #fff;
+}
+.ui-auth .form-title {
+  margin: 0 0 24px;
+  font-size: 30px;
+  font-weight: 650;
+  line-height: 1.4;
+  letter-spacing: -.03em;
+}
+.ui-auth .form-title span { color: var(--ui-accent) !important; }
+.ui-auth #LoginForm > span {
+  display: block;
+  width: auto !important;
+  text-align: left !important;
+  line-height: 1.5 !important;
+  margin: 14px 0 7px;
+  color: #354359;
+  font-size: 13px !important;
+  font-weight: 500;
+}
+/* These breaks only supplied spacing; form controls keep their original order. */
+.ui-auth #LoginForm > br { display: none; }
+.ui-auth input {
+  width: 100%;
+  height: 46px;
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid rgba(59, 86, 125, .16);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, .9);
+  color: var(--ui-ink);
+  font-size: 16px;
+  box-shadow: 0 1px 2px rgba(31, 58, 89, .025);
+  transition: border-color .18s, box-shadow .18s;
+}
+.ui-auth input:focus {
+  border-color: var(--ui-accent);
+  box-shadow: 0 0 0 3px rgba(8, 102, 223, .08);
+}
+.ui-auth .button,
+.ui-auth .GetCode {
+  position: static;
+  transform: none;
+  min-height: 46px;
+  border: 0;
+  border-radius: 14px !important;
+  background: var(--ui-accent);
+  color: #fff;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color .18s, box-shadow .18s;
+}
+.ui-auth .button {
+  display: block;
+  clear: both;
+  width: 100%;
+  margin: 24px 0 18px;
+  padding: 11px 18px;
+  box-shadow: 0 5px 14px rgba(8, 102, 223, .16);
+}
+.ui-auth .button:hover { background: #0055c4; }
+.ui-auth .code { width: calc(100% - 126px) !important; float: none !important; }
+.ui-auth .GetCode {
+  width: 114px !important;
+  height: 46px !important;
+  float: right !important;
+  padding: 0 8px;
+  margin: 0;
+  color: var(--ui-accent);
+  background: #e8f1ff;
+  font-size: 13px;
+}
+.ui-auth .form-container a {
+  display: block;
+  margin: 10px 0 0;
+  color: #42648f;
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: center;
+  text-decoration: none;
+}
+.ui-auth .form-container a:hover { color: var(--ui-accent); text-decoration: underline; }
+.ui-auth .error { padding-left: 8px; font-size: 12px; font-weight: 400; }
+
+body.ui-pricing {
+  margin: 0;
+  min-height: 100svh;
+  background: radial-gradient(ellipse at 50% 0%, #e6f0ff 0, transparent 55%), #f5f7fa;
+}
+.ui-pricing .container { width: min(1240px, calc(100% - 64px)); overflow: visible; }
+.ui-pricing .pricing-header { padding: 76px 24px 34px; }
+.ui-pricing .pricing-header h2 {
+  color: var(--ui-ink);
+  background: none;
+  animation: none;
+  font-size: clamp(28px, 3.5vw, 40px);
+  font-weight: 650;
+  letter-spacing: -.035em;
+}
+.ui-pricing .pricing-plans {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 16px;
+  padding: 20px 0 64px;
+}
+.ui-pricing .pricing-plan {
+  display: flex;
+  flex-direction: column;
+  width: auto;
+  margin: 0;
+  padding: 26px;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, .9);
+  border-radius: 26px;
+  background: var(--ui-glass);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  box-shadow: var(--ui-shadow), inset 0 0 0 1px rgba(39, 62, 90, .045);
+  transition: box-shadow .2s;
+}
+.ui-pricing .pricing-plan:hover { transform: none; box-shadow: 0 15px 44px rgba(31, 58, 89, .1); }
+.ui-pricing .pricing-plan h3 { margin: 0; color: var(--ui-ink); font-size: 20px; font-weight: 600; }
+.ui-pricing .pricing-plan hr { width: 100%; height: 1px; margin: 22px 0 0; background: var(--ui-border); }
+.ui-pricing .pricing-plan .price { margin: 23px 0; color: var(--ui-ink); font-size: 30px; font-weight: 650; }
+.ui-pricing .pricing-plan ul { flex: 1; margin: 0 0 24px; }
+.ui-pricing .pricing-plan ul li { margin: 0 0 14px; color: #59667b; font-size: 14px; line-height: 1.75; }
+.ui-pricing .pricing-plan .btn {
+  display: block;
+  padding: 12px;
+  margin: 0;
+  border: 1px solid rgba(8, 102, 223, .1);
+  border-radius: 15px;
+  color: var(--ui-accent);
+  background: #edf4ff;
+  box-shadow: none;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+.ui-pricing .pricing-plan .btn:hover { background: #dfecff; }
+.ui-pricing .footer {
+  margin: 0;
+  padding: 28px 0;
+  border-top: 1px solid var(--ui-border);
+  background: transparent;
+  color: var(--ui-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+@media (max-width: 1000px) {
+  .ui-pricing .pricing-plans { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  body.ui-auth { justify-content: center; padding: 24px 18px; background-position: 25% center; }
+  .ui-auth .form-container { padding: 28px 24px; border-radius: 24px; }
+  .ui-auth .form-title { font-size: 27px; }
+  .ui-pricing .container { width: calc(100% - 32px); }
+  .ui-pricing .pricing-header { padding: 42px 16px 20px; }
+  .ui-pricing .pricing-plans { grid-template-columns: 1fr; padding-bottom: 32px; }
+}

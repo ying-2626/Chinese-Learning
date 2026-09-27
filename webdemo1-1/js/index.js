@@ -13,16 +13,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const love = new LoveModule();
 
   // Chatbot Module (handles .chatbot2 section)
-  const chatbot = new ChatbotModule();
+  window.chatbotModule = new ChatbotModule();
 
   // Speech Evaluation Module (handles .speech-evaluation section)
-  const speechEval = new SpeechEvalModule();
+  window.speechEvalModule = new SpeechEvalModule();
 
   // Magic Tool Module (handles .magic-tool2 section)
   const magicTool = new MagicToolModule();
 
   // History Module (handles .history section)
-  const history = new HistoryModule();
+  window.historyModule = new HistoryModule();
 
   // 3. Initialize Voice Module (Iframe)
   // The voice module is primarily an iframe, so no complex JS logic is needed here.

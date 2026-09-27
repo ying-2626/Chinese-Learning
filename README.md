@@ -1,5 +1,19 @@
 # 声动汉语 (Chinese-Learning) - 智能口语学习专家
 
+## 前端预览（当前 UI 分支）
+
+```sh
+python3 scripts/preview.py
+```
+
+打开 `http://127.0.0.1:4193/entry.html`，工作台为 `/index.html`。前端以 `webdemo1-1` 旧版页面与 `feat/feedback-listening` 中已有交互为依据，保留原正文、价格、工具与课程入口。未新增套餐或产品能力。
+
+当前分支只包含前端和预览脚本。登录、聊天、档案、测评记录等请求沿用旧版接口；预览脚本可代理到本地 `127.0.0.1:8088`。没有服务时展示连接失败，不生成示例回复或评分。支付、课程、专家答疑等旧版占位入口仍保留原状态。
+
+液态玻璃使用原生 CSS/SVG 装饰层，动效使用 Web Animations API，无新增运行时依赖。参考 [Apple Liquid Glass](https://developer.apple.com/videos/play/wwdc2025/219/) 与 [Aave 的网页玻璃实现](https://aave.com/design/building-glass-for-the-web)。Chromium 使用边缘折射，其他浏览器回退为磨砂与高光；支持减少动态效果、减少透明度偏好。
+
+前端检查：`node --test webdemo1-1/js/modules/FeedbackSpeech.test.js webdemo1-1/js/modules/LegacyFeatures.test.js`。真实腾讯测评、FastGPT、注册邮件和数字人服务不属于本轮联调范围。
+
 ## 📖 产品简介
 “声动汉语”是一款专为汉语学习者打造的智能化口语学习与测评平台。我们致力于通过先进的人工智能技术，解决传统语言学习中“开口难、发音准、反馈慢”的痛点。平台结合了高精度的语音评测引擎与生成式 AI 大模型，为用户提供沉浸式的练习环境和像真人老师一样的即时指导，帮助学习者有效提升口语水平。
 

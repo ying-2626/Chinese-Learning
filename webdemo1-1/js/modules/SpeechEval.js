@@ -6,12 +6,24 @@ class SpeechEvalModule {
         this.iseWS = null;
         this.recorder = null;
         this.audioChunks = []; // Initialize audioChunks
+        this.suggestionBox = document.querySelector('.suggestion-box');
+        this.feedbackSpeechButton = document.getElementById('feedback_speech_toggle');
+        this.feedbackSpeechIcon = document.getElementById('feedback_speech_icon');
+        this.feedbackSpeechLabel = document.getElementById('feedback_speech_label');
+        this.feedbackSpeechRate = document.getElementById('feedback_speech_rate');
+        this.feedbackSpeechStatus = document.getElementById('feedback_speech_status');
+        this.feedbackSpeech = typeof FeedbackSpeech !== 'undefined' ? new FeedbackSpeech() : null;
+        this.feedbackReady = false;
+        this.feedbackGeneration = 0;
 
         this.init();
     }
 
     init() {
         if (!this.btnControl) return;
+
+        this.bindFeedbackSpeech();
+        this.bindFeedbackSpeechLifecycle();
 
         // Initialize Recorder
         // Assuming RecorderManager is globally available from dist/index.umd.js
@@ -23,9 +35,142 @@ class SpeechEvalModule {
         }
     }
 
+    bindFeedbackSpeech() {
+        if (!this.feedbackSpeechButton || !this.suggestionBox) return;
+
+        if (!this.feedbackSpeech?.isSupported()) {
+            this.updateFeedbackSpeechUi({
+                label: '听反馈',
+                icon: 'ph-speaker-slash',
+                status: '当前设备暂时无法朗读，请阅读文字反馈',
+                disabled: true,
+            });
+            return;
+        }
+
+        this.feedbackSpeechButton.addEventListener('click', () => {
+            if (this.feedbackSpeech.isReading()) {
+                this.stopFeedbackSpeech(true);
+                return;
+            }
+
+            try {
+                this.updateFeedbackSpeechUi({
+                    label: '停止',
+                    icon: 'ph-stop-circle',
+                    status: '正在准备朗读',
+                    disabled: false,
+                });
+
+                this.feedbackSpeech.speak(this.suggestionBox.value, {
+                    rate: Number(this.feedbackSpeechRate?.value || 0.85),
+                    onStart: () => {
+                        this.updateFeedbackSpeechUi({
+                            label: '停止',
+                            icon: 'ph-stop-circle',
+                            status: '正在朗读反馈',
+                            disabled: false,
+                        });
+                    },
+                    onEnd: () => {
+                        this.updateFeedbackSpeechUi({
+                            label: '再听一遍',
+                            icon: 'ph-arrow-counter-clockwise',
+                            status: '朗读完成',
+                            disabled: false,
+                        });
+                    },
+                    onError: () => {
+                        this.updateFeedbackSpeechUi({
+                            label: '再试一次',
+                            icon: 'ph-arrow-counter-clockwise',
+                            status: '朗读失败，请重试或阅读文字',
+                            disabled: false,
+                        });
+                    },
+                });
+
+            } catch (error) {
+                this.updateFeedbackSpeechUi({
+                    label: '再试一次',
+                    icon: 'ph-arrow-counter-clockwise',
+                    status: error.message || '朗读失败，请重试或阅读文字',
+                    disabled: !this.feedbackReady,
+                });
+            }
+        });
+    }
+
+    bindFeedbackSpeechLifecycle() {
+        window.addEventListener('beforeunload', () => {
+            this.feedbackSpeech?.stop();
+        });
+
+        document.addEventListener('click', (event) => {
+            const moduleNavigation = event.target.closest?.('[data-module]');
+            if (moduleNavigation && moduleNavigation.dataset.module !== 'speech-evaluation') {
+                this.stopFeedbackSpeech(false);
+            }
+        });
+    }
+
+    updateFeedbackSpeechUi({ label, icon, status, disabled }) {
+        if (this.feedbackSpeechLabel) {
+            this.feedbackSpeechLabel.textContent = label;
+        }
+        if (this.feedbackSpeechIcon) {
+            this.feedbackSpeechIcon.className = `ph ${icon}`;
+        }
+        if (this.feedbackSpeechStatus) {
+            this.feedbackSpeechStatus.textContent = status;
+        }
+        if (this.feedbackSpeechButton) {
+            this.feedbackSpeechButton.disabled = disabled;
+            this.feedbackSpeechButton.setAttribute('aria-label', label);
+        }
+    }
+
+    stopFeedbackSpeech(userInitiated = false) {
+        const wasReading = Boolean(this.feedbackSpeech?.isReading());
+        this.feedbackSpeech?.stop();
+
+        if ((wasReading || userInitiated) && this.feedbackReady) {
+            this.updateFeedbackSpeechUi({
+                label: '再听一遍',
+                icon: 'ph-arrow-counter-clockwise',
+                status: '已停止',
+                disabled: false,
+            });
+        }
+    }
+
+    prepareForNewFeedback(status) {
+        this.feedbackGeneration++;
+        this.feedbackSpeech?.stop();
+        this.feedbackReady = false;
+
+        if (!this.feedbackSpeech?.isSupported()) {
+            this.updateFeedbackSpeechUi({
+                label: '听反馈',
+                icon: 'ph-speaker-slash',
+                status: '当前设备暂时无法朗读，请阅读文字反馈',
+                disabled: true,
+            });
+            return;
+        }
+
+        this.updateFeedbackSpeechUi({
+            label: '听反馈',
+            icon: 'ph-speaker-high',
+            status,
+            disabled: true,
+        });
+    }
+
     bindEvents() {
         this.recorder.onStart = () => {
             console.log("onStart");
+            this.prepareForNewFeedback('完成本次朗读后可以听新反馈');
             this.audioChunks = [];
             this.changeBtnStatus("OPEN");
         }
@@ -48,8 +193,9 @@ class SpeechEvalModule {
 
         this.btnControl.onclick = () => {
             if (this.btnStatus === "UNDEFINED" || this.btnStatus === "CLOSED") {
+                this.prepareForNewFeedback('完成本次朗读后可以听新反馈');
                 this.connectWebSocket();
-            } else if (this.btnStatus === "CONNECTING" || this.btnStatus === "OPEN") {
+            } else if (this.btnStatus === "OPEN") {
                 // 结束录音
                 console.log("停止录音");
                 this.recorder.stop();
@@ -57,49 +203,55 @@ class SpeechEvalModule {
         };
     }
 
-    getWebSocketUrl() {
-        const APPID = CONFIG.TENCENT.APPID;
-        const SECRET_ID = CONFIG.TENCENT.SECRET_ID;
-        const SECRET_KEY = CONFIG.TENCENT.SECRET_KEY;
-
-        const SERVER_ENGINE_TYPE = "16k_zh"; // 中文标准版
-        const VOICE_ID = crypto.randomUUID(); // 生成唯一音频流标识
-        //添加声调评测标识
-        const REF_TEXT = "{::cmd{F_TDET=true}}" + (document.getElementById("evalText")?.innerText || "你好");
-        const TIMESTAMP = Math.floor(Date.now() / 1000);
-        const NONCE = Math.floor(Math.random() * 1000000000);
-        const EXPIRED = TIMESTAMP + 86400; // 1 天有效期
-
+    async getWebSocketUrl() {
+        const selectedModeElement = document.querySelector('input[type="radio"][name="group"]:checked');
         let selectedMode = "读汉字";
-        const checkedRadio = document.querySelector('input[type="radio"][name="group"]:checked');
-        if (checkedRadio) {
-            selectedMode = checkedRadio.value || checkedRadio.nextSibling.textContent.trim();
+        if (selectedModeElement) {
+            selectedMode = selectedModeElement.value || selectedModeElement.nextSibling.textContent.trim();
         }
 
         console.log("mode is: ", selectedMode);
-        let EVAL_MODE = 0
+        let evalMode = 0;
         if (selectedMode === "读句子") {
-            EVAL_MODE = 1
+            evalMode = 1;
         } else if (selectedMode === "读段落") {
-            EVAL_MODE = 2
+            evalMode = 2;
         } else {
-            // 默认为读汉字/读单词
-            EVAL_MODE = 0
+            evalMode = 0;
         }
 
-        const SCORE_COEFF = 1.0; // 评分严格度
+        const refText = document.getElementById("evalText")?.innerText || "你好";
 
-        const params = `eval_mode=${EVAL_MODE}&expired=${EXPIRED}&nonce=${NONCE}&ref_text=${REF_TEXT}&score_coeff=${SCORE_COEFF}&secretid=${SECRET_ID}&server_engine_type=${SERVER_ENGINE_TYPE}&text_mode=0&timestamp=${TIMESTAMP}&voice_format=1&voice_id=${VOICE_ID}`;
+        try {
+            const response = await fetch(`${CONFIG.BACKEND_API}/api/tencent/soe/websocket-url`, {
+                method: 'POST',
+                headers: LegacyContent.headers(true),
+                body: JSON.stringify({
+                    refText: refText,
+                    evalMode: evalMode,
+                    scoreCoeff: 1.0
+                })
+            });
 
-        const SIGNATURE_STRING = `soe.cloud.tencent.com/soe/api/${APPID}?${params}`;
-        const SIGNATURE = CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA1(SIGNATURE_STRING, SECRET_KEY));
-        const ENCODED_SIGNATURE = encodeURIComponent(SIGNATURE);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
-        return `wss://soe.cloud.tencent.com/soe/api/${APPID}?${params}&signature=${ENCODED_SIGNATURE}`;
+            const result = await response.json();
+            if (result.code !== 0) {
+                throw new Error(result.message || '获取连接失败');
+            }
+
+            return result.result;
+        } catch (error) {
+            console.error("获取 WebSocket URL 失败:", error);
+            throw error;
+        }
     }
 
     changeBtnStatus(status) {
         this.btnStatus = status;
+        this.btnControl.disabled = status === "CONNECTING" || status === "CLOSING";
         if (status === "CONNECTING") {
             this.btnControl.innerText = "建立连接中";
         } else if (status === "OPEN") {
@@ -111,16 +263,33 @@ class SpeechEvalModule {
         }
     }
 
-    getAnalysis(req_content) {
-        const Authorization = CONFIG.FASTGPT.API_KEY;
-
-        // Determine mode from UI (radio buttons)
+    async getAnalysis(req_content) {
+        const headers = LegacyContent.headers(true);
         const selectedModeElement = document.querySelector('input[name="group"]:checked');
-        const selectedMode = selectedModeElement ? selectedModeElement.value : '读句子'; // Default to Sentence if not found
+        const selectedMode = selectedModeElement ? selectedModeElement.value : '读句子';
+
+        this.prepareForNewFeedback('AI 老师正在生成建议');
+        const generation = this.feedbackGeneration;
+
+        let suggestionBox = this.suggestionBox;
+        if (suggestionBox) {
+            suggestionBox.value = "正在分析你的录音，请稍候...";
+            suggestionBox.disabled = true;
+        }
+
+        let loadingDots = 0;
+        const loadingInterval = setInterval(() => {
+            if (!suggestionBox) {
+                suggestionBox = document.querySelector(".suggestion-box");
+            }
+            if (generation === this.feedbackGeneration && suggestionBox && suggestionBox.disabled) {
+                loadingDots = (loadingDots + 1) % 4;
+                suggestionBox.value = "正在分析你的录音" + ".".repeat(loadingDots) + "   ".repeat(3 - loadingDots);
+            }
+        }, 500);
 
         let prompt;
 
-        // Use global PROMPTS object
         if (typeof PROMPTS !== 'undefined') {
             if (selectedMode === '读段落') {
                 prompt = PROMPTS.PARAGRAPH;
@@ -128,43 +297,38 @@ class SpeechEvalModule {
                 prompt = PROMPTS.DEFAULT;
             }
         } else {
-            // Fallback if PROMPTS not loaded
             if (selectedMode === '读段落') {
                 prompt = `你是一位中文口语老师，以下是口语测评数据，请分析并给出评价。数据包括整体的准确度、流利度、完整度以及总分。
                   然后对这位汉语学习者给出练习建议。
                   注意：
                   1. 分析和建议各控制在300字以内
-                  2. 输出应该模仿老师的语言风格，避免出现markdown等特殊格式的字符，并以“你”来称呼对方
+                  2. 输出应该模仿老师的语言风格，避免出现markdown等特殊格式的字符，并以"你"来称呼对方
                   3. 重点分析整体的朗读效果，如停顿、语速、情感表达等
                   4. 避免列举具体数字
                   5. 开头直接分析就行，不需要引入语
                   6. 由于是段落朗读，请更多关注语流音变和整体语感`;
             } else {
-                prompt = `你是一位中文口语老师，以下是口语测评数据，请分析并给出评价。数据包括一句里每个字的音素和音素得分：({
-                      Word: item.Word,
-                      // 遍历 PhoneInfos 并提取 Phone 和 PronAccuracy
-                      PhoneInfos: item.PhoneInfos.map(phoneItem => ({
-                        Phone: phoneItem.Phone,
-                        PronAccuracy: phoneItem.PronAccuracy
-                      })
-                      // 遍历Tone,若Valid=false,则无效；若Valid=Ture,提取RefTone和HypothesisTone进行比对。如果比对结果是不相等，则说明该字的韵母声调错误，一定要明确指出该字的声调错误。
-                      然后对这位汉语学习者给出练习建议。
+                prompt = `你是一位中文口语老师，以下是口语测评数据，请分析并给出评价。数据包括一句里每个字的音素和音素得分。
+                      分析步骤：
+                      1. 整体评价：根据总分、准确度、流利度、完整度给出鼓励性评价
+                      2. 共性问题归纳：找出所有低分字中反复出现的共性问题，统一说明（如多个字声调未识别、声母普遍偏弱等），不要逐字重复
+                      3. 逐字分析：只对有独特问题的字单独分析，共性问题不要重复
+                      4. 练习建议：针对问题给出简洁建议
                       注意：
                       1. 分析和建议各控制在300字以内
-                      2. 输出应该模仿老师的语言风格，避免出现markdown等特殊格式的字符，并以“你”来称呼对方
-                      3. 如果没有音素得分有可能是因为漏读了
+                      2. 输出应该模仿老师的语言风格，避免出现markdown等特殊格式的字符，并以"你"来称呼对方
+                      3. 避免重复：共性问题只说一次，不要每个字都复制粘贴相同的分析
                       4. 避免列举具体数字
                       5. 开头直接分析就行，不需要引入语
-                      6. 需要从音素的声母、韵母，整体的准确度、流利度等多个维度进行分析
-                      7. 如果单字的Tone:Valid=true说明启用了声调评测，启用时你才需要额外分析声调是否正确，HypothesisTone为-1代表该字的声调读错了`;
+                      6. 如果单字的Tone:Valid=true说明启用了声调评测，HypothesisTone为-1代表声调读错`;
             }
         }
 
         return axios({
-            url: 'https://api.fastgpt.in/api/v1/chat/completions',
+            url: `${CONFIG.BACKEND_API}/api/fastgpt/chat/completions`,
             method: 'post',
             data: JSON.stringify({
-                "chatId": "111",
+                "chatId": "evaluation:" + crypto.randomUUID(),
                 "stream": false,
                 "detail": false,
                 "messages": [
@@ -174,21 +338,53 @@ class SpeechEvalModule {
                     }
                 ]
             }),
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': Authorization
+            headers,
+            withCredentials: true
+        }).then((response) => {
+            const data = response.data;
+            if (data.code !== 0) {
+                throw new Error(data.message || '分析请求失败');
             }
-        }).then(function (response) {
-            let content = response.data.choices[0].message.content;
+            let content = data.result?.choices?.[0]?.message?.content;
+            if (typeof content !== 'string' || !content.trim()) throw new Error('服务未返回反馈内容');
+            clearInterval(loadingInterval);
+            if (generation !== this.feedbackGeneration) return content;
             let suggestionBox = document.querySelector(".suggestion-box");
 
             if (suggestionBox) {
                 suggestionBox.value = content;
+                suggestionBox.disabled = false;
+                this.feedbackReady = Boolean(content?.trim());
+                const speechSupported = Boolean(this.feedbackSpeech?.isSupported());
+                this.updateFeedbackSpeechUi({
+                    label: '听反馈',
+                    icon: speechSupported ? 'ph-speaker-high' : 'ph-speaker-slash',
+                    status: !speechSupported
+                        ? '当前设备暂时无法朗读，请阅读文字反馈'
+                        : (this.feedbackReady ? '可以阅读，也可以听' : '暂无可朗读反馈'),
+                    disabled: !this.feedbackReady || !speechSupported,
+                });
             } else {
                 console.error("未找到 .suggestion-box 元素");
             }
             return content;
+        }).catch(err => {
+            clearInterval(loadingInterval);
+            if (generation === this.feedbackGeneration) {
+                if (suggestionBox) {
+                    suggestionBox.value = '分析失败：' + (err.message || '请重试');
+                    suggestionBox.disabled = false;
+                }
+                this.feedbackReady = false;
+                this.updateFeedbackSpeechUi({label:'听反馈', icon:'ph-speaker-high', status:'暂无可朗读反馈', disabled:true});
+            }
+            throw err;
         });
+    }
+
+    showSaveStatus(message) {
+        const status = document.getElementById('score_save_status');
+        if (status) status.textContent = message;
     }
 
     mergeAudioChunks() {
@@ -322,7 +518,7 @@ class SpeechEvalModule {
                     } else {
                         randomColor = `rgb(34, 139, 34)`; // Green for >= 80
                     }
-                    coloredText += `<span style="color: ${randomColor}">${word}</span>`;
+                    coloredText += `<span style="color: ${randomColor}">${LegacyContent.escapeHtml(word)}</span>`;
                 }
             }
 
@@ -363,39 +559,40 @@ class SpeechEvalModule {
             const jsonString = JSON.stringify(analysisRequestData, null, 2);
 
             if (isFinal) {
-                // 1. Get Analysis
-                const analysisPromise = this.getAnalysis(jsonString);
+                try {
+                    this.showSaveStatus('正在保存本次评测');
+                    const analysisPromise = this.getAnalysis(jsonString);
+                    const generation = this.feedbackGeneration;
 
-                // 2. Upload Audio
-                const pcmBuffer = this.mergeAudioChunks();
-                const wavBuffer = this.addWavHeader(pcmBuffer);
-                const audioBlob = new Blob([wavBuffer], { type: 'audio/wav' });
-                const audioUploadPromise = ScoreService.uploadAudioFile(audioBlob);
+                    const pcmBuffer = this.mergeAudioChunks();
+                    const wavBuffer = this.addWavHeader(pcmBuffer);
+                    const audioBlob = new Blob([wavBuffer], { type: 'audio/wav' });
+                    const audioUploadPromise = ScoreService.uploadAudioFile(audioBlob);
 
-                Promise.all([analysisPromise, audioUploadPromise])
-                    .then(([advice, audioUrl]) => {
-                        // 3. Create Score Action
-                        const scoreData = {
-                            audioUrl: audioUrl,
-                            accuracy: jsonData.result.PronAccuracy,
-                            fluency: jsonData.result.PronFluency * 100,
-                            completeness: jsonData.result.PronCompletion * 100,
-                            initialSoundScore: initialScore,
-                            finalSoundScore: finalScore,
-                            toneScore: toneScore,
-                            totalScore: jsonData.result.SuggestedScore,
-                            advice: advice
-                        };
-                        return ScoreService.createScoreAction(scoreData);
-                    })
-                    .then(res => {
-                        console.log("Score saved successfully:", res);
-                        // alert("评分已保存！");
-                    })
-                    .catch(err => {
-                        console.error("Failed to save score:", err);
-                        // alert("保存评分失败: " + err.message);
-                    });
+                    Promise.all([analysisPromise, audioUploadPromise])
+                        .then(([advice, audioUrl]) => {
+                            const scoreData = {
+                                audioUrl: audioUrl,
+                                accuracy: jsonData.result.PronAccuracy,
+                                fluency: jsonData.result.PronFluency * 100,
+                                completeness: jsonData.result.PronCompletion * 100,
+                                initialSoundScore: initialScore,
+                                finalSoundScore: finalScore,
+                                toneScore: toneScore,
+                                totalScore: jsonData.result.SuggestedScore,
+                                advice: advice
+                            };
+                            return ScoreService.createScoreAction(scoreData);
+                        })
+                        .then(res => {
+                            if (generation === this.feedbackGeneration) this.showSaveStatus('本次评测已保存，可在历史记录中查看');
+                        })
+                        .catch(err => {
+                            if (generation === this.feedbackGeneration) this.showSaveStatus('本次评测未保存：' + (err.message || '请检查连接后重试'));
+                        });
+                } catch (err) {
+                    this.showSaveStatus('本次评测未保存：' + (err.message || '请检查连接后重试'));
+                }
             }
 
             evalText.innerHTML = coloredText;
@@ -454,40 +651,53 @@ class SpeechEvalModule {
         }
     }
 
-    connectWebSocket() {
-        const websocketUrl = this.getWebSocketUrl();
-        if ("WebSocket" in window) {
-            this.iseWS = new WebSocket(websocketUrl);
-        } else {
-            alert("浏览器不支持WebSocket");
-            return;
-        }
+    async connectWebSocket() {
+        if (this.btnStatus === "CONNECTING" || this.btnStatus === "OPEN") return;
         this.changeBtnStatus("CONNECTING");
-        this.iseWS.onopen = () => {
-            this.recorder.start({ sampleRate: 16000, frameSize: 1280 });
-        };
-
-        this.iseWS.onmessage = (e) => {
-            const data = JSON.parse(e.data);
-            console.log("收到消息:", data);
-            const isFinal = data.final === 1;
-            this.renderResult(e.data, isFinal);
-
-            if (isFinal) {
-                this.iseWS.close();
+        this.showSaveStatus('');
+        try {
+            const websocketUrl = await this.getWebSocketUrl();
+            if ("WebSocket" in window) {
+                this.iseWS = new WebSocket(websocketUrl);
+            } else {
+                throw new Error("浏览器不支持WebSocket");
             }
-        };
+            this.changeBtnStatus("CONNECTING");
+            this.iseWS.onopen = () => {
+                this.recorder.start({ sampleRate: 16000, frameSize: 1280 });
+            };
 
-        this.iseWS.onerror = (e) => {
-            console.error(e);
-            this.recorder.stop();
+            this.iseWS.onmessage = (e) => {
+                let data;
+                try { data = JSON.parse(e.data); } catch { this.showSaveStatus('评测服务返回格式异常'); this.iseWS.close(); return; }
+                if (data.code && data.code !== 0) {
+                    this.showSaveStatus('评测失败：' + (data.message || '请重新录音'));
+                    this.iseWS.close();
+                    return;
+                }
+                const isFinal = data.final === 1;
+                this.renderResult(e.data, isFinal);
+
+                if (isFinal) {
+                    this.iseWS.close();
+                }
+            };
+
+            this.iseWS.onerror = (e) => {
+                this.showSaveStatus('评测连接中断，请重新录音');
+                this.recorder.stop();
+                this.changeBtnStatus("CLOSED");
+            };
+            this.iseWS.onclose = () => {
+                this.recorder.stop();
+                this.changeBtnStatus("CLOSED");
+            };
+        } catch (error) {
+            this.showSaveStatus('连接服务失败：' + (error.message || '请稍后重试'));
             this.changeBtnStatus("CLOSED");
-        };
-        this.iseWS.onclose = () => {
-            this.recorder.stop();
-            this.changeBtnStatus("CLOSED");
-        };
+        }
     }
 }
 
-window.SpeechEvalModule = SpeechEvalModule;
+if (typeof window !== 'undefined') window.SpeechEvalModule = SpeechEvalModule;
+if (typeof module !== 'undefined' && module.exports) module.exports = SpeechEvalModule;

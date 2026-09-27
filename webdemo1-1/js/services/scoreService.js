@@ -1,107 +1,36 @@
 const ScoreService = {
-    /**
-     * 创建评分记录
-     * @param {Object} scoreData - 评分数据
-     * @returns {Promise}
-     */
-    createScoreAction: function (scoreData) {
-        const userInfo = JSON.parse(localStorage.getItem("user_info") || "{}");
-        const sessionId = userInfo.sessionId;
-
-        return axios({
-            url: CONFIG.BACKEND_API + '/scoreAction/createScoreAction',
-            method: 'post',
-            data: scoreData,
-            headers: {
-                'Content-Type': 'application/json',
-                'session': sessionId // Add session header
-            },
-            withCredentials: true
-        });
+    async createScoreAction(scoreData) {
+        return LegacyContent.result(await axios({
+            url: CONFIG.BACKEND_API + '/scoreAction/createScoreAction', method:'post', data:scoreData,
+            headers: LegacyContent.headers(true), withCredentials:true
+        }));
     },
-
-    /**
-     * 上传音频文件
-     * @param {Blob|File} audioFile - 音频文件对象
-     * @returns {Promise<string>} - 返回音频文件的URL
-     */
-    uploadAudioFile: function (audioFile) {
-        const userInfo = JSON.parse(localStorage.getItem("user_info") || "{}");
-        const sessionId = userInfo.sessionId;
-
+    async uploadAudioFile(audioFile) {
+        const headers = LegacyContent.headers();
         const formData = new FormData();
-        formData.append('audioFile', audioFile, 'recording.mp3');
-
-        return axios({
-            url: CONFIG.BACKEND_API + '/scoreAction/uploadAudioFile',
-            method: 'post',
-            data: formData,
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                'session': sessionId // Add session header
-            },
-            withCredentials: true
-        }).then(response => {
-            if (response.data.code === 0) {
-                return response.data.result;
-            } else {
-                throw new Error(response.data.message);
-            }
-        });
+        formData.append('audioFile', audioFile, 'recording.wav');
+        const result = LegacyContent.result(await axios({
+            url: CONFIG.BACKEND_API + '/scoreAction/uploadAudioFile', method:'post', data:formData,
+            headers, withCredentials:true
+        }));
+        if (typeof result !== 'string' || !result) throw new Error('音频上传未返回地址');
+        return result;
     },
-
-    /**
-     * 查找当前用户的评分记录
-     * @returns {Promise<Array>}
-     */
-    findCurrentUserScoreActions: function () {
-        const userInfo = JSON.parse(localStorage.getItem("user_info") || "{}");
-        const sessionId = userInfo.sessionId;
-
-        return axios({
-            url: CONFIG.BACKEND_API + '/user/findCurrentUserScoreActions',
-            method: 'get',
-            headers: {
-                'session': sessionId // Add session header
-            },
-            withCredentials: true
-        }).then(response => {
-            if (response.data.code === 0) {
-                // Check if result is 0 (which seems to be returned when no list is found or user has no scores)
-                // The user reported: {"code":0,"message":"操作成功！","result":0}
-                if (response.data.result === 0) {
-                    return [];
-                }
-                return response.data.result;
-            } else {
-                throw new Error(response.data.message);
-            }
-        });
+    async findCurrentUserScoreActions() {
+        const result = LegacyContent.result(await axios({
+            url: CONFIG.BACKEND_API + '/user/findCurrentUserScoreActions', method:'get',
+            headers:LegacyContent.headers(), withCredentials:true
+        }));
+        if (result === 0) return [];
+        if (!Array.isArray(result)) throw new Error('评测记录返回格式异常');
+        return result;
     },
-
-    /**
-     * 查找所有评分记录 (管理员用)
-     * @returns {Promise<Array>}
-     */
-    findAllScoreActions: function () {
-        const userInfo = JSON.parse(localStorage.getItem("user_info") || "{}");
-        const sessionId = userInfo.sessionId;
-
-        return axios({
-            url: CONFIG.BACKEND_API + '/scoreAction/findAllScoreActions',
-            method: 'get',
-            headers: {
-                'session': sessionId // Add session header
-            },
-            withCredentials: true
-        }).then(response => {
-            if (response.data.code === 0) {
-                return response.data.result;
-            } else {
-                throw new Error(response.data.message);
-            }
-        });
+    async findAllScoreActions() {
+        return LegacyContent.result(await axios({
+            url:CONFIG.BACKEND_API + '/scoreAction/findAllScoreActions', method:'get',
+            headers:LegacyContent.headers(), withCredentials:true
+        }));
     }
 };
-
-window.ScoreService = ScoreService;
+if (typeof window !== 'undefined') window.ScoreService = ScoreService;
+if (typeof module !== 'undefined' && module.exports) module.exports = ScoreService;
