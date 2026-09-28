@@ -46,4 +46,10 @@ public interface UserService extends IService<User> {
 
     // 根据 userId 获取用户信息
     User getUserById(String userId) throws MyException;
+
+    // 获取用户学习资料
+    Object getUserProfile() throws MyException;
+
+    // 更新用户学习资料
+    UserInfoResponse updateUserProfile(com.shengdonghanyu.backend.controller.user.request.UpdateUserProfileRequest profile) throws MyException;
 }

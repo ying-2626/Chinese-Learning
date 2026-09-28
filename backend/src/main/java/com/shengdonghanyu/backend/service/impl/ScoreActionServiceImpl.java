@@ -10,10 +10,16 @@ import com.shengdonghanyu.backend.service.ScoreActionService;
 import com.shengdonghanyu.backend.service.UserService;
 import com.shengdonghanyu.backend.util.SessionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.UUID;
+import java.util.Locale;
+import java.util.Map;
 import java.util.List;
 
 /**
@@ -31,6 +37,12 @@ public class ScoreActionServiceImpl implements ScoreActionService {
     @Autowired
     private SessionUtils sessionUtils;
 
+
+    @Value("${audio.storage-dir:./data/audios}")
+    private String audioStorageDir;
+
+    @Value("${audio.public-base-url:/audios}")
+    private String audioPublicBaseUrl;
 
     /**
      * 创建评分行为
@@ -67,24 +79,24 @@ public class ScoreActionServiceImpl implements ScoreActionService {
      */
     @Override
     public String uploadAudioFile(MultipartFile audioFile) {
+        sessionUtils.getUserId();
         if (audioFile == null || audioFile.isEmpty()) {
             throw new MyException(EnumExceptionType.DATA_IS_NULL);
         }
-
+        String contentType = audioFile.getContentType();
+        String extension = Map.of("audio/wav", ".wav", "audio/x-wav", ".wav",
+                "audio/mpeg", ".mp3", "audio/mp3", ".mp3", "audio/ogg", ".ogg",
+                "audio/webm", ".webm", "audio/mp4", ".m4a", "audio/x-m4a", ".m4a")
+                .get(contentType == null ? "" : contentType.toLowerCase(Locale.ROOT).split(";", 2)[0].trim());
+        if (extension == null) throw new MyException(EnumExceptionType.PARAMETER_ERROR);
         try {
-            File dir = new File("/www/wwwroot/web/audios");
-            if (!dir.exists() && !dir.mkdirs()) {
-                throw new MyException(EnumExceptionType.INSERT_FAILED);
-            }
-
-            String original = audioFile.getOriginalFilename();
-            String safeName = (original == null || original.trim().isEmpty()) ? "audio" : original.replaceAll("[^a-zA-Z0-9\\.\\-_%]", "_");
-            String filename = System.currentTimeMillis() + "_" + safeName;
-            File dest = new File(dir, filename);
-            audioFile.transferTo(dest);
-
-            return "https://shengdonghanyu.com" + "/audios/" + filename;
-        } catch (Exception e) {
+            Path directory = Path.of(audioStorageDir).toAbsolutePath().normalize();
+            Files.createDirectories(directory);
+            // The public URL must remain an audio resource regardless of the supplied filename.
+            String filename = UUID.randomUUID() + extension;
+            audioFile.transferTo(directory.resolve(filename));
+            return audioPublicBaseUrl.replaceAll("/+$", "") + "/" + filename;
+        } catch (IOException e) {
             throw new MyException(EnumExceptionType.INSERT_FAILED);
         }
     }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 
 <head>
     <meta charset="UTF-8">
@@ -15,8 +15,8 @@
         href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown-light.min.css">
 
     <!-- Config -->
-    <script src="js/config/config.js?v=20260922-ui"></script>
-    <script src="js/services/scoreService.js?v=20260922-ui"></script>
+    <script src="js/config/config.js?v=20260927"></script>
+    <script src="js/services/scoreService.js?v=20260927"></script>
 
     <!-- Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -49,10 +49,13 @@
         }
     </style>
     <link rel="stylesheet" href="styles/ui-base.css">
-    <link rel="stylesheet" href="styles/workspace-refresh.css?v=20260922">
-    <link rel="stylesheet" href="styles/legacy-features-refresh.css?v=20260922">
-    <link rel="stylesheet" href="styles/ui-motion.css?v=20260922">
-    <link rel="stylesheet" href="styles/liquid-glass.css?v=20260922">
+    <link rel="stylesheet" href="styles/workspace-refresh.css?v=20260927">
+    <link rel="stylesheet" href="styles/legacy-features-refresh.css?v=20260927">
+    <link rel="stylesheet" href="styles/ui-motion.css?v=20260927">
+    <link rel="stylesheet" href="styles/liquid-glass.css?v=20260927">
+    <link rel="stylesheet" href="styles/voice-interaction.css?v=20260927">
+    <link rel="stylesheet" href="styles/practice-experience.css?v=20260928">
+    <link rel="stylesheet" href="styles/score-motion.css?v=20260928">
 </head>
 
 <body class="ui-workspace">
@@ -72,13 +75,17 @@
             <label><input type="radio" name="group" value="读句子"> 读句子</label>
             <label><input type="radio" name="group" value="读段落"> 读段落</label>
                     </div>
-            <div id="evalText" contenteditable="true" role="textbox" aria-label="朗读内容" aria-multiline="true"
-                style="width: 500px; height: 130px; font-size: 16px; padding: 10px; border: 2px solid #007bff; border-radius: 5px; outline: none; transition: border 0.3s; box-sizing: border-box; background-color: White; margin-top: 30px; overflow: auto;">
-                输入你想要朗读的内容
-            </div>
+            <div id="evalText" contenteditable="true" role="textbox" aria-label="朗读内容" aria-multiline="true" data-placeholder="输入你想要朗读的内容"
+                style="width: 500px; height: 130px; font-size: 16px; padding: 10px; border: 2px solid #007bff; border-radius: 5px; outline: none; transition: border 0.3s; box-sizing: border-box; background-color: White; margin-top: 30px; overflow: auto;"></div>
                     <div class="practice-controls">
-                        <button id="btn_control"
-                style="padding: 6px 20px; font-size: 16px; border: none; border-radius: 5px; background-color: #007bff; color: white; cursor: pointer;">开始录音</button>
+                        <div class="recording-capsule" data-state="idle">
+                            <div class="recording-meter" aria-hidden="true">
+                                <svg class="recording-wave" viewBox="0 0 122 28"><path></path></svg>
+                                <span class="recording-time">0:00</span>
+                            </div>
+                            <button id="btn_control" type="button" aria-label="开始录音" aria-describedby="recording_status"><span class="recording-label">开始录音</span></button>
+                        </div>
+                        <p id="recording_status" class="recording-status" role="status" aria-live="polite"></p>
                     </div>
                 </section>
             <div class="output-box" id="result_output">
@@ -153,9 +160,17 @@
 
         <!-- Voice板块 -->
         <div class="module voice" id="voice" style="display:none;">
-            <iframe src="https://www.light4ai.com/sentio/bec46b4b-db2e-4dc0-a411-c3484c82f347"
-                style="width: 100%; min-height: 700px; border: none;" allow="microphone">
+            <div class="voice-toolbar">
+                <p>数字人口语陪练 <span>在同一个画面里，边对话边互动。</span></p>
+                <button id="vi-open" type="button" aria-controls="voice-interaction" aria-expanded="false">展开互动卡 <span aria-hidden="true">↗</span></button>
+            </div>
+            <div id="voice-scene" data-placement="overlay">
+            <div id="voice-conversation">
+            <iframe title="数字人对话" data-src="https://www.light4ai.com/sentio/bec46b4b-db2e-4dc0-a411-c3484c82f347" allow="microphone">
             </iframe>
+            </div>
+            <section id="voice-interaction" aria-label="数字人互动卡" hidden></section>
+            </div>
         </div>
 
         <!-- Chatbot板块 -->
@@ -528,19 +543,21 @@
     </div>
 
     <!-- Config Scripts -->
-    <script src="js/config/config.js?v=20260922-ui"></script>
-    <script src="js/prompt/prompts.js?v=20260922-ui"></script>
+    <script src="js/config/config.js?v=20260927"></script>
+    <script src="js/prompt/prompts.js?v=20260927"></script>
 
     <!-- Modules Scripts -->
-    <script src="js/components/Sidebar.js?v=20260922-ui"></script>
-    <script src="js/modules/LegacyContent.js?v=20260922-ui"></script>
-    <script src="js/modules/Chatbot.js?v=20260922-ui"></script>
-    <script src="js/modules/FeedbackSpeech.js?v=20260922-ui"></script>
-    <script src="js/modules/SpeechEval.js?v=20260922-ui"></script>
-    <script src="js/modules/MagicTool.js?v=20260922-ui"></script>
-    <script src="js/modules/History.js?v=20260922-ui"></script>
-    <script src="js/modules/Love.js?v=20260922-ui"></script>
-    <script src="js/modules/CustomLearning.js?v=20260922-ui"></script>
+    <script src="js/components/Sidebar.js?v=20260927"></script>
+    <script src="js/modules/LegacyContent.js?v=20260927"></script>
+    <script src="js/modules/Chatbot.js?v=20260927"></script>
+    <script src="js/modules/FeedbackSpeech.js?v=20260927"></script>
+    <script src="js/recording-capsule.js?v=20260928"></script>
+    <script src="js/score-motion.js?v=20260928"></script>
+    <script src="js/modules/SpeechEval.js?v=20260928"></script>
+    <script src="js/modules/MagicTool.js?v=20260927"></script>
+    <script src="js/modules/History.js?v=20260927"></script>
+    <script src="js/modules/Love.js?v=20260927"></script>
+    <script src="js/modules/CustomLearning.js?v=20260927"></script>
 
     <!-- Purchase Modal Functions -->
     <script>
@@ -665,9 +682,10 @@
     </script>
 
     <!-- Main Script -->
-    <script src="js/index.js?v=20260922-ui"></script>
-    <script defer src="js/ui-motion.js?v=20260922-ui"></script>
-    <script defer src="js/liquid-glass.js?v=20260922-ui"></script>
+    <script src="js/index.js?v=20260927"></script>
+    <script defer src="js/ui-motion.js?v=20260927"></script>
+    <script defer src="js/liquid-glass.js?v=20260927"></script>
+    <script type="module" src="js/interaction/workspace-voice.js?v=20260927"></script>
 </body>
 
 </html>

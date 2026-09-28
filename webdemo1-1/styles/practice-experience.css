@@ -1,0 +1,65 @@
+/* One glass surface carries the existing start / stop interaction. */
+.ui-workspace .practice-controls { flex-direction: column; gap: 10px; }
+.ui-workspace .recording-capsule {
+  position: relative;
+  isolation: isolate;
+  width: 188px;
+  max-width: 100%;
+  height: 60px;
+  padding: 6px;
+  border: 1px solid rgb(255 255 255 / 95%);
+  border-radius: 999px;
+  background: linear-gradient(155deg, rgb(239 246 255 / 88%), rgb(247 250 255 / 60%) 50%, rgb(218 230 249 / 62%));
+  box-shadow: 0 7px 20px rgb(40 77 134 / 9%), inset 0 1px 1px #fff, inset 0 -1px 2px rgb(121 155 202 / 15%);
+  backdrop-filter: blur(16px) saturate(135%);
+  -webkit-backdrop-filter: blur(16px) saturate(135%);
+  transition: width 380ms cubic-bezier(.22,.85,.22,1), background-color 220ms ease, box-shadow 220ms ease;
+}
+.ui-workspace .recording-capsule::after {
+  position: absolute; inset: 0; z-index: -1; content: ''; border-radius: inherit;
+  box-shadow: inset 0 2px 2px #fff, inset 0 -2px 3px rgb(133 169 218 / 17%);
+  pointer-events: none;
+}
+.ui-workspace .recording-capsule #btn_control {
+  position: absolute; top: 5px; right: 5px; min-width: 0; min-height: 48px;
+  width: calc(100% - 10px); height: 48px; padding: 0 20px !important; overflow: hidden;
+  border: 0;
+  background: linear-gradient(170deg, #578af1, #356ae3 70%, #2e60d3) !important;
+  box-shadow: inset 0 2px 2px rgb(255 255 255 / 38%), inset 0 -1px 1px rgb(14 48 120 / 20%), 0 3px 7px rgb(47 95 181 / 18%);
+  transition: width 380ms cubic-bezier(.22,.85,.22,1), background 220ms ease, box-shadow 180ms ease;
+}
+.ui-workspace .recording-label { white-space: nowrap; }
+.ui-workspace .recording-meter {
+  position: absolute; inset: 6px 72px 6px 20px; display: flex; align-items: center; gap: 13px;
+  color: #365a88; opacity: 0; visibility: hidden; translate: 6px 0;
+  transition: opacity 140ms ease, translate 280ms ease, visibility 280ms;
+  pointer-events: none;
+}
+.ui-workspace .recording-wave { width: 118px; min-width: 0; height: 28px; flex: 1; overflow: visible; }
+.ui-workspace .recording-wave path { stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; fill: none; }
+.ui-workspace .recording-time { font-size: 13px; font-weight: 550; font-variant-numeric: tabular-nums; letter-spacing: .025em; }
+.ui-workspace .recording-capsule[data-state="recording"] { width: 316px; box-shadow: 0 8px 26px rgb(40 77 134 / 13%), inset 0 1px 1px #fff; }
+.ui-workspace .recording-capsule[data-state="recording"] .recording-meter { opacity: 1; visibility: visible; translate: 0 0; transition-delay: 80ms; }
+.ui-workspace .recording-capsule[data-state="recording"] #btn_control { width: 48px; padding: 0 !important; background: linear-gradient(160deg, #c15d67, #ad3e4d) !important; }
+.ui-workspace .recording-capsule[data-state="recording"] .recording-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.ui-workspace .recording-capsule:is([data-state="connecting"], [data-state="closing"]) #btn_control { cursor: progress; }
+.ui-workspace .recording-capsule:is([data-state="connecting"], [data-state="closing"]) #btn_control::before { animation: recording-pending 1s linear infinite; }
+@keyframes recording-pending { to { rotate: 360deg; } }
+.ui-workspace .recording-status { min-height: 0; margin: 0; color: #8f4650; font-size: 12px; line-height: 1.6; text-align: center; overflow-wrap: anywhere; }
+.ui-workspace .recording-status:empty { display: none; }
+.ui-workspace .recording-status a { margin-left: 8px; color: #3261bd; text-decoration: underline; text-underline-offset: 3px; }
+.ui-workspace #btn_control:focus-visible { outline: 3px solid #97bafb; outline-offset: 4px; }
+.ui-workspace #evalText[contenteditable="false"] { cursor: default; }
+.ui-workspace #evalText:empty::before { content: attr(data-placeholder); color: #8e98a8; pointer-events: none; }
+.ui-workspace .practice-modes:has(input:disabled) { opacity: .7; }
+.ui-workspace .practice-modes label:has(input:disabled) { cursor: default; }
+.ui-workspace #feedback_text:not(:disabled) { color: #4f5d73 !important; }
+@media (prefers-reduced-motion: reduce) {
+  .ui-workspace .recording-capsule,
+  .ui-workspace .recording-capsule #btn_control,
+  .ui-workspace .recording-meter { transition: none; }
+  .ui-workspace .recording-capsule #btn_control::before { animation: none; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .ui-workspace .recording-capsule { background: #edf3fd; backdrop-filter: none; -webkit-backdrop-filter: none; }
+}

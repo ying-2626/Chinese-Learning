@@ -1,0 +1,49 @@
+/* Scoped to values updated by ScoreMotion. No score is created on page load. */
+.score-motion {
+  position: relative;
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  isolation: isolate;
+}
+
+.score-motion-value {
+  display: block;
+  white-space: nowrap;
+}
+
+.score-motion-running > .score-motion-value {
+  opacity: 0;
+}
+
+.score-motion-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+.score-motion-slot {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.score-motion-glyph {
+  position: absolute;
+  inset: 0;
+  display: block;
+  white-space: pre;
+}
+
+.score-motion-glyph::after {
+  content: attr(data-character);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .score-motion-running > .score-motion-value { opacity: 1; }
+  .score-motion-overlay { display: none; }
+}

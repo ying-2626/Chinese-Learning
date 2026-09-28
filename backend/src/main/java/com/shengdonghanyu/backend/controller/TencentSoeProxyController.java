@@ -1,6 +1,9 @@
 package com.shengdonghanyu.backend.controller;
 
 import com.shengdonghanyu.backend.common.Result;
+import com.shengdonghanyu.backend.exception.MyException;
+import com.shengdonghanyu.backend.util.SessionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +24,6 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequestMapping("/api/tencent/soe")
-@CrossOrigin(origins = "*")
 public class TencentSoeProxyController {
 
     @Value("${tencent.soe.appid:}")
@@ -32,6 +34,9 @@ public class TencentSoeProxyController {
 
     @Value("${tencent.soe.secretKey:}")
     private String secretKey;
+
+    @Autowired
+    private SessionUtils sessionUtils;
 
     private static final String SERVER_ENGINE_TYPE = "16k_zh";
     private static final long EXPIRE_SECONDS = 86400; // 1天有效期
@@ -44,9 +49,17 @@ public class TencentSoeProxyController {
      */
     @PostMapping("/websocket-url")
     public Result getWebSocketUrl(@RequestBody SoeWebSocketRequest request) {
-        if (appId.isEmpty() || secretId.isEmpty() || secretKey.isEmpty()) {
-            log.error("腾讯云语音评测配置未设置");
-            return Result.fail("服务配置错误，请联系管理员");
+        try {
+            sessionUtils.getUserId();
+        } catch (MyException e) {
+            return Result.result(e.getEnumExceptionType());
+        }
+        if (appId.isBlank() || secretId.isBlank() || secretKey.isBlank()) {
+            return Result.fail("语音评测服务尚未配置，请联系管理员");
+        }
+        if (request.getRefText().isBlank() || request.getEvalMode() < 0 || request.getEvalMode() > 2
+                || !Double.isFinite(request.getScoreCoeff()) || request.getScoreCoeff() <= 0) {
+            return Result.fail("评测参数错误，请检查朗读内容与模式");
         }
 
         try {

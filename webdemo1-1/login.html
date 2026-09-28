@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 
 <head>
     <meta charset="UTF-8">
@@ -9,32 +9,33 @@
     </link>
     <link rel="stylesheet" href="styles/ui-base.css">
     <link rel="stylesheet" href="styles/auth-pricing-refresh.css">
-    <link rel="stylesheet" href="styles/ui-motion.css?v=20260921">
-    <link rel="stylesheet" href="styles/liquid-glass.css?v=20260921">
+    <link rel="stylesheet" href="styles/ui-motion.css?v=20260927">
+    <link rel="stylesheet" href="styles/liquid-glass.css?v=20260927">
 </head>
 
 <body class="ui-auth" background="img/背景图.jpg" style="background-attachment: fixed; background-size: 100% 100%;">
     <div class="form-container">
-        <h1 class="form-title" style="text-align:left">欢迎 <span style="color:#2a91f6;">登录</span></h2>
+        <h1 class="form-title" style="text-align:left">欢迎 <span style="color:#2a91f6;">登录</span></h1>
             <!-- 登录表单 -->
             <form id="LoginForm">
                 <span style="font-size:14px;width:80px;text-align:right;line-height: 40px;">用户名: </span>
                 <br>
-                <input type="text" placeholder="" class="username" required>
+                <input type="text" placeholder="" class="username" aria-label="用户名" autocomplete="username" required>
                 <span style="font-size:14px;width:80px;text-align:right;line-height: 40px;">密码: </span>
                 <br>
-                <input type="password" placeholder="" class="password" required>
-                <button type="button" class="button" id="login" onclick="dologin()">登录</button>
+                <input type="password" placeholder="" class="password" aria-label="密码" autocomplete="current-password" required>
+                <button type="submit" class="button" id="login">登录</button>
+                <p id="authStatus" class="auth-status" role="status" aria-live="polite" hidden></p>
             </form>
             <a href="register.html">新用户？立即注册</a>
             <a href="entry.html">回到首页</a>
     </div>
-    <script src="js/config/config.js?v=20260921-ui"></script>
+    <script src="js/config/config.js?v=20260927"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="js/login.js?v=20260921-ui"></script>
+    <script src="js/login.js?v=20260927"></script>
 
-    <script defer src="js/ui-motion.js?v=20260921-ui"></script>
-    <script defer src="js/liquid-glass.js?v=20260921-ui"></script>
+    <script defer src="js/ui-motion.js?v=20260927"></script>
+    <script defer src="js/liquid-glass.js?v=20260927"></script>
 </body>
 
 </html>

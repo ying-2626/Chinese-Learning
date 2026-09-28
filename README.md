@@ -1,18 +1,64 @@
 # 声动汉语 (Chinese-Learning) - 智能口语学习专家
 
-## 前端预览（当前 UI 分支）
+前后端界面与数字人互动现已统一开发。当前工作树、交接范围、Live2D 参考项目和下一步见[统一开发记录](docs/PROJECT_STATUS.md)。
+
+## 本地预览与已有后端联调（当前动效分支）
+
+当前 `codex/ui-motion-backend` 分支在原 HTML 页面上优化玻璃质感、导航与交互动效，并接回旧版已有的登录注册、聊天会话、个人资料、测评保存和历史接口。前端仍以 `webdemo1-1` 与 `feat/feedback-listening` 已有内容为依据，保留原正文、价格和入口；支付、课程、专家答疑等原有占位功能不新增实现。
+
+现有 `.local/runtime.env` 已配置好独立本地环境，可直接复用；该文件和 `.local/` 均被 Git 忽略，不应提交或打印其中的凭据。已有服务运行时，直接打开 [首页](http://127.0.0.1:4195/entry.html) 或 [工作台](http://127.0.0.1:4195/index.html)。
+
+| 服务 | 本机地址/端口 |
+| --- | --- |
+| 前端与同源 API 代理 | `127.0.0.1:4195` |
+| Spring Boot 后端 | `127.0.0.1:8091` |
+| 独立 MySQL | `127.0.0.1:23306` |
+| 独立 Redis | `127.0.0.1:26379` |
+| 测试 SMTP 收件箱 | `127.0.0.1:21025` |
+
+服务未启动时，在项目根目录执行：
 
 ```sh
-python3 scripts/preview.py
+docker compose --env-file .local/runtime.env -f compose.local.yml up -d
+mvn -f backend/pom.xml package -DskipTests
 ```
 
-打开 `http://127.0.0.1:4193/entry.html`，工作台为 `/index.html`。前端以 `webdemo1-1` 旧版页面与 `feat/feedback-listening` 中已有交互为依据，保留原正文、价格、工具与课程入口。未新增套餐或产品能力。
+然后分别在三个终端启动常驻进程：
 
-当前分支只包含前端和预览脚本。登录、聊天、档案、测评记录等请求沿用旧版接口；预览脚本可代理到本地 `127.0.0.1:8088`。没有服务时展示连接失败，不生成示例回复或评分。支付、课程、专家答疑等旧版占位入口仍保留原状态。
+```sh
+# 终端 1：只接收测试邮件，保存为 .local/mail/*.eml，不向外网投递。
+/usr/bin/python3 scripts/mail_sink.py
+```
 
-液态玻璃使用原生 CSS/SVG 装饰层，动效使用 Web Animations API，无新增运行时依赖。参考 [Apple Liquid Glass](https://developer.apple.com/videos/play/wwdc2025/219/) 与 [Aave 的网页玻璃实现](https://aave.com/design/building-glass-for-the-web)。Chromium 使用边缘折射，其他浏览器回退为磨砂与高光；支持减少动态效果、减少透明度偏好。
+```sh
+# 终端 2：读取 .local/runtime.env，启动已有后端。
+python3 scripts/run_backend.py
+```
 
-前端检查：`node --test webdemo1-1/js/modules/FeedbackSpeech.test.js webdemo1-1/js/modules/LegacyFeatures.test.js`。真实腾讯测评、FastGPT、注册邮件和数字人服务不属于本轮联调范围。
+```sh
+# 终端 3：打开前端，并将已有 API 与 /audios 请求转发给本地后端。
+python3 scripts/preview.py --port 4195 --backend http://127.0.0.1:8091
+```
+
+测试收件箱使用标准库 `smtpd`，要求 Python ≤ 3.11；当前 macOS 的 `/usr/bin/python3` 为 3.9，可直接运行。验证码邮件只写入 `.local/mail`，可用本地文本编辑器查看。已有收件箱进程运行时，不要重复启动占用同一端口。
+
+新建环境时，可从 `backend/.env.example` 复制一份到 `.local/runtime.env` 并设置本地凭据：另加 Compose 所需的 `MYSQL_ROOT_PASSWORD`；设置 `DB_USERNAME=chinese_learning`，`DB_URL` 使用 `127.0.0.1:23306/chinese_learning`，`REDIS_PORT=26379`，`SERVER_PORT=8091`，`MAIL_HOST=127.0.0.1`、`MAIL_PORT=21025`、`MAIL_AUTH=false`、`MAIL_STARTTLS=false`，`MAIL_USERNAME` 使用测试发件地址。`DB_PASSWORD` 同时供 Compose 和后端使用。首次创建空 MySQL 数据卷时，Compose 会按顺序执行 `create_table.sql`、`add_user_profile_fields.sql`、`add_chat_tables.sql`；已有数据卷不会重复初始化。`run_backend.py` 负责加载环境文件，Spring Boot 本身不会自动读取 `.env`。数据库和 Redis 数据保留在该 Compose 项目的独立卷中。
+
+本轮已实测通过本地数据库、Redis 会话与测试 SMTP 链路。**腾讯语音测评、FastGPT、真实邮件投递和数字人服务尚未实测**；缺少供应商配置或后端不可达时显示实际错误，不生成示例回复或评分。测试邮件成功不代表真实邮件投递已验证。
+
+玻璃效果使用原生 CSS/SVG，动效使用 Web Animations API，无新增前端运行时依赖；支持减少动态效果与减少透明度偏好。参考 [Apple Liquid Glass](https://developer.apple.com/videos/play/wwdc2025/219/) 与 [Aave 的网页玻璃实现](https://aave.com/design/building-glass-for-the-web)。
+
+录音按钮会随真实状态展开为波形、计时与停止控件，音量复用录音器的 PCM 帧，不额外获取麦克风。评分值按位过渡，最终文本仍来自测评结果。交互参考 [Voice Pill](https://reactbits.dev/micro/voice-pill) 与 [NumberFlow](https://number-flow.barvian.me/vanilla)，本页采用原生实现。拒绝麦克风、切换模块和连接失败会恢复控件；等待浏览器权限时不会并发开启第二次录音。
+
+前端针对性检查：
+
+```sh
+node --test webdemo1-1/js/modules/FeedbackSpeech.test.js webdemo1-1/js/modules/LegacyFeatures.test.js webdemo1-1/js/modules/RecordingLifecycle.test.js
+```
+
+## 工作台互动底座
+
+「语音交互」已加入数字人画面内的互动卡，支持收起、放到画面下方和窄屏布局。访问 [画面内互动](http://127.0.0.1:4195/index.html#voice-interaction)，复用当前账号和 8091 后端。当前卡片可以准备台词；托管数字人的外部播报接口尚未接通，准备完成不代表人物说出。详见 [接入说明](docs/interaction/README.md)。
 
 ## 📖 产品简介
 “声动汉语”是一款专为汉语学习者打造的智能化口语学习与测评平台。我们致力于通过先进的人工智能技术，解决传统语言学习中“开口难、发音准、反馈慢”的痛点。平台结合了高精度的语音评测引擎与生成式 AI 大模型，为用户提供沉浸式的练习环境和像真人老师一样的即时指导，帮助学习者有效提升口语水平。

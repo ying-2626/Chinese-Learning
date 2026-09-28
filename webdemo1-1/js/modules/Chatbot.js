@@ -6,6 +6,7 @@ class ChatbotModule {
         this.sessions = [];
         this.sending = false;
         this.loadingMessages = false;
+        this.authRequired = false;
         this.sessionRequest = 0;
         if (!this.container) return;
         this.renderLayout();
@@ -71,11 +72,11 @@ class ChatbotModule {
     }
 
     updateControls() {
-        const signedIn = Boolean(LegacyContent.getUser());
+        const signedIn = Boolean(LegacyContent.getUser()) && !this.authRequired;
         this.sendBtnEl.disabled = !signedIn || this.sending || this.loadingMessages || !this.inputEl.value.trim();
         this.inputEl.disabled = this.sending;
         this.newBtn.disabled = !signedIn || this.sending;
-        this.sessionListEl.querySelectorAll('button').forEach(button => { button.disabled = this.sending; });
+        this.sessionListEl.querySelectorAll('button').forEach(button => { button.disabled = !signedIn || this.sending; });
         this.sendIcon.src = this.inputEl.value.trim() ? 'img/纸飞机（彩色版）.png' : 'img/纸飞机（灰色版）.png';
     }
 
@@ -84,7 +85,9 @@ class ChatbotModule {
         const message = document.createElement('span');
         message.textContent = error?.message || '连接失败，请稍后重试';
         this.statusEl.append(message);
-        if (LegacyContent.isAuthError(error) || !LegacyContent.getUser()) {
+        if (LegacyContent.isAuthError(error) || !LegacyContent.getUser() || this.authRequired) {
+            this.authRequired = true;
+            this.updateControls();
             const login = document.createElement('a');
             login.href = 'login.html';
             login.textContent = '前往登录';
@@ -99,6 +102,13 @@ class ChatbotModule {
     }
 
     async loadSessions() {
+        if (!LegacyContent.getUser()) {
+            this.sessionListEl.textContent = '';
+            this.showError(new Error('请先登录后使用此功能'));
+            this.updateControls();
+            return;
+        }
+        this.authRequired = false;
         this.statusEl.textContent = '';
         this.sessionListEl.textContent = '加载中...';
         try {
@@ -223,6 +233,11 @@ class ChatbotModule {
     async sendMessage() {
         const content = this.inputEl.value.trim();
         if (!content || this.sending || this.loadingMessages) return;
+        if (!LegacyContent.getUser() || this.authRequired) {
+            this.showError(new Error('请先登录后使用此功能'));
+            this.updateControls();
+            return;
+        }
         this.sending = true;
         this.statusEl.textContent = '';
         this.updateControls();
@@ -244,7 +259,6 @@ class ChatbotModule {
             const chatId = this.currentChatId;
             await this.request('/chat/sessions/' + sessionId + '/messages', 'post', { role: 'user', content });
             userSaved = true;
-            this.inputEl.value = '';
             this.appendMessage('user', content);
             thinking = this.appendMessage('assistant', '思考中……');
             const result = await this.request('/api/fastgpt/chat/completions', 'post', {
@@ -264,9 +278,10 @@ class ChatbotModule {
                 session.title = title;
                 this.renderSessionList();
             }
+            this.inputEl.value = '';
         } catch (error) {
             if (thinking) thinking.remove();
-            const errorCode = error.code;
+            const errorCode = LegacyContent.isAuthError(error) ? 1013 : error.code;
             if (answerReceived) error = new Error('回复已生成，但对话保存未完成：' + error.message);
             else if (userSaved) error = new Error('消息已保存，回复失败：' + error.message);
             error.code = errorCode;

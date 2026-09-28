@@ -271,4 +271,39 @@ public class UserController {
         }
     }
 
+    /**
+     * 获取用户学习资料
+     * @return 用户学习资料
+     */
+    @GetMapping(value = "/profile", produces = "application/json")
+    @ApiOperation(value = "获取用户学习资料")
+    public Result getProfile() {
+        try {
+            return Result.success(userService.getUserProfile());
+        } catch (Exception e) {
+            if (e instanceof MyException) {
+                return Result.result(((MyException) e).getEnumExceptionType());
+            }
+            return Result.fail(e.getMessage());
+        }
+    }
+
+    /**
+     * 更新用户学习资料
+     * @param profile 用户学习资料
+     * @return 更新结果
+     */
+    @PostMapping(value = "/updateProfile", produces = "application/json")
+    @ApiOperation(value = "更新用户学习资料")
+    public Result updateProfile(@RequestBody com.shengdonghanyu.backend.controller.user.request.UpdateUserProfileRequest profile) {
+        try {
+            return Result.success(userService.updateUserProfile(profile));
+        } catch (Exception e) {
+            if (e instanceof MyException) {
+                return Result.result(((MyException) e).getEnumExceptionType());
+            }
+            return Result.fail(e.getMessage());
+        }
+    }
+
 }

@@ -21,6 +21,10 @@ class SpeechEvalModule {
 
     init() {
         if (!this.btnControl) return;
+        this.buttonLabel = this.btnControl.querySelector('.recording-label');
+        const capsule = this.btnControl.closest('.recording-capsule');
+        this.recordingCapsule = capsule && typeof RecordingCapsule !== 'undefined' ? new RecordingCapsule(capsule) : null;
+        this.changeBtnStatus("CLOSED");
 
         this.bindFeedbackSpeech();
         this.bindFeedbackSpeechLifecycle();
@@ -28,10 +32,11 @@ class SpeechEvalModule {
         // Initialize Recorder
         // Assuming RecorderManager is globally available from dist/index.umd.js
         if (typeof RecorderManager !== 'undefined') {
-            this.recorder = new RecorderManager("dist");
             this.bindEvents();
         } else {
             console.error("RecorderManager is not defined.");
+            this.btnControl.disabled = true;
+            this.showRecordingStatus('录音组件未加载，请刷新页面');
         }
     }
 
@@ -102,14 +107,16 @@ class SpeechEvalModule {
     }
 
     bindFeedbackSpeechLifecycle() {
-        window.addEventListener('beforeunload', () => {
+        window.addEventListener('pagehide', () => {
             this.feedbackSpeech?.stop();
+            this.finishRecording();
         });
 
         document.addEventListener('click', (event) => {
             const moduleNavigation = event.target.closest?.('[data-module]');
             if (moduleNavigation && moduleNavigation.dataset.module !== 'speech-evaluation') {
                 this.stopFeedbackSpeech(false);
+                this.finishRecording();
             }
         });
     }
@@ -168,39 +175,76 @@ class SpeechEvalModule {
     }
 
     bindEvents() {
-        this.recorder.onStart = () => {
-            console.log("onStart");
+        this.btnControl.onclick = () => {
+            if (this.btnStatus === "UNDEFINED" || this.btnStatus === "CLOSED") {
+                this.connectWebSocket();
+            } else if (this.btnStatus === "OPEN") {
+                this.changeBtnStatus("CLOSING");
+                this.activeRecording.stopping = true;
+                this.recorder.stop();
+            }
+        };
+    }
+
+    bindRecorder(attempt) {
+        const current = () => attempt.active && this.activeRecording === attempt;
+        attempt.recorder.onStart = () => {
+            if (!current()) {
+                attempt.recorder.stop();
+                return;
+            }
+            attempt.started = true;
             this.prepareForNewFeedback('完成本次朗读后可以听新反馈');
             this.audioChunks = [];
             this.changeBtnStatus("OPEN");
-        }
+        };
 
-        this.recorder.onFrameRecorded = ({ isLastFrame, frameBuffer }) => {
-            if (frameBuffer) {
+        attempt.recorder.onFrameRecorded = ({ isLastFrame, frameBuffer }) => {
+            if (!current()) return;
+            if (frameBuffer?.byteLength) {
                 this.audioChunks.push(frameBuffer);
+                this.recordingCapsule?.pushFrame(frameBuffer);
             }
-            if (this.iseWS && this.iseWS.readyState === this.iseWS.OPEN) {
-                this.iseWS.send(frameBuffer);
+            if (attempt.socket?.readyState === WebSocket.OPEN && !attempt.endSent) {
+                if (frameBuffer?.byteLength) attempt.socket.send(frameBuffer);
                 if (isLastFrame) {
-                    this.iseWS.send(JSON.stringify({ type: "end" }));
+                    attempt.endSent = true;
+                    attempt.socket.send(JSON.stringify({ type: "end" }));
                     this.changeBtnStatus("CLOSING");
                 }
             }
         };
 
-        this.recorder.onStop = () => {
+        attempt.recorder.onStop = () => {
+            if (current() && this.btnStatus === 'OPEN') this.changeBtnStatus('CLOSING');
         };
+    }
 
-        this.btnControl.onclick = () => {
-            if (this.btnStatus === "UNDEFINED" || this.btnStatus === "CLOSED") {
-                this.prepareForNewFeedback('完成本次朗读后可以听新反馈');
-                this.connectWebSocket();
-            } else if (this.btnStatus === "OPEN") {
-                // 结束录音
-                console.log("停止录音");
-                this.recorder.stop();
-            }
-        };
+    finishRecording(attempt = this.activeRecording) {
+        if (!attempt) return;
+        attempt.active = false;
+        if (!attempt.stopping) {
+            attempt.stopping = true;
+            attempt.recorder.stop();
+        }
+        if (attempt.socket && attempt.socket.readyState < 2) attempt.socket.close();
+        if (this.activeRecording === attempt) {
+            this.activeRecording = null;
+            this.iseWS = null;
+            this.changeBtnStatus('CLOSED');
+        }
+    }
+
+    showRecordingStatus(message, needsLogin = false) {
+        const status = document.getElementById('recording_status');
+        if (!status) return;
+        status.textContent = message;
+        if (needsLogin) {
+            const link = document.createElement('a');
+            link.href = 'login.html';
+            link.textContent = '前往登录';
+            status.append(link);
+        }
     }
 
     async getWebSocketUrl() {
@@ -220,7 +264,7 @@ class SpeechEvalModule {
             evalMode = 0;
         }
 
-        const refText = document.getElementById("evalText")?.innerText || "你好";
+        const refText = document.getElementById("evalText").innerText.trim();
 
         try {
             const response = await fetch(`${CONFIG.BACKEND_API}/api/tencent/soe/websocket-url`, {
@@ -239,7 +283,9 @@ class SpeechEvalModule {
 
             const result = await response.json();
             if (result.code !== 0) {
-                throw new Error(result.message || '获取连接失败');
+                const error = new Error(result.message || '获取连接失败');
+                error.code = result.code;
+                throw error;
             }
 
             return result.result;
@@ -251,16 +297,26 @@ class SpeechEvalModule {
 
     changeBtnStatus(status) {
         this.btnStatus = status;
+        this.btnControl.dataset.state = {
+            CONNECTING: 'connecting', OPEN: 'recording', CLOSING: 'closing', CLOSED: 'idle'
+        }[status] || 'idle';
         this.btnControl.disabled = status === "CONNECTING" || status === "CLOSING";
-        if (status === "CONNECTING") {
-            this.btnControl.innerText = "建立连接中";
-        } else if (status === "OPEN") {
-            this.btnControl.innerText = "录音中...";
-        } else if (status === "CLOSING") {
-            this.btnControl.innerText = "关闭连接中";
-        } else if (status === "CLOSED") {
-            this.btnControl.innerText = "开始录音";
-        }
+        const label = { CONNECTING: '建立连接中', OPEN: '停止录音', CLOSING: '正在测评', CLOSED: '开始录音' }[status] || '开始录音';
+        if (this.buttonLabel) this.buttonLabel.textContent = label;
+        else this.btnControl.innerText = label;
+        this.btnControl.setAttribute('aria-label', label);
+        this.btnControl.setAttribute('aria-busy', String(this.btnControl.disabled));
+        this.recordingCapsule?.setState(this.btnControl.dataset.state);
+        const busy = ['CONNECTING', 'OPEN', 'CLOSING'].includes(status);
+        document.getElementById('evalText')?.setAttribute('contenteditable', String(!busy));
+        document.querySelectorAll('input[name="group"]').forEach(input => { input.disabled = busy; });
+    }
+
+    displayScore(id, value) {
+        const element = document.getElementById(id);
+        const text = value.toFixed(2);
+        if (typeof ScoreMotion !== 'undefined') ScoreMotion.set(element, text);
+        else element.innerText = text;
     }
 
     async getAnalysis(req_content) {
@@ -387,6 +443,41 @@ class SpeechEvalModule {
         if (status) status.textContent = message;
     }
 
+    async saveEvaluation(scores, analysisRequest) {
+        const sessionId = LegacyContent.getUser()?.sessionId;
+        this.showSaveStatus('正在保存本次评测');
+        const analysisPromise = this.getAnalysis(analysisRequest);
+        const generation = this.feedbackGeneration;
+        const audioPromise = (async () => {
+            const wavBuffer = this.addWavHeader(this.mergeAudioChunks());
+            return ScoreService.uploadAudioFile(new Blob([wavBuffer], { type: 'audio/wav' }));
+        })();
+
+        try {
+            // Advice and audio can fail independently without discarding the measured scores.
+            const [analysis, audio] = await Promise.allSettled([analysisPromise, audioPromise]);
+            if (sessionId !== LegacyContent.getUser()?.sessionId) {
+                throw new Error('登录状态已变化，请重新登录后评测');
+            }
+            await ScoreService.createScoreAction({
+                ...scores,
+                advice: analysis.status === 'fulfilled' ? analysis.value : null,
+                audioUrl: audio.status === 'fulfilled' ? audio.value : null
+            });
+            if (generation !== this.feedbackGeneration) return;
+            const missing = [];
+            if (analysis.status === 'rejected') missing.push('AI 建议未生成：' + (analysis.reason?.message || '请稍后重试'));
+            if (audio.status === 'rejected') missing.push('录音未保存：' + (audio.reason?.message || '请检查连接'));
+            this.showSaveStatus(missing.length
+                ? (audio.status === 'fulfilled' ? '本次评分和录音已保存；' : '本次评分已保存；') + missing.join('；')
+                : '本次评测已保存，可在历史记录中查看');
+        } catch (error) {
+            if (generation === this.feedbackGeneration) {
+                this.showSaveStatus('本次评测未保存：' + (error.message || '请检查连接后重试'));
+            }
+        }
+    }
+
     mergeAudioChunks() {
         const totalLength = this.audioChunks.reduce((acc, chunk) => acc + chunk.byteLength, 0);
         const result = new Uint8Array(totalLength);
@@ -437,10 +528,10 @@ class SpeechEvalModule {
             let toneScore = 0;
 
             // 显示整体分数
-            document.getElementById("accuracy_score").innerText = jsonData.result.PronAccuracy.toFixed(2);
-            document.getElementById("fluency_score").innerText = (jsonData.result.PronFluency * 100).toFixed(2);
-            document.getElementById("integrity_score").innerText = (jsonData.result.PronCompletion * 100).toFixed(2);
-            document.getElementById("total_score").innerText = jsonData.result.SuggestedScore.toFixed(2);
+            this.displayScore('accuracy_score', jsonData.result.PronAccuracy);
+            this.displayScore('fluency_score', jsonData.result.PronFluency * 100);
+            this.displayScore('integrity_score', jsonData.result.PronCompletion * 100);
+            this.displayScore('total_score', jsonData.result.SuggestedScore);
 
             // Determine mode
             const selectedModeElement = document.querySelector('input[name="group"]:checked');
@@ -489,9 +580,9 @@ class SpeechEvalModule {
                 console.log(`[SpeechEval] Calculated Scores -> Initial: ${initialScore}, Final: ${finalScore}, Tone: ${toneScore}, WordCount: ${wordCount}`);
 
                 // 显示分数
-                document.getElementById("initial_score").innerText = initialScore.toFixed(2);
-                document.getElementById("final_score").innerText = finalScore.toFixed(2);
-                document.getElementById("tone_score").innerText = toneScore.toFixed(2);
+                this.displayScore('initial_score', initialScore);
+                this.displayScore('final_score', finalScore);
+                this.displayScore('tone_score', toneScore);
 
                 document.getElementById("initial_score_wrapper").style.display = "block";
                 document.getElementById("final_score_wrapper").style.display = "block";
@@ -559,40 +650,15 @@ class SpeechEvalModule {
             const jsonString = JSON.stringify(analysisRequestData, null, 2);
 
             if (isFinal) {
-                try {
-                    this.showSaveStatus('正在保存本次评测');
-                    const analysisPromise = this.getAnalysis(jsonString);
-                    const generation = this.feedbackGeneration;
-
-                    const pcmBuffer = this.mergeAudioChunks();
-                    const wavBuffer = this.addWavHeader(pcmBuffer);
-                    const audioBlob = new Blob([wavBuffer], { type: 'audio/wav' });
-                    const audioUploadPromise = ScoreService.uploadAudioFile(audioBlob);
-
-                    Promise.all([analysisPromise, audioUploadPromise])
-                        .then(([advice, audioUrl]) => {
-                            const scoreData = {
-                                audioUrl: audioUrl,
-                                accuracy: jsonData.result.PronAccuracy,
-                                fluency: jsonData.result.PronFluency * 100,
-                                completeness: jsonData.result.PronCompletion * 100,
-                                initialSoundScore: initialScore,
-                                finalSoundScore: finalScore,
-                                toneScore: toneScore,
-                                totalScore: jsonData.result.SuggestedScore,
-                                advice: advice
-                            };
-                            return ScoreService.createScoreAction(scoreData);
-                        })
-                        .then(res => {
-                            if (generation === this.feedbackGeneration) this.showSaveStatus('本次评测已保存，可在历史记录中查看');
-                        })
-                        .catch(err => {
-                            if (generation === this.feedbackGeneration) this.showSaveStatus('本次评测未保存：' + (err.message || '请检查连接后重试'));
-                        });
-                } catch (err) {
-                    this.showSaveStatus('本次评测未保存：' + (err.message || '请检查连接后重试'));
-                }
+                this.saveEvaluation({
+                    accuracy: jsonData.result.PronAccuracy,
+                    fluency: jsonData.result.PronFluency * 100,
+                    completeness: jsonData.result.PronCompletion * 100,
+                    initialSoundScore: initialScore,
+                    finalSoundScore: finalScore,
+                    toneScore: toneScore,
+                    totalScore: jsonData.result.SuggestedScore
+                }, jsonString);
             }
 
             evalText.innerHTML = coloredText;
@@ -652,49 +718,87 @@ class SpeechEvalModule {
     }
 
     async connectWebSocket() {
-        if (this.btnStatus === "CONNECTING" || this.btnStatus === "OPEN") return;
+        if (['CONNECTING', 'OPEN', 'CLOSING'].includes(this.btnStatus)) return;
+        // RecorderManager shares a worker; don't overlap an unresolved microphone prompt with a new start.
+        if (this.pendingRecorderStart) {
+            this.showRecordingStatus('请先处理浏览器的麦克风权限提示');
+            return;
+        }
+        if (!document.getElementById('evalText').innerText.trim()) {
+            this.showRecordingStatus('请输入朗读内容');
+            document.getElementById('evalText').focus();
+            return;
+        }
+        if (!LegacyContent.getUser()) {
+            this.showRecordingStatus('请先登录后开始录音', true);
+            return;
+        }
+        const attempt = { active: true, recorder: new RecorderManager('dist'), started: false, stopping: false, final: false };
+        const current = () => attempt.active && this.activeRecording === attempt;
+        this.activeRecording = attempt;
+        this.recorder = attempt.recorder;
+        this.bindRecorder(attempt);
         this.changeBtnStatus("CONNECTING");
+        this.showRecordingStatus('');
         this.showSaveStatus('');
         try {
             const websocketUrl = await this.getWebSocketUrl();
+            if (!current()) return;
             if ("WebSocket" in window) {
-                this.iseWS = new WebSocket(websocketUrl);
+                attempt.socket = this.iseWS = new WebSocket(websocketUrl);
             } else {
                 throw new Error("浏览器不支持WebSocket");
             }
-            this.changeBtnStatus("CONNECTING");
-            this.iseWS.onopen = () => {
-                this.recorder.start({ sampleRate: 16000, frameSize: 1280 });
+            attempt.socket.onopen = async () => {
+                if (!current()) return;
+                this.pendingRecorderStart = attempt;
+                try {
+                    // The legacy recorder logs permission failures instead of rejecting.
+                    await attempt.recorder.start({ sampleRate: 16000, frameSize: 1280 });
+                    if (current() && !attempt.started) {
+                        throw new Error('无法启动麦克风，请检查浏览器权限和输入设备');
+                    }
+                } catch (error) {
+                    if (!current()) return;
+                    this.showRecordingStatus(error.message || '无法启动麦克风，请重试');
+                    this.finishRecording(attempt);
+                } finally {
+                    if (this.pendingRecorderStart === attempt) this.pendingRecorderStart = null;
+                }
             };
 
-            this.iseWS.onmessage = (e) => {
+            attempt.socket.onmessage = (e) => {
+                if (!current()) return;
                 let data;
-                try { data = JSON.parse(e.data); } catch { this.showSaveStatus('评测服务返回格式异常'); this.iseWS.close(); return; }
+                try { data = JSON.parse(e.data); } catch { this.showRecordingStatus('评测服务返回格式异常'); this.finishRecording(attempt); return; }
                 if (data.code && data.code !== 0) {
-                    this.showSaveStatus('评测失败：' + (data.message || '请重新录音'));
-                    this.iseWS.close();
+                    this.showRecordingStatus('评测失败：' + (data.message || '请重新录音'));
+                    this.finishRecording(attempt);
                     return;
                 }
                 const isFinal = data.final === 1;
                 this.renderResult(e.data, isFinal);
 
                 if (isFinal) {
-                    this.iseWS.close();
+                    attempt.final = true;
+                    this.finishRecording(attempt);
                 }
             };
 
-            this.iseWS.onerror = (e) => {
-                this.showSaveStatus('评测连接中断，请重新录音');
-                this.recorder.stop();
-                this.changeBtnStatus("CLOSED");
+            attempt.socket.onerror = () => {
+                if (!current()) return;
+                this.showRecordingStatus('评测连接中断，请重新录音');
+                this.finishRecording(attempt);
             };
-            this.iseWS.onclose = () => {
-                this.recorder.stop();
-                this.changeBtnStatus("CLOSED");
+            attempt.socket.onclose = () => {
+                if (!current()) return;
+                if (!attempt.final) this.showRecordingStatus('连接已结束，未收到完整测评结果，请重试');
+                this.finishRecording(attempt);
             };
         } catch (error) {
-            this.showSaveStatus('连接服务失败：' + (error.message || '请稍后重试'));
-            this.changeBtnStatus("CLOSED");
+            if (!current()) return;
+            this.showRecordingStatus('连接服务失败：' + (error.message || '请稍后重试'), LegacyContent.isAuthError(error));
+            this.finishRecording(attempt);
         }
     }
 }

@@ -5,6 +5,7 @@
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     const activeAnimations = new Set();
+    const elementAnimations = new WeakMap();
     const visibility = new WeakMap();
     const panels = '.main-container > .module, #purchase-modal, [role="dialog"], dialog, .modal, [id$="-modal"]';
     const controls = 'button, input[type="button"], input[type="submit"], [role="button"], a.login-button, .index-button-container a, a.btn, a.cta-button, .tools';
@@ -16,16 +17,22 @@
 
     function animate(element, frames, options = {}) {
       if (reduced.matches || !element.animate || !shown(element)) return null;
+      elementAnimations.get(element)?.cancel();
       const animation = element.animate(frames, {
         duration: 360,
         easing: 'cubic-bezier(.2,.75,.25,1)',
         ...options
       });
       activeAnimations.add(animation);
+      elementAnimations.set(element, animation);
+      const forget = () => {
+        activeAnimations.delete(animation);
+        if (elementAnimations.get(element) === animation) elementAnimations.delete(element);
+      };
       animation.addEventListener('finish', () => {
-        if (options.fill !== 'forwards') activeAnimations.delete(animation);
+        if (options.fill !== 'forwards') forget();
       }, { once: true });
-      animation.addEventListener('cancel', () => activeAnimations.delete(animation), { once: true });
+      animation.addEventListener('cancel', forget, { once: true });
       return animation;
     }
 
@@ -33,9 +40,23 @@
       const visible = shown(element);
       if (visibility.get(element) === visible) return;
       visibility.set(element, visible);
-      if (!visible) return;
+      if (!visible) {
+        activeAnimations.forEach(animation => {
+          const target = animation.effect?.target;
+          if (target === element || (target instanceof Element && element.contains(target))) animation.cancel();
+        });
+        return;
+      }
       if (element.matches('.module')) {
-        animate(element, [{ opacity: .65, translate: '0 10px' }, { opacity: 1, translate: '0 0' }], { duration: 300 });
+        const cards = [...element.querySelectorAll('.practice-layout > *, .profile-stats-container > *, .exam-features-grid > *, .AllTools > .tools')]
+          .filter(shown).slice(0, 4);
+        if (cards.length > 1) {
+          cards.forEach((card, index) => animate(card,
+            [{ opacity: .82, translate: '0 6px' }, { opacity: 1, translate: '0 0' }],
+            { duration: 260, delay: index * 24 }));
+        } else {
+          animate(element, [{ opacity: .85, translate: '0 6px' }, { opacity: 1, translate: '0 0' }], { duration: 260 });
+        }
       } else {
         const content = element.querySelector('.modal-content, .dialog-content, [role="document"]') || element;
         animate(content, [
@@ -105,27 +126,27 @@
 
     function controlAt(target) {
       const element = target instanceof Element ? target.closest(controls) : null;
-      if (!element || element.closest('#sidebar') || element.matches(':disabled, [aria-disabled="true"]') || element.closest('[inert]')) return null;
+      if (!element || element.closest('#sidebar') || element.matches(':disabled, [aria-disabled="true"], [aria-busy="true"]') || element.closest('[inert]')) return null;
       return element;
     }
 
     function release(rebound = true) {
       if (!held) return;
-      const { element, animation, scale } = held;
+      const { element, animation } = held;
+      const scale = getComputedStyle(element).scale;
       held = null;
       animation?.cancel();
       if (rebound) animate(element, [
-        { scale },
-        { scale: '1.012', offset: .65 },
+        { scale: scale === 'none' ? '1' : scale },
         { scale: '1' }
-      ], { duration: 250 });
+      ], { duration: 180 });
     }
 
     function press(element) {
       if (reduced.matches) return;
       release(false);
-      const scale = element.matches('.tools') ? '.985' : '.97';
-      held = { element, scale, animation: animate(element, [{ scale: '1' }, { scale }], { duration: 105, fill: 'forwards' }) };
+      const scale = element.matches('.tools') ? '.993' : '.98';
+      held = { element, animation: animate(element, [{ scale: '1' }, { scale }], { duration: 105, fill: 'forwards' }) };
     }
 
     document.addEventListener('pointerdown', event => {

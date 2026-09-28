@@ -11,8 +11,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 
@@ -35,12 +33,9 @@ public class SessionUtils {
     @Autowired
     private RedisUtils redisUtil;
 
-    //获取 userId，首先尝试从会话数据中获取，如果获取失败则返回一个新的 SessionData 对象的 Id
+    // All callers require a real, unexpired session with a user identity.
     public String getUserId() {
-        return Optional
-                .ofNullable(getSessionData())
-                .orElse(new SessionData())
-                .getId();
+        return getSessionData().getId();
     }
 
     //根据 userId 从 Redis 中获取 sessionId，如果获取到的对象不是 String 类型则抛出自定义异常
@@ -58,24 +53,7 @@ public class SessionUtils {
         //从请求头中获得 sessionId
         String key = request.getHeader("session");
 
-        //测试用例
-        if (Objects.equals(key, "shadow")) {
-            SessionData sessionData = new SessionData();
-            sessionData.setId("shadow");
-            return sessionData;
-        }
-        if (Objects.equals(key, "admin")) {
-            SessionData sessionData = new SessionData();
-            sessionData.setId("admin");
-            return sessionData;
-        }
-        if (Objects.equals(key, "superAdmin")) {
-            SessionData sessionData = new SessionData();
-            sessionData.setId("superAdmin");
-            return sessionData;
-        }
-
-        if (key == null)
+        if (key == null || key.isBlank())
             throw new MyException(EnumExceptionType.NEED_SESSION_ID);
         //检查会话是否过期
         if (redisUtil.isExpire(key)) {
@@ -83,7 +61,11 @@ public class SessionUtils {
             throw new MyException(EnumExceptionType.LOGIN_HAS_OVERDUE);
         }
 
-        return (SessionData) redisUtil.get(key);
+        Object stored = redisUtil.get(key);
+        if (!(stored instanceof SessionData data) || data.getId() == null || data.getId().isBlank()) {
+            throw new MyException(EnumExceptionType.SESSION_IS_INVALID);
+        }
+        return data;
     }
 
     //将 sessionId 设置到响应头中

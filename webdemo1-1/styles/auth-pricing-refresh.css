@@ -186,3 +186,7 @@ body.ui-pricing {
   .ui-pricing .pricing-header { padding: 42px 16px 20px; }
   .ui-pricing .pricing-plans { grid-template-columns: 1fr; padding-bottom: 32px; }
 }
+
+body.ui-auth .auth-status { clear: both; margin: 14px 0 0; padding: 11px 14px; color: #8a3445; background: #fff1f3; border: 1px solid #f0d9de; border-radius: 12px; font-size: 13px; line-height: 1.65; overflow-wrap: anywhere; }
+body.ui-auth .auth-status[hidden] { display: none; }
+body.ui-auth .auth-status[data-state="success"] { color: #2b6758; background: #edf8f3; border-color: #d8e9e2; }

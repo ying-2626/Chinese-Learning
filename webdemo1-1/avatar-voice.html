@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>互动语音播放器</title>
+  <link rel="stylesheet" href="styles/ui-base.css">
+  <script src="js/modules/LegacyContent.js"></script>
+  <style>
+    *{box-sizing:border-box}body{margin:0;padding:22px 24px;background:linear-gradient(145deg,#f8faff,#edf3fc);color:var(--ui-ink);font-family:var(--ui-font)}
+    main{display:grid;gap:13px}h2{font-size:17px;font-weight:550;margin:0}p{font-size:12px;line-height:1.7;color:var(--ui-muted);margin:0}.state{display:flex;align-items:center;gap:13px;min-height:57px}.signal{display:grid;place-items:center;width:44px;height:44px;flex-shrink:0;border-radius:50%;background:#e6edfb;color:#7890b8}.signal[data-speaking="true"]{background:#d9e8ff;color:#2563eb;box-shadow:0 0 0 5px #e8f0ff}.signal svg{width:24px;height:24px}#status{color:#405779;font-size:14px}#detail{max-height:38px;overflow:auto;overflow-wrap:anywhere}button{width:100%;padding:11px 16px;border:0;border-radius:999px;background:#2563eb;color:#fff;font:inherit;font-size:13px;cursor:pointer}button:focus-visible{outline:3px solid #9bb9f3;outline-offset:3px}.note{font-size:10px}
+  </style>
+</head>
+<body><main><h2>中文语音伙伴</h2><p>本机语音预览 · 婷婷</p><div class="state"><div class="signal" id="signal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 10v4m4-7v10m4-13v16m4-13v10m4-7v4"/></svg></div><div role="status" aria-live="polite"><p id="status">等待启用</p><p id="detail">先启用语音，再发送想说的内容。</p></div></div><button id="enable" type="button">启用语音</button><p class="note">仅显示真实播报状态，数字人口型尚未接入。</p></main>
+<script type="module">
+  import { installAvatarHost } from './js/interaction/avatar-host.js';
+  import { createLocalAudioDriver } from './js/interaction/local-audio.js';
+  const status = document.getElementById('status'), detail = document.getElementById('detail'), signal = document.getElementById('signal'), button = document.getElementById('enable');
+  const labels = {'audio.ready':'语音已启用','speech.pending':'正在准备语音','speech.started':'正在播报','speech.ended':'播报完成','speech.cancelled':'播报已停止','speech.error':'语音不可用'};
+  const driver = createLocalAudioDriver({getHeaders: () => window.LegacyContent.headers(), onState(type,message) {
+    status.textContent = labels[type] || type;
+    signal.dataset.speaking = String(type === 'speech.started');
+    detail.textContent = message || '等待下一次互动。';
+  }});
+  button.disabled = !driver.capabilities.speak;
+  if (button.disabled) { status.textContent = '浏览器不支持音频播放'; detail.textContent = '请使用支持 AudioContext 的浏览器。'; }
+  button.addEventListener('click', async () => { if (await driver.enable()) button.textContent = '重新启用语音'; });
+  const host = installAvatarHost({allowedOrigin:location.origin,allowedSource:parent,driver});
+  window.addEventListener('pagehide', () => host.dispose(), {once:true});
+</script></body></html>

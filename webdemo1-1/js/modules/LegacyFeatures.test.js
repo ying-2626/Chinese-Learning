@@ -30,7 +30,7 @@ function chatFixture() {
         sending:false, loadingMessages:false, currentSessionId:7, currentChatId:'chat-7',
         sessions:[{id:7,title:'已有对话',chatId:'chat-7'}], appended:[], errors:[],
         updateControls(){}, renderSessionList(){},
-        appendMessage(role,content) { this.appended.push({role,content}); return {remove(){}}; },
+        appendMessage(role,content) { const item={role,content}; this.appended.push(item); return {remove(){item.removed=true;}}; },
         showError(error) { this.errors.push(error); }
     });
     return chat;
@@ -164,4 +164,167 @@ test('plain text fallback escapes stored and generated HTML', () => {
     assert.equal(LegacyContent.markdown('<img src=x onerror=alert(1)>'), '&lt;img src=x onerror=alert(1)&gt;');
     assert.equal(LegacyContent.safeUrl('javascript:alert(1)'),'');
     assert.equal(LegacyContent.isAuthError(new Error('Network Error')),false);
+});
+
+function chatControlsFixture() {
+    const element = () => ({
+        children: [], textContent: '',
+        append(child) { this.children.push(child); },
+        replaceChildren() { this.children = []; },
+        addEventListener() {}, querySelectorAll() { return []; }
+    });
+    global.document = {createElement: element};
+    const chat = chatFixture();
+    Object.assign(chat, {
+        statusEl: element(), sessionListEl: element(), sendBtnEl: {}, newBtn: {}, sendIcon: {},
+        updateControls: Chatbot.prototype.updateControls, showError: Chatbot.prototype.showError
+    });
+    return chat;
+}
+
+test('guest chat loads no sessions and uses the existing login entry', async () => {
+    store.delete('user_info');
+    const chat = chatControlsFixture();
+    let requests = 0;
+    chat.request = async () => { requests++; throw new Error('502'); };
+    await chat.loadSessions();
+    await chat.sendMessage();
+    assert.equal(requests, 0);
+    assert.equal(chat.inputEl.value, '你好');
+    assert.equal(chat.sendBtnEl.disabled, true);
+    assert.equal(chat.newBtn.disabled, true);
+    assert.equal(chat.statusEl.children.at(-1).href, 'login.html');
+    assert.match(chat.statusEl.children[0].textContent, /请先登录/);
+});
+
+test('expired chat session shows login and disables sending instead of retrying with stale credentials', async () => {
+    const chat = chatControlsFixture();
+    global.axios = async () => ({data:{code:2004,message:'登录已过期'}});
+    await chat.loadSessions();
+    assert.equal(chat.authRequired, true);
+    assert.equal(chat.sendBtnEl.disabled, true);
+    assert.equal(chat.newBtn.disabled, true);
+    assert.equal(chat.statusEl.children.at(-1).href, 'login.html');
+});
+
+test('provider failure keeps the chat draft and never invents an answer', async () => {
+    const chat = chatFixture();
+    chat.request = async path => {
+        if (path.startsWith('/api/')) throw new Error('服务未配置');
+        return {id: 1};
+    };
+    await chat.sendMessage();
+    assert.equal(chat.inputEl.value, '你好');
+    assert.equal(chat.appended.filter(item => item.role === 'assistant' && !item.removed).length, 0);
+    assert.match(chat.errors[0].message, /消息已保存，回复失败/);
+});
+
+test('successful chat clears the draft only after both messages have persisted', async () => {
+    const chat = chatFixture();
+    chat.request = async (path, method, data) => {
+        assert.equal(chat.inputEl.value, '你好');
+        if (path.startsWith('/api/')) return {choices:[{message:{content:'答复'}}]};
+        return {id: 1};
+    };
+    await chat.sendMessage();
+    assert.equal(chat.inputEl.value, '');
+    const failed = chatFixture();
+    failed.request = async (path, method, data) => {
+        if (path.startsWith('/api/')) return {choices:[{message:{content:'答复'}}]};
+        if (data.role === 'assistant') throw new Error('保存失败');
+        return {id:1};
+    };
+    await failed.sendMessage();
+    assert.equal(failed.inputEl.value, '你好');
+});
+
+function speechSaveFixture() {
+    const speech = Object.create(SpeechEval.prototype);
+    Object.assign(speech, {
+        feedbackGeneration: 0, audioChunks: [new Uint8Array([1, 2]).buffer], statuses: [],
+        getAnalysis: async () => '实际生成的建议',
+        showSaveStatus(message) { this.statuses.push(message); }
+    });
+    return speech;
+}
+const measuredScores = {accuracy:83, fluency:84, completeness:90, initialSoundScore:81, finalSoundScore:82, toneScore:80, totalScore:85};
+
+test('advice failure preserves the measured scores and successfully uploaded recording', async () => {
+    const speech = speechSaveFixture();
+    speech.getAnalysis = async () => { throw new Error('AI 服务未配置'); };
+    let saved;
+    global.ScoreService = {
+        async uploadAudioFile(blob) { assert.equal(blob.type, 'audio/wav'); return '/audios/recording.wav'; },
+        async createScoreAction(data) { saved = data; return {id:3}; }
+    };
+    await speech.saveEvaluation(measuredScores, '{}');
+    assert.deepEqual(saved, {...measuredScores, advice:null, audioUrl:'/audios/recording.wav'});
+    assert.match(speech.statuses.at(-1), /评分和录音已保存.*AI 建议未生成.*未配置/);
+});
+
+test('audio failure preserves scores and available advice without claiming the recording was saved', async () => {
+    const speech = speechSaveFixture();
+    let saved;
+    global.ScoreService = {
+        async uploadAudioFile() { throw new Error('磁盘写入失败'); },
+        async createScoreAction(data) { saved = data; return {id:3}; }
+    };
+    await speech.saveEvaluation(measuredScores, '{}');
+    assert.deepEqual(saved, {...measuredScores, advice:'实际生成的建议', audioUrl:null});
+    assert.match(speech.statuses.at(-1), /本次评分已保存.*录音未保存.*磁盘/);
+});
+
+test('two supplemental failures still save scores; persistence failure is never reported as saved', async () => {
+    const speech = speechSaveFixture();
+    speech.getAnalysis = async () => { throw new Error('建议失败'); };
+    const writes = [];
+    global.ScoreService = {
+        async uploadAudioFile() { throw new Error('上传失败'); },
+        async createScoreAction(data) { writes.push(data); return {id:3}; }
+    };
+    await speech.saveEvaluation(measuredScores, '{}');
+    assert.deepEqual(writes, [{...measuredScores, advice:null, audioUrl:null}]);
+    assert.match(speech.statuses.at(-1), /评分已保存.*AI 建议未生成.*录音未保存/);
+    global.ScoreService.createScoreAction = async () => { throw new Error('数据库不可用'); };
+    await speech.saveEvaluation(measuredScores, '{}');
+    assert.match(speech.statuses.at(-1), /^本次评测未保存.*数据库/);
+});
+
+test('saving an older recording cannot overwrite a newer recording status or save under a different login', async () => {
+    const speech = speechSaveFixture();
+    const analysis = deferred();
+    speech.getAnalysis = () => analysis.promise;
+    let saves = 0;
+    global.ScoreService = {async uploadAudioFile(){return '/audios/test.wav';}, async createScoreAction(){saves++;}};
+    const pending = speech.saveEvaluation(measuredScores, '{}');
+    speech.feedbackGeneration++;
+    speech.showSaveStatus('新的录音状态');
+    analysis.resolve('上一次的建议');
+    await pending;
+    assert.equal(saves, 1);
+    assert.equal(speech.statuses.at(-1), '新的录音状态');
+
+    const other = speechSaveFixture();
+    const nextAnalysis = deferred();
+    other.getAnalysis = () => nextAnalysis.promise;
+    const otherPending = other.saveEvaluation(measuredScores, '{}');
+    store.set('user_info', JSON.stringify({id:8,sessionId:'other-session'}));
+    nextAnalysis.resolve('上一位用户的建议');
+    await otherPending;
+    assert.equal(saves, 1);
+    assert.match(other.statuses.at(-1), /未保存.*登录状态已变化/);
+});
+
+test('recording button exposes actual lifecycle states to the motion layer', () => {
+    const speech = Object.create(SpeechEval.prototype);
+    speech.btnControl = {dataset:{},setAttribute(){}};
+    global.document = {getElementById(){return null;},querySelectorAll(){return [];}};
+    for (const [status, state, disabled] of [
+        ['CONNECTING','connecting',true], ['OPEN','recording',false],
+        ['CLOSING','closing',true], ['CLOSED','idle',false]
+    ]) {
+        speech.changeBtnStatus(status);
+        assert.equal(speech.btnControl.dataset.state, state);
+        assert.equal(speech.btnControl.disabled, disabled);
+    }
 });

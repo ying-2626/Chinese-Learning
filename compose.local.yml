@@ -1,0 +1,31 @@
+name: chinese-learning-ui-motion
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in your local env file}
+      MYSQL_DATABASE: chinese_learning
+      MYSQL_USER: chinese_learning
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in your local env file}
+    ports:
+      - "127.0.0.1:23306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./create_table.sql:/docker-entrypoint-initdb.d/01-base.sql:ro
+      - ./add_user_profile_fields.sql:/docker-entrypoint-initdb.d/02-profile.sql:ro
+      - ./add_chat_tables.sql:/docker-entrypoint-initdb.d/03-chat.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "127.0.0.1:26379:6379"
+    volumes:
+      - redis-data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+volumes:
+  mysql-data:
+  redis-data:

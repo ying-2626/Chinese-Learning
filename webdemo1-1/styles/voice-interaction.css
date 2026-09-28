@@ -1,0 +1,57 @@
+/* The interaction card shares the real avatar scene; only this module is styled. */
+#voice [hidden] { display:none !important; }
+#voice .voice-toolbar { display:flex; align-items:center; justify-content:space-between; gap:20px; margin:0 0 16px; }
+#voice .voice-toolbar p { margin:0; color:#39485d; font-size:13px; font-weight:550; }
+#voice .voice-toolbar p span { margin-left:14px; font-size:12px; font-weight:400; color:var(--ui-muted); }
+#voice button { font-family:var(--ui-font); cursor:pointer; }
+#voice #vi-open { flex-shrink:0; display:flex; align-items:center; gap:18px; padding:10px 17px; border:1px solid #dce6f6; border-radius:999px; color:#375e99; background:var(--ui-glass); font-size:12px; box-shadow:var(--ui-shadow); }
+#voice #voice-scene { position:relative; isolation:isolate; }
+#voice #voice-conversation { overflow:hidden; border-radius:25px; background:#eef2f9; box-shadow:var(--ui-shadow); }
+.ui-workspace #voice #voice-conversation iframe { display:block; width:100%; height:clamp(600px,calc(100dvh - 178px),820px); min-height:0 !important; border:0 !important; border-radius:0; box-shadow:none; }
+#voice #voice-interaction { position:absolute; right:20px; bottom:86px; z-index:2; width:330px; max-height:calc(100% - 114px); border:1px solid rgba(255,255,255,.75); border-radius:22px; background:rgba(252,253,255,.91); backdrop-filter:blur(24px) saturate(1.18); -webkit-backdrop-filter:blur(24px) saturate(1.18); box-shadow:0 16px 54px #0c244334,inset 0 1px 1px #fff; color:#25364d; overflow:hidden; }
+#voice .vi-card-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:17px 19px 14px; border-bottom:1px solid #8098b81b; }
+#voice .vi-card-heading>div { display:flex; align-items:center; gap:9px; }
+#voice .vi-card-heading h2 { margin:0; font-size:15px; font-weight:600; }
+#voice .vi-mark { display:grid; place-items:center; width:25px; height:25px; border-radius:8px; background:#e8effd; color:#4a6ead; font-size:15px; }
+#voice .vi-window-actions button { display:grid; place-items:center; width:26px; height:26px; padding:0; font-size:19px; line-height:1; border:0; border-radius:8px; background:transparent; color:#8490a0; }
+#voice .vi-window-actions button:hover { background:#e8edf6; color:#314e77; }
+#voice .vi-card-body { padding:16px 19px 13px; max-height:calc(clamp(600px,100dvh - 178px,820px) - 186px); overflow:auto; scrollbar-width:thin; }
+#voice .vi-meta { display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:10px; color:#8993a3; }
+#voice .vi-connection { display:inline-flex; align-items:center; gap:6px; color:#997436; }
+#voice .vi-connection::before { content:''; width:5px; height:5px; border-radius:50%; background:currentColor; }
+#voice .vi-connection[data-connected="true"] { color:#36816a; }
+#voice .vi-prompt { padding:17px 0 16px; }
+#voice .vi-prompt>span { color:#93a0b3; font-size:10px; }
+#voice .vi-prompt h3 { margin:7px 0 7px; font-size:18px; letter-spacing:-.025em; font-weight:550; }
+#voice .vi-prompt p { margin:0; color:#6e7b8d; font-size:12px; line-height:1.8; overflow-wrap:anywhere; max-height:100px; overflow:auto; }
+#voice #vi-complete { color:#367756; margin-top:8px; }
+#voice #vi-form label { display:block; margin:0 0 8px; font-size:11px; color:#8490a0; }
+#voice #vi-text { display:block; width:100%; min-height:72px; max-height:140px; padding:11px 12px; border:1px solid #c8d4e44d; border-radius:12px; color:#3c4e65; background:#ffffffa6; font-family:var(--ui-font); font-size:12px; line-height:1.75; resize:vertical; }
+#voice #vi-text:focus { outline:2px solid #99b7ed; outline-offset:1px; }
+#voice .vi-actions { display:flex; justify-content:space-between; gap:10px; margin-top:12px; }
+#voice .vi-actions button { padding:9px 12px; border:1px solid #d4deeb5e; border-radius:999px; background:#ffffff82; color:#79869a; font-size:11px; }
+#voice .vi-actions .vi-primary { display:flex; align-items:center; justify-content:space-between; gap:16px; padding-inline:16px; border-color:transparent; background:linear-gradient(150deg,#4e82ec,#3169d5); color:#fff; box-shadow:0 3px 10px #2e67c929; }
+#voice .vi-playback { margin:12px 0 0; color:#8995a6; font-size:10px; line-height:1.6; }
+#voice .vi-details { margin-top:14px; padding-top:11px; border-top:1px solid #8098b81b; }
+#voice .vi-details summary { color:#8490a0; font-size:10px; cursor:pointer; }
+#voice .vi-details>p { font-size:11px; line-height:1.7; color:#7b8798; }
+#voice .vi-session { display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:10px; color:#7b8798; }
+#voice :where(.vi-session button,.vi-link) { padding:5px 0; border:0; background:none; color:#5e7dab; font-size:10px; }
+#voice #vi-events { list-style:none; padding:0; margin:10px 0 0; max-height:115px; overflow:auto; }
+#voice #vi-events li { font-size:10px; line-height:1.9; color:#8591a3; border-top:1px solid #8098b815; padding:3px 0; }
+#voice :where(.vi-auth,.vi-error) { border:1px solid #ebdfc8; border-radius:10px; padding:10px 12px; margin-top:12px; background:#fffaf1; color:#896b3c; font-size:11px; line-height:1.6; }
+#voice .vi-auth a { display:inline-block; margin-left:8px; color:#416bad; }
+#voice #voice-scene[data-placement="below"] #voice-interaction { position:relative; inset:auto; width:min(100%,700px); max-height:none; margin:16px auto 0; background:#ffffffeb; box-shadow:var(--ui-shadow); }
+#voice #voice-scene[data-placement="below"] .vi-card-body { max-height:none; }
+@media(max-width:1100px) {
+  #voice #voice-interaction { width:300px; right:14px; }
+  #voice .voice-toolbar p span { display:none; }
+}
+@media(max-width:900px) {
+  #voice #voice-interaction,#voice #voice-scene[data-placement="below"] #voice-interaction { position:relative; inset:auto; width:100%; max-height:none; margin:14px 0 0; border-radius:20px; box-shadow:var(--ui-shadow); background:#ffffffed; }
+  #voice .vi-card-body { max-height:none; padding:16px 20px; }
+  #voice .vi-card-heading { padding-inline:20px; }
+  #voice #vi-dock { display:none; }
+  .ui-workspace #voice #voice-conversation iframe { height:clamp(440px,65dvh,610px); }
+}
+@media(prefers-reduced-transparency:reduce) { #voice #voice-interaction { background:#fff; backdrop-filter:none; -webkit-backdrop-filter:none; } }

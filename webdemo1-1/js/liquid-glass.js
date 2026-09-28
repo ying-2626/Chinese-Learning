@@ -28,7 +28,7 @@
         'body.ui-exam #sidebar .side-content',
         'body.ui-learning .nav-menu'
     ].join(',');
-    const modeSelector = 'body.ui-workspace .practice-modes label:has(input[name="group"])';
+    const modeSelector = 'body.ui-workspace .practice-modes';
 
     function start() {
         const reduceTransparency = window.matchMedia('(prefers-reduced-transparency: reduce)');
@@ -134,27 +134,34 @@
             resizeObserver.observe(host);
         }
 
-        function addNav(nav) {
-            if (navs.has(nav)) return;
+        function addNav(nav, kind = 'navigation') {
+            if (navs.has(nav)) {
+                const state = navs.get(nav);
+                if (state.indicator.parentElement !== nav) nav.append(state.indicator);
+                return;
+            }
             const indicator = document.createElement('span');
             indicator.className = 'ui-glass-indicator';
             indicator.setAttribute('aria-hidden', 'true');
             const layer = document.createElement('i');
             layer.className = 'ui-glass-surface';
             indicator.append(layer);
-            nav.dataset.uiGlassNav = document.body.classList.contains('ui-learning') ? 'light' : 'blue';
+            nav.dataset.uiGlassNav = kind === 'mode' ? 'mode' : document.body.classList.contains('ui-learning') ? 'light' : 'blue';
             nav.append(indicator);
-            navs.set(nav, { indicator, surface: { layer }, geometry: '' });
+            const itemSelector = kind === 'mode' ? 'label:has(input[name="group"])' : '.side-footer, .nav-item';
+            const activeSelector = kind === 'mode' ? 'label:has(input[name="group"]:checked)' : '.side-footer.active, .nav-item.active';
+            const items = new Set(nav.querySelectorAll(itemSelector));
+            navs.set(nav, { indicator, surface: { layer, kind }, itemSelector, activeSelector, items, active: null, geometry: '' });
             resizeObserver.observe(nav);
-            nav.querySelectorAll('.side-footer, .nav-item').forEach(item => resizeObserver.observe(item));
+            items.forEach(item => resizeObserver.observe(item));
         }
 
         function refresh() {
             pending = false;
             document.querySelectorAll(panelSelector).forEach(host => addSurface(host, 'panel'));
             document.querySelectorAll(buttonSelector).forEach(host => addSurface(host, 'button'));
-            document.querySelectorAll(modeSelector).forEach(host => addSurface(host, 'mode'));
-            document.querySelectorAll(navSelector).forEach(addNav);
+            document.querySelectorAll(modeSelector).forEach(nav => addNav(nav, 'mode'));
+            document.querySelectorAll(navSelector).forEach(nav => addNav(nav));
             for (const [host, surface] of surfaces) {
                 if (!host.isConnected) {
                     resizeObserver.unobserve(host);
@@ -168,14 +175,19 @@
             for (const [nav, state] of navs) {
                 if (!nav.isConnected) {
                     resizeObserver.unobserve(nav);
-                    nav.querySelectorAll('.side-footer, .nav-item').forEach(item => resizeObserver.unobserve(item));
+                    state.items.forEach(item => resizeObserver.unobserve(item));
                     state.surface.filter?.remove();
                     navs.delete(nav);
                     continue;
                 }
-                const active = nav.querySelector('.side-footer.active, .nav-item.active');
+                const items = new Set(nav.querySelectorAll(state.itemSelector));
+                state.items.forEach(item => { if (!items.has(item)) resizeObserver.unobserve(item); });
+                items.forEach(item => { if (!state.items.has(item)) resizeObserver.observe(item); });
+                state.items = items;
+                const active = nav.querySelector(state.activeSelector);
                 if (!active || !active.getClientRects().length) {
                     state.indicator.hidden = true;
+                    state.active = null;
                     continue;
                 }
                 state.indicator.hidden = false;
@@ -184,13 +196,18 @@
                 const x = rect.left - container.left + nav.scrollLeft - nav.clientLeft;
                 const y = rect.top - container.top + nav.scrollTop - nav.clientTop;
                 const geometry = [x, y, rect.width, rect.height].map(Math.round).join(':');
-                if (state.geometry === geometry) continue;
-                state.indicator.classList.toggle('ui-glass-settled', Boolean(state.geometry) && !reduceMotion.matches);
+                if (state.geometry === geometry) {
+                    state.active = active;
+                    continue;
+                }
+                // Animate a new selection; resizing and revealing a panel should align immediately.
+                state.indicator.classList.toggle('ui-glass-settled', Boolean(state.active) && state.active !== active && !reduceMotion.matches);
                 state.indicator.style.transform = `translate(${x}px, ${y}px)`;
                 state.indicator.style.width = `${rect.width}px`;
                 state.indicator.style.height = `${rect.height}px`;
                 state.indicator.style.borderRadius = getComputedStyle(active).borderTopLeftRadius;
                 state.geometry = geometry;
+                state.active = active;
                 updateLens(state.surface, rect.width, rect.height, parseFloat(getComputedStyle(active).borderTopLeftRadius) || 16);
             }
         }
@@ -207,13 +224,21 @@
             if (records.some(record => {
                 if (record.target.closest?.('.ui-glass-surface, .ui-glass-indicator, .ui-glass-definitions')) return false;
                 if (record.type === 'attributes') {
-                    return record.target.matches('.side-footer, .nav-item, .module');
+                    return record.target.matches('.side-footer, .nav-item, .module, input[name="group"]');
                 }
-                if (record.target.matches(buttonSelector) && [...record.removedNodes].some(node => node.nodeType === 1 && node.matches('.ui-glass-surface'))) return true;
+                const surface = surfaces.get(record.target);
+                if (surface && record.target.isConnected && surface.layer.parentElement !== record.target) {
+                    // SpeechEval replaces innerText. Restore only our empty layer before the next paint.
+                    record.target.append(surface.layer);
+                    return true;
+                }
                 return [...record.addedNodes].some(node => node.nodeType === 1 && !node.matches('.ui-glass-surface, .ui-glass-indicator, .ui-glass-definitions'));
             })) schedule();
         });
-        observer.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'style'] });
+        observer.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'style', 'hidden', 'checked'] });
+        document.addEventListener('change', event => {
+            if (event.target.matches('input[name="group"]') && event.target.closest(modeSelector)) schedule();
+        });
         reduceTransparency.addEventListener('change', () => {
             navs.forEach(state => { state.geometry = ''; });
             schedule();

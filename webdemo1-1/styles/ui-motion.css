@@ -37,8 +37,32 @@ body.ui-workspace #magic-tool .tools {
   transition: translate 280ms cubic-bezier(.2,.8,.2,1), box-shadow 280ms ease, border-color 220ms ease;
 }
 
+/* Business code sets data-state; these styles never infer state from button text. */
+body.ui-workspace #btn_control[data-state="recording"] {
+  background: linear-gradient(180deg, #bf4953, #ac3541) !important;
+  box-shadow: 0 3px 9px rgb(172 53 65 / 16%), inset 0 1px 0 rgb(255 255 255 / 20%);
+}
+body.ui-workspace #btn_control[data-state="recording"]::before {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  -webkit-mask: none;
+  mask: none;
+}
+body.ui-workspace #btn_control:is([data-state="connecting"], [data-state="closing"])::before {
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  background: transparent;
+  -webkit-mask: none;
+  mask: none;
+}
+body[class*="ui-"] :is(button, input[type="submit"])[aria-busy="true"] { cursor: progress; }
+
 @media (hover: hover) and (pointer: fine) {
-  body[class*="ui-"] :is(button, input[type="button"], input[type="submit"], a.login-button, .index-button-container a, a.btn, a.cta-button, [role="button"]):not(#sidebar *):not(:disabled):not([aria-disabled="true"]):hover {
+  body[class*="ui-"] :is(button, input[type="button"], input[type="submit"], a.login-button, .index-button-container a, a.btn, a.cta-button, [role="button"]):not(#sidebar *):not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]):hover {
     translate: 0 -1px;
     box-shadow: 0 7px 18px rgb(35 80 138 / 12%), inset 0 1px 0 rgb(255 255 255 / 28%);
   }
