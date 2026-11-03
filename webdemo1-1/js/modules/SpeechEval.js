@@ -746,6 +746,11 @@ class SpeechEvalModule {
             this.showRecordingStatus('请先登录后开始录音', true);
             return;
         }
+        // 浏览器只在 HTTPS（或本机）下开放麦克风；IP/HTTP 访问时直接说明原因，不去建立评测连接。
+        if (!window.isSecureContext) {
+            this.showRecordingStatus('当前通过 IP（HTTP）访问，浏览器不允许录音；网站启用 https 域名后即可使用语音测评');
+            return;
+        }
         const attempt = { active: true, recorder: new RecorderManager('dist'), started: false, stopping: false, final: false };
         const current = () => attempt.active && this.activeRecording === attempt;
         this.activeRecording = attempt;

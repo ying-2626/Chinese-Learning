@@ -27,7 +27,7 @@ function element(text = '') {
     };
 }
 
-function fixture({ text = '你好', user = { sessionId: 'recording-test-session' } } = {}) {
+function fixture({ text = '你好', user = { sessionId: 'recording-test-session' }, secure = true } = {}) {
     const label = element();
     const button = element();
     const content = element(text);
@@ -81,7 +81,7 @@ function fixture({ text = '你好', user = { sessionId: 'recording-test-session'
         },
         CONFIG: { BACKEND_API: 'http://localhost:4195' },
         fetch: (...args) => { requests.push(args); return fetchResult(...args); },
-        window: { WebSocket: Socket, addEventListener: (name, handler) => { windowEvents[name] = handler; } },
+        window: { WebSocket: Socket, isSecureContext: secure, addEventListener: (name, handler) => { windowEvents[name] = handler; } },
         document: {
             getElementById: id => ({ btn_control: button, evalText: content, recording_status: status, score_save_status: saveStatus })[id] || null,
             querySelector: selector => selector.includes(':checked') ? modes[0] : null,
@@ -214,6 +214,15 @@ test('a guest receives a login link without requesting a URL or microphone', asy
     assert.equal(f.requests.length, 0);
     assert.equal(f.recorders.length, 0);
     assertIdle(f);
+});
+
+test('plain HTTP access explains that recording needs HTTPS without requesting a URL or microphone', async () => {
+    const f = fixture({ secure: false });
+    await f.speech.connectWebSocket();
+    assertIdle(f);
+    assert.match(f.status.textContent, /HTTP/);
+    assert.equal(f.requests.length, 0);
+    assert.equal(f.recorders.length, 0);
 });
 
 test('content and modes remain locked through connection, recording, and final-result waiting', async () => {

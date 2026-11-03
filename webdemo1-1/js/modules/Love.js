@@ -2,8 +2,8 @@ class LoveModule {
     constructor() {
         this.container = document.getElementById('love');
         this.images = [
-            'img/love放图1.png',
-            'img/love放图2.png'
+            'img/love放图1.webp',
+            'img/love放图2.webp'
         ];
         this.currentIndex = 0;
         this.intervalId = null;
@@ -25,7 +25,7 @@ class LoveModule {
                 <div class="carousel-wrapper">
                     ${this.images.map((src, index) => `
                         <div class="carousel-slide ${index === 0 ? 'active' : ''}">
-                            <img src="${src}" alt="User Feedback ${index + 1}">
+                            <img src="${src}" alt="User Feedback ${index + 1}" loading="lazy" decoding="async">
                         </div>
                     `).join('')}
                 </div>

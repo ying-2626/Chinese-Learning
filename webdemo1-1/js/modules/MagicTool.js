@@ -32,10 +32,8 @@ class MagicToolModule {
                 const toolName = tool.querySelector('.h1p')?.textContent;
                 console.log(`Tool clicked: ${toolName}`);
                 
-                if (toolName === '单词本') {
-                     // Handled by inline onclick in HTML or link
-                     // window.location.href='https://typing-word.ttentau.top'
-                } else if (toolName === '写作生成') {
+                // 原「单词本」外链 typing-word.ttentau.top 已失效，与其他未上线工具统一提示。
+                if (toolName === '写作生成') {
                     // TODO: Restore Writing Generator functionality
                     // The original code referenced .tool-display which is missing from DOM.
                     alert('写作生成正在升级中，敬请期待。');
