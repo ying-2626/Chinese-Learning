@@ -27,7 +27,11 @@
 #voice #vi-complete { color:#367756; margin-top:8px; }
 #voice #vi-form label { display:block; margin:0 0 8px; font-size:11px; color:#8490a0; }
 #voice #vi-text { display:block; width:100%; min-height:72px; max-height:140px; padding:11px 12px; border:1px solid #c8d4e44d; border-radius:12px; color:#3c4e65; background:#ffffffa6; font-family:var(--ui-font); font-size:12px; line-height:1.75; resize:vertical; }
-#voice #vi-text:focus { outline:2px solid #99b7ed; outline-offset:1px; }
+#voice #vi-text:focus, #voice #vi-context:focus { outline:2px solid #99b7ed; outline-offset:1px; }
+#voice .vi-mode { display:flex; gap:14px; margin:0 0 10px; padding:0; border:0; font-size:12px; color:#3c4e65; }
+#voice .vi-mode legend { float:left; margin-right:4px; font-size:11px; color:#8490a0; }
+#voice #vi-form .vi-mode label { display:flex; align-items:center; gap:4px; margin:0; font-size:12px; color:#3c4e65; }
+#voice #vi-context { display:block; width:100%; min-height:72px; max-height:160px; margin-bottom:10px; padding:9px 12px; border:1px solid #c8d4e44d; border-radius:12px; color:#3c4e65; background:#ffffffa6; font-family:var(--ui-font); font-size:11px; line-height:1.65; resize:vertical; }
 #voice .vi-actions { display:flex; justify-content:space-between; gap:10px; margin-top:12px; }
 #voice .vi-actions button { padding:9px 12px; border:1px solid #d4deeb5e; border-radius:999px; background:#ffffff82; color:#79869a; font-size:11px; }
 #voice .vi-actions .vi-primary { display:flex; align-items:center; justify-content:space-between; gap:16px; padding-inline:16px; border-color:transparent; background:linear-gradient(150deg,#4e82ec,#3169d5); color:#fff; box-shadow:0 3px 10px #2e67c929; }

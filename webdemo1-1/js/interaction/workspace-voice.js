@@ -16,11 +16,20 @@ root.innerHTML = `
     <div id="vi-auth" class="vi-auth" hidden>登录后可以准备本轮互动内容。<a href="login.html">前往登录</a></div>
     <div id="vi-error" class="vi-error" role="alert" hidden></div>
     <div class="vi-prompt"><span id="vi-stage-label">本轮互动</span><h3 id="vi-stage-title">从一句话开始</h3><p id="vi-stage-body">互动内容会显示在这里。后续的题目、选项和反馈，也会留在数字人身边。</p><p id="vi-complete" hidden>本句已播完，可以衔接下一步。</p></div>
-    <form id="vi-form"><label for="vi-text">本轮台词</label><textarea id="vi-text" rows="2" maxlength="1000" required placeholder="写下这次想互动的内容…">你好，我们一起开始今天的练习吧。</textarea><div class="vi-actions"><button id="vi-stop" type="button" disabled>停止本轮</button><button id="vi-send" class="vi-primary" type="submit" disabled>准备台词 <span aria-hidden="true">↗</span></button></div></form>
+    <form id="vi-form"><fieldset class="vi-mode"><legend>互动方式</legend><label><input type="radio" name="vi-mode" value="agent" checked>数字人回答</label><label><input type="radio" name="vi-mode" value="script">直接播报</label></fieldset><div id="vi-context-field"><label for="vi-context">场景与规则（上下文）</label><textarea id="vi-context" rows="4" maxlength="8000">场景：中秋节文化问答。你扮演主持人，一次只问一个问题，例如“中秋节人们会吃什么？”。学习者说出“月饼”就算答对，答对后夸奖并问下一题；答错或卡住时，提示“可以用‘中秋节吃……’来回答”。</textarea></div><label id="vi-text-label" for="vi-text">学习者说的话</label><textarea id="vi-text" rows="2" maxlength="1000" required placeholder="写下学习者这一轮说的话…">开始吧</textarea><div class="vi-actions"><button id="vi-stop" type="button" disabled>停止本轮</button><button id="vi-send" class="vi-primary" type="submit" disabled>准备台词 <span aria-hidden="true">↗</span></button></div></form>
     <p id="vi-playback" class="vi-playback" role="status" aria-live="polite">等待输入</p>
     <details class="vi-details"><summary>连接说明与记录</summary><p id="vi-connection-note">正在检查数字人是否支持互动控制。</p><div class="vi-session"><span id="vi-session-status">等待会话</span><button id="vi-restart" type="button">重新开始</button></div><button id="vi-reconnect" class="vi-link" type="button">重新检查数字人连接</button><ol id="vi-events" aria-label="交互事件"></ol></details>
   </div>`;
 const $ = id => root.querySelector(`#vi-${id}`);
+// 数字人回答：上下文 + 学习者的话交给后端大模型；直接播报：原样朗读台词。
+const agentMode = () => root.querySelector('input[name="vi-mode"]:checked')?.value === 'agent';
+function renderMode() {
+  $('context-field').hidden = !agentMode();
+  $('text-label').textContent = agentMode() ? '学习者说的话' : '本轮台词';
+  $('text').placeholder = agentMode() ? '写下学习者这一轮说的话…' : '写下数字人要原样说出的台词…';
+}
+root.querySelectorAll('input[name="vi-mode"]').forEach(input => input.addEventListener('change', renderMode));
+renderMode();
 let bridge = null, connected = false, checking = false, sceneActive = false;
 let entered = false, ownerSession = null, authRequired = false;
 const labels = { idle:'等待输入', queued:'等待数字人播报', playing:'数字人正在播报', ended:'本句已播完', cancelled:'本轮已停止', error:'本轮未完成', unavailable:'台词已准备，尚未送达数字人。' };
@@ -128,7 +137,11 @@ $('form').addEventListener('submit',event => {
   event.preventDefault();
   const text = $('text').value.trim();
   if (!text) return showError('先写一句想互动的内容。');
-  controller.submit({type:'text.submit',text});
+  if (agentMode()) {
+    const context = $('context').value.trim();
+    if (!context) return showError('先写好场景与规则，数字人才知道怎么回答。');
+    controller.submit({type:'agent.ask',text,context});
+  } else controller.submit({type:'text.submit',text});
 });
 $('stop').onclick = () => controller.interrupt();
 $('restart').onclick = () => { ownerSession = window.LegacyContent.getUser()?.sessionId; entered = true; controller.start(); };

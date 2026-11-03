@@ -3,10 +3,13 @@ package com.shengdonghanyu.backend.interaction;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayDeque;
+import java.util.List;
 import java.util.UUID;
 
 /** 绑定已登录用户的临时交互轮次；不表示数字人的实际播放状态。 */
 final class InteractionSession {
+    static final int HISTORY_LIMIT = 6;
     private final String id = UUID.randomUUID().toString();
     private final String userId;
     private long turnId;
@@ -14,6 +17,7 @@ final class InteractionSession {
     private boolean closed;
     private boolean replyReady;
     private String previousReply = "";
+    private final ArrayDeque<Exchange> history = new ArrayDeque<>();
     private Process speechProcess;
 
     InteractionSession(String userId) {
@@ -47,6 +51,19 @@ final class InteractionSession {
         }
         previousReply = reply;
         replyReady = true;
+    }
+
+    /** 只记录数字人回答模式的成功轮次，供下一轮作为对话历史。 */
+    synchronized void completeExchange(long completedTurnId, String userText, String reply) {
+        complete(completedTurnId, reply);
+        history.addLast(new Exchange(userText, reply));
+        while (history.size() > HISTORY_LIMIT) {
+            history.removeFirst();
+        }
+    }
+
+    synchronized List<Exchange> history() {
+        return List.copyOf(history);
     }
 
     synchronized void interrupt(long interruptedTurnId) {
@@ -123,5 +140,8 @@ final class InteractionSession {
 
     private ResponseStatusException staleTurn() {
         return new ResponseStatusException(HttpStatus.CONFLICT, "此轮输入已过期或已取消，请开始新一轮。");
+    }
+
+    record Exchange(String user, String assistant) {
     }
 }

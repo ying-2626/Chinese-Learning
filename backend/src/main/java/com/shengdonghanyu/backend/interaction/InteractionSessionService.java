@@ -13,11 +13,14 @@ public class InteractionSessionService {
     private static final String SESSION_ATTRIBUTE = InteractionSessionService.class.getName() + ".session";
     private static final String AGENT_MODE = "local-script";
     private final InteractionReply reply;
+    private final AgentReply agentReply;
     private final LocalSpeechSynthesis speechSynthesis;
     private final SessionUtils loginSession;
 
-    public InteractionSessionService(InteractionReply reply, LocalSpeechSynthesis speechSynthesis, SessionUtils loginSession) {
+    public InteractionSessionService(InteractionReply reply, AgentReply agentReply,
+                                     LocalSpeechSynthesis speechSynthesis, SessionUtils loginSession) {
         this.reply = reply;
+        this.agentReply = agentReply;
         this.speechSynthesis = speechSynthesis;
         this.loginSession = loginSession;
     }
@@ -38,12 +41,21 @@ public class InteractionSessionService {
     public EventResponse submit(HttpSession httpSession, Event event) {
         InteractionSession session = requireSession(httpSession, event.sessionId());
         String previousReply = session.begin(event.turnId());
-        // reply 可替换为耗时模型调用，但不能持有状态锁。
-        InteractionReply.Reply result = reply.reply(event, previousReply);
-        session.complete(event.turnId(), result.text());
+        // 回复可能是耗时模型调用，不能持有状态锁；期间被取消则 complete 拒绝过期轮次。
+        InteractionReply.Reply result;
+        String mode = AGENT_MODE;
+        if ("agent.ask".equals(event.type())) {
+            String text = agentReply.reply(event.context(), session.history(), event.text());
+            session.completeExchange(event.turnId(), event.text(), text);
+            result = new InteractionReply.Reply(text, "数字人回答");
+            mode = "agent";
+        } else {
+            result = reply.reply(event, previousReply);
+            session.complete(event.turnId(), result.text());
+        }
         return new EventResponse(session.id(), event.turnId(),
                 new Speech(UUID.randomUUID().toString(), result.text()),
-                new View(result.title(), result.text()), AGENT_MODE);
+                new View(result.title(), result.text()), mode);
     }
 
     public InterruptResponse interrupt(HttpSession httpSession, String sessionId, long turnId) {
@@ -81,7 +93,10 @@ public class InteractionSessionService {
         return new ResponseStatusException(HttpStatus.FORBIDDEN, "交互会话不存在或不属于当前登录用户，请重新开始。");
     }
 
-    public record Event(String sessionId, long turnId, String type, String text, String action) {
+    public record Event(String sessionId, long turnId, String type, String text, String action, String context) {
+        public Event(String sessionId, long turnId, String type, String text, String action) {
+            this(sessionId, turnId, type, text, action, null);
+        }
     }
 
     public record SessionResponse(String sessionId, long turnId, String agentMode, String state) {

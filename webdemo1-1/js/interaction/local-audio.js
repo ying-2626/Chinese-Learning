@@ -2,7 +2,7 @@
 export function createLocalAudioDriver({ scope = window, onState = () => {}, getHeaders = () => ({}) } = {}) {
   const Context = scope.AudioContext || scope.webkitAudioContext;
   const supported = typeof Context === 'function' && typeof scope.fetch === 'function';
-  let context = null, current = null;
+  let context = null, current = null, analyser = null, samples = null;
   const cleanup = (job, stop = false) => {
     if (!job.source) return;
     job.source.onended = null;
@@ -58,7 +58,7 @@ export function createLocalAudioDriver({ scope = window, onState = () => {}, get
         const source = context.createBufferSource();
         job.source = source;
         source.buffer = audio;
-        source.connect(context.destination);
+        source.connect(analyser || context.destination);
         source.onended = () => finish(job, 'speech.ended');
         source.start();
         emit({ type: 'speech.started' });
@@ -70,10 +70,23 @@ export function createLocalAudioDriver({ scope = window, onState = () => {}, get
   };
   return {
     provider: 'local-audio', capabilities: { speak: supported, interrupt: supported }, speak, interrupt,
+    get ready() { return Boolean(context && context.state === 'running'); },
+    getLevel() {
+      if (!analyser || !current?.source) return 0;
+      analyser.getFloatTimeDomainData(samples);
+      let sum = 0;
+      for (const value of samples) sum += value * value;
+      return Math.sqrt(sum / samples.length);
+    },
     async enable() {
       try {
         if (!supported) throw new Error('当前浏览器不支持音频播放。');
-        if (!context || context.state === 'closed') context = new Context();
+        if (!context || context.state === 'closed') {
+          context = new Context();
+          // 口型只读取正在播放的同一路音频的音量，不另开声源。
+          analyser = typeof context.createAnalyser === 'function' ? context.createAnalyser() : null;
+          if (analyser) { analyser.fftSize = 1024; samples = new Float32Array(analyser.fftSize); analyser.connect(context.destination); }
+        }
         await context.resume();
         if (context.state !== 'running') throw new Error('浏览器尚未允许音频播放，请再次点击启用。');
         onState('audio.ready', '可接收台词');

@@ -39,8 +39,13 @@ public class InteractionController {
         String type = requiredText(body, "type", 30);
         String text = null;
         String action = null;
+        String context = null;
         switch (type) {
             case "text.submit", "speech.final" -> text = requiredText(body, "text", 1000);
+            case "agent.ask" -> {
+                text = requiredText(body, "text", 1000);
+                context = requiredText(body, "context", 8000);
+            }
             case "action.request" -> {
                 action = requiredText(body, "action", 20);
                 if (!"introduce".equals(action) && !"repeat".equals(action)) {
@@ -50,7 +55,7 @@ public class InteractionController {
             default -> throw invalid("不支持此输入类型。");
         }
         return sessions.submit(request.getSession(false),
-                new InteractionSessionService.Event(sessionId, turnId, type, text, action));
+                new InteractionSessionService.Event(sessionId, turnId, type, text, action, context));
     }
 
     @PostMapping("/interrupt")
@@ -92,6 +97,7 @@ public class InteractionController {
         String code = switch (error.getStatusCode().value()) {
             case 403 -> "session_forbidden";
             case 409 -> "stale_turn";
+            case 502 -> "agent_failed";
             case 503 -> "speech_unavailable";
             default -> "invalid_request";
         };

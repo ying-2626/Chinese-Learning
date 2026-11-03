@@ -50,7 +50,7 @@ class InteractionSessionConcurrencyTest {
                 }
             }
             return local.reply(event, previous);
-        }, new LocalSpeechSynthesis(), loginSession);
+        }, new AgentReply("", "http://127.0.0.1:9/unused", ""), new LocalSpeechSynthesis(), loginSession);
         MockHttpSession browser = new MockHttpSession();
         String sessionId = service.create(browser).sessionId();
         service.submit(browser, event(sessionId, 1, "上一条有效回复"));
