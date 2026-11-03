@@ -41,7 +41,6 @@ class HistoryModule {
     renderEmptyState() {
         this.container.innerHTML = `
             <div class="empty-state">
-                <img src="img/side_logo.png" alt="No Data" style="width: 100px; opacity: 0.5; filter: grayscale(100%);">
                 <p>暂无评测记录</p>
                 <button class="start-evaluation">去评测</button>
             </div>

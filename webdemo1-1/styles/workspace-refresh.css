@@ -729,8 +729,23 @@ body.ui-workspace {
 }
 
 .ui-workspace #love .love-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   margin-bottom: 22px;
   text-align: left;
+}
+
+/* 问卷入口原为全局右下角浮钮，会压住各模块的输入区，移到用户反馈页 */
+.ui-workspace #love .love-survey {
+  padding: 9px 18px;
+  border-radius: 999px;
+  background: linear-gradient(150deg, #4e82ec, #3169d5);
+  color: #fff;
+  font-size: 13px;
+  text-decoration: none;
+  box-shadow: 0 3px 10px #2e67c929;
 }
 
 .ui-workspace #love .love-header h2 {

@@ -23,7 +23,7 @@
   <canvas id="stage" aria-label="数字人"></canvas>
   <div class="stage-status" id="status-pill" role="status" aria-live="polite"><i aria-hidden="true"></i><span id="status">正在加载人物</span></div>
   <button id="enable" type="button" hidden>点击启用语音</button>
-  <p class="stage-credit">Live2D 人物 Shizuku · 本机语音预览</p>
+  <p class="stage-credit">Live2D · Shizuku</p>
 <script type="module">
   import { installAvatarHost } from './js/interaction/avatar-host.js';
   import { createLocalAudioDriver } from './js/interaction/local-audio.js';
@@ -31,11 +31,13 @@
 
   const pill = document.getElementById('status-pill'), status = document.getElementById('status'), button = document.getElementById('enable');
   const labels = {'audio.ready':'可以开口了','speech.pending':'正在准备语音','speech.started':'正在说话','speech.ended':'说完了','speech.cancelled':'已停下','speech.error':'语音不可用'};
-  const setStatus = (text, { speaking = false, error = false } = {}) => {
-    status.textContent = text; pill.dataset.speaking = String(speaking); pill.dataset.error = String(error);
+  const setStatus = (text, { speaking = false, error = false, detail = '' } = {}) => {
+    status.textContent = text; pill.dataset.speaking = String(speaking); pill.dataset.error = String(error); pill.title = detail;
   };
   const audio = createLocalAudioDriver({ getHeaders: () => window.LegacyContent.headers(), onState(type, message) {
-    setStatus(type === 'speech.error' && message ? message : labels[type] || type, { speaking: type === 'speech.started', error: type === 'speech.error' });
+    // 画面上只显示简短状态，技术原因放在悬停提示里。
+    const text = type === 'speech.error' ? (/启用语音/.test(message) ? '请先点击「点击启用语音」' : '暂时无法发声') : labels[type] || type;
+    setStatus(text, { speaking: type === 'speech.started', error: type === 'speech.error', detail: type === 'speech.error' ? message : '' });
     button.hidden = audio.ready;
   } });
   const enable = async () => { const ok = await audio.enable(); button.hidden = ok; return ok; };
@@ -66,10 +68,10 @@
   try {
     stage = await createLive2DStage({ canvas: document.getElementById('stage'), modelUrl: 'live2d/Shizuku/Shizuku.model3.json', framing: { zoom: 1.05, focusY: 0.08 },
       getMouthLevel: () => audio.getLevel() * 7 });
-    setStatus('等待台词');
+    setStatus('准备就绪');
     button.hidden = audio.ready;
   } catch (error) {
-    setStatus(String(error.message || error), { error: true });
+    setStatus('人物加载失败', { error: true, detail: String(error.message || error) });
   }
 </script>
 </body>

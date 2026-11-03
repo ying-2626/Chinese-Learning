@@ -133,6 +133,6 @@ export class InteractionController {
 
   fail(error) {
     this.update({ business: 'error', playback: 'error', error: error.message });
-    this.emit('interaction.error', { message: error.message });
+    this.emit('interaction.error', { message: error.message, code: error.code });
   }
 }

@@ -504,7 +504,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 //
 //        // 调用模型API
 //        // API Key
-//        String apiKey = "5176fd66b5ebf072d3a4cb3cc7373e8b.GYxJkFGKPDaaMW3A";
+//        String apiKey = "<已移除：曾泄露，需在平台作废>";
 //        // API endpoint
 //        String url = "https://open.bigmodel.cn/api/paas/v4/chat/completions";
 //
@@ -617,7 +617,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 //
 //        // 调用模型API
 //        // API Key
-//        String apiKey = "5176fd66b5ebf072d3a4cb3cc7373e8b.GYxJkFGKPDaaMW3A";
+//        String apiKey = "<已移除：曾泄露，需在平台作废>";
 //        // API endpoint
 //        String url = "https://open.bigmodel.cn/api/paas/v4/chat/completions";
 //

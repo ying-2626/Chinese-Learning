@@ -23,7 +23,7 @@
 //
 //    private static String username = "root";
 //
-//    private static String password = "a13738780767";
+//    private static String password = "<已移除：曾泄露，需更换>";
 //
 //    public static void main(String[] args) {
 //

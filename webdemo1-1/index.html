@@ -8,8 +8,8 @@
     <link rel="stylesheet" href="./styles/index.css">
     <link rel="icon" href="./img/side_logo.png">
 
-    <!-- Phosphor Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web@2.0.3"></script>
+    <!-- Phosphor Icons（仅 regular 字重，本地托管） -->
+    <link rel="stylesheet" href="styles/vendor/phosphor-regular/style.css">
 
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown-light.min.css">
@@ -21,10 +21,7 @@
     <!-- Libraries -->
     <script src="js/vendor/marked-15.0.12.min.js"></script>
     <script src="js/vendor/axios-1.21.0.min.js"></script>
-    <script src="js/vendor/xml-js-1.6.11.min.js"></script>
-    <script src="js/vendor/crypto-js-4.1.1.js"></script>
     <script src="dist/index.umd.js"></script>
-    <script src="js/vendor/RecordRTC-5.6.2.min.js"></script>
 
     <style>
         @media (max-width: 767px) {
@@ -49,11 +46,11 @@
         }
     </style>
     <link rel="stylesheet" href="styles/ui-base.css">
-    <link rel="stylesheet" href="styles/workspace-refresh.css?v=20261103">
+    <link rel="stylesheet" href="styles/workspace-refresh.css?v=20261104">
     <link rel="stylesheet" href="styles/legacy-features-refresh.css?v=20260927">
     <link rel="stylesheet" href="styles/ui-motion.css?v=20260927">
     <link rel="stylesheet" href="styles/liquid-glass.css?v=20260927">
-    <link rel="stylesheet" href="styles/voice-interaction.css?v=20260927">
+    <link rel="stylesheet" href="styles/voice-interaction.css?v=20261104d">
     <link rel="stylesheet" href="styles/practice-experience.css?v=20260928">
     <link rel="stylesheet" href="styles/score-motion.css?v=20260928">
     <link rel="stylesheet" href="styles/exam-center.css?v=20261103">
@@ -105,7 +102,7 @@
                             <div class="score-summary">
                                 <p id="score_grade" class="score-grade">等待朗读</p>
                                 <p id="score_focus" class="score-focus"></p>
-                                <p class="score-hint">完成一次朗读后，这里会显示各项得分；文本中的每个字会按准确度着色。</p>
+                                <p class="score-hint">朗读后显示各项得分，每个字按准确度着色。</p>
                                 <ul class="score-legend" aria-label="颜色说明">
                                     <li data-level="good">准确 ≥80</li>
                                     <li data-level="warn">待改进 60–79</li>
@@ -134,7 +131,7 @@
                         </div>
 
                         <textarea id="feedback_text" class="suggestion-box" readonly
-                            aria-labelledby="feedback_panel_title" aria-describedby="feedback_speech_status">完成一次朗读后，AI 老师会在这里给出改进建议。</textarea>
+                            aria-labelledby="feedback_panel_title" aria-describedby="feedback_speech_status">朗读后显示改进建议。</textarea>
 
                         <div class="feedback-panel-footer">
                             <label class="feedback-rate-control" for="feedback_speech_rate">
@@ -146,7 +143,7 @@
                             </label>
                             <span id="score_save_status" role="status" aria-live="polite"></span>
                             <span id="feedback_speech_status" class="feedback-speech-status" role="status"
-                                aria-live="polite">完成一次朗读后可以听反馈</span>
+                                aria-live="polite">暂无反馈</span>
                         </div>
                     </section>
                 </div>
@@ -162,15 +159,15 @@
         <!-- Voice板块 -->
         <div class="module voice" id="voice" style="display:none;">
             <div class="voice-toolbar">
-                <p>数字人口语陪练 <span>在同一个画面里，边对话边互动。</span></p>
-                <button id="vi-open" type="button" aria-controls="voice-interaction" aria-expanded="false">展开互动卡 <span aria-hidden="true">↗</span></button>
+                <p>数字人口语陪练</p>
+                <button id="vi-open" type="button" aria-controls="voice-interaction" aria-expanded="false">开始对话 <span aria-hidden="true">↗</span></button>
             </div>
             <div id="voice-scene" data-placement="overlay">
             <div id="voice-conversation">
             <iframe title="数字人对话" data-src="avatar-stage.html" allow="autoplay">
             </iframe>
             </div>
-            <section id="voice-interaction" aria-label="数字人互动卡" hidden></section>
+            <section id="voice-interaction" aria-label="和数字人对话" hidden></section>
             </div>
         </div>
 
@@ -178,14 +175,14 @@
         <div class="module chatbot2" id="chat-bot" style="display:none;">
             <div class="input-container">
                 <div class="pleaseinput" style="display:none;">请输入你的问题</div>
-                <textarea cols="30" rows="5" class="chat-input" placeholder="Please input your question..."></textarea>
+                <textarea cols="30" rows="5" class="chat-input" placeholder="输入你的问题"></textarea>
                 <img src="img/纸飞机（灰色版）.png" alt="">
             </div>
             <div class="cover-container"></div>
             <div class="chat-item">
                 <div class="message ai-message" id="start-message">
                     <div class="p1">
-                        请输入你的问题，输入问题后，AI将给出答案
+                        你好！汉语学习上的问题都可以问我。
                     </div>
                 </div>
             </div>
@@ -428,7 +425,6 @@
                 <section class="ex-block" aria-labelledby="ex_sections_title">
                     <header class="ex-block-head">
                         <h3 id="ex_sections_title">题型专项练习</h3>
-                        <p>每个题型都连接真实的 AI 语音评测，练完立即出分。</p>
                     </header>
                     <div class="ex-sections" data-exam-field="sections"></div>
                 </section>
@@ -487,14 +483,6 @@
             </div>
         </div>
 
-        <!-- 右下角悬浮反馈按钮 -->
-        <a href="https://v.wjx.cn/vm/wcgDtu5.aspx#" target="_blank" class="feedback-float-btn" title="使用反馈">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 11l3 3L22 4"/>
-                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
-            </svg>
-        </a>
-
         <!-- History 板块 -->
         <div class="module history" id="history" style="display:none;">
             <div class="history-container">
@@ -513,14 +501,14 @@
     <!-- Modules Scripts -->
     <script src="js/components/Sidebar.js?v=20261103"></script>
     <script src="js/modules/LegacyContent.js?v=20260927"></script>
-    <script src="js/modules/Chatbot.js?v=20260927"></script>
+    <script src="js/modules/Chatbot.js?v=20261104"></script>
     <script src="js/modules/FeedbackSpeech.js?v=20260927"></script>
     <script src="js/recording-capsule.js?v=20260928"></script>
     <script src="js/score-motion.js?v=20260928"></script>
     <script src="js/modules/SpeechEval.js?v=20261104"></script>
     <script src="js/modules/MagicTool.js?v=20261104"></script>
-    <script src="js/modules/History.js?v=20260927"></script>
-    <script src="js/modules/Love.js?v=20261104"></script>
+    <script src="js/modules/History.js?v=20261104"></script>
+    <script src="js/modules/Love.js?v=20261104b"></script>
     <script src="js/modules/CustomLearning.js?v=20260927"></script>
     <script src="js/modules/ExamCenter.js?v=20261103"></script>
 
@@ -639,7 +627,7 @@
     <script src="js/index.js?v=20260927"></script>
     <script defer src="js/ui-motion.js?v=20260927"></script>
     <script defer src="js/liquid-glass.js?v=20260927"></script>
-    <script type="module" src="js/interaction/workspace-voice.js?v=20260927"></script>
+    <script type="module" src="js/interaction/workspace-voice.js?v=20261104b"></script>
 </body>
 
 </html>

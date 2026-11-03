@@ -20,6 +20,7 @@ class LoveModule {
         this.container.innerHTML = `
             <div class="love-header">
                 <h2>用户反馈</h2>
+                <a class="love-survey" href="https://v.wjx.cn/vm/wcgDtu5.aspx#" target="_blank" rel="noopener">填写使用反馈</a>
             </div>
             <div class="carousel-container">
                 <div class="carousel-wrapper">

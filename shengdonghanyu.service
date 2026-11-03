@@ -6,7 +6,8 @@ After=network.target
 Type=simple
 User=ubuntu
 WorkingDirectory=/home/ubuntu
-ExecStart=/usr/bin/java -jar /home/ubuntu/backend-0.0.1-SNAPSHOT.jar
+# systemd 会展开 $JAVA_OPTS，使下方的内存上限真正生效（小内存服务器上避免 JVM 占满内存）
+ExecStart=/usr/bin/java $JAVA_OPTS -jar /home/ubuntu/backend-0.0.1-SNAPSHOT.jar
 Restart=always
 RestartSec=10
 Environment="JAVA_OPTS=-Xmx512m -Xms256m"

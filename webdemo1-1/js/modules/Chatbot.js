@@ -26,7 +26,7 @@ class ChatbotModule {
                     <div class="chat-messages" id="chatMessages" aria-label="对话消息"></div>
                     <form class="chat-input-area">
                         <div class="input-container">
-                            <textarea class="chat-input" id="chatInput" placeholder="Please input your question..." aria-label="输入消息"></textarea>
+                            <textarea class="chat-input" id="chatInput" placeholder="输入你的问题" aria-label="输入消息"></textarea>
                             <button type="submit" class="chat-send-btn" id="chatSendBtn" aria-label="发送">
                                 <img src="img/纸飞机（灰色版）.png" alt="">
                             </button>
@@ -42,7 +42,7 @@ class ChatbotModule {
         this.newBtn = document.getElementById('chatNewBtn');
         this.sessionListEl = document.getElementById('chatSessionList');
         this.statusEl = document.getElementById('chatStatus');
-        this.appendMessage('assistant', '请输入你的问题，输入问题后，AI将给出答案');
+        this.appendMessage('assistant', '你好！汉语学习上的问题都可以问我。');
     }
 
     bindEvents() {
