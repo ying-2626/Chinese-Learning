@@ -24,7 +24,7 @@
 
 人物沿用原 Light4AI 托管页的形象：Shizuku + 「可爱城市」动态背景，取自开源项目 [awesome-digital-human-live2d](https://github.com/wan-h/awesome-digital-human-live2d) 的 `web/public/sentio/`（原托管页加载的是同一组文件）。取景在 `avatar-stage.html` 的 `framing` 参数中调整。
 
-素材与许可：`js/vendor/live2dcubismcore.min.js` 来自 Live2D 官方 CDN（Live2D Proprietary Software License），年营收 1000 万日元以上的主体发布前需签 Cubism SDK 发行许可。开源仓库代码为 MIT，但未单独写明 `live2d/Shizuku/` 与 `live2d/backgrounds/cute-city.mp4`（14 MB）的素材许可：Shizuku 应为 Live2D 早期官方示例人物（免费素材许可），背景视频来源不明，正式发布前需确认。
+素材与许可：`js/vendor/live2dcubismcore.min.js` 来自 Live2D 官方 CDN（Live2D Proprietary Software License），年营收 1000 万日元以上的主体发布前需签 Cubism SDK 发行许可。开源仓库代码为 MIT，但未单独写明 `live2d/Shizuku/` 与 `live2d/backgrounds/cute-city.mp4`（已由 4K 原片压缩为 1600×900、无音轨，约 830 KB；人物贴图转为 WebP，模型配置随之改名）的素材许可：Shizuku 应为 Live2D 早期官方示例人物（免费素材许可），背景视频来源不明，正式发布前需确认。
 
 ## 布局和操作
 
