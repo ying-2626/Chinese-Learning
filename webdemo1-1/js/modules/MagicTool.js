@@ -22,8 +22,7 @@ class MagicToolModule {
                 // Add active to clicked
                 btn.classList.add('active');
 
-                const filterName = btn.textContent.trim();
-                this.filterTools(filterName);
+                this.filterTools(btn.dataset.category);
             });
         });
 
@@ -39,34 +38,18 @@ class MagicToolModule {
                 } else if (toolName === '写作生成') {
                     // TODO: Restore Writing Generator functionality
                     // The original code referenced .tool-display which is missing from DOM.
-                    alert("Writing Generator functionality is currently under maintenance.");
+                    alert('写作生成正在升级中，敬请期待。');
                 } else {
-                    // Other tools
+                    alert(`「${toolName}」即将上线，敬请期待。`);
                 }
             });
         });
     }
 
     filterTools(category) {
-        if (category.includes("All")) {
-            this.tools.forEach(tool => tool.style.display = '');
-        } else {
-            this.tools.forEach(tool => {
-                // The original code matched by class name.
-                // HTML classes: "tools Tool1", "tools Content", "tools Questions", etc.
-                // Category names: "Planning", "Content", "Questions", etc.
-                // We need to check if the tool has the class matching the category.
-                // Note: The category string might need processing (e.g., "Intellectual Prep" -> class?)
-                // Original code: if (tool.classList.contains(toolname.split(" ")[0]))
-                
-                const matchClass = category.split(" ")[0];
-                if (tool.classList.contains(matchClass)) {
-                    tool.style.display = '';
-                } else {
-                    tool.style.display = 'none';
-                }
-            });
-        }
+        this.tools.forEach(tool => {
+            tool.style.display = category === 'all' || tool.dataset.category === category ? '' : 'none';
+        });
     }
 }
 

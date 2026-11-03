@@ -49,13 +49,14 @@
         }
     </style>
     <link rel="stylesheet" href="styles/ui-base.css">
-    <link rel="stylesheet" href="styles/workspace-refresh.css?v=20260927">
+    <link rel="stylesheet" href="styles/workspace-refresh.css?v=20261103">
     <link rel="stylesheet" href="styles/legacy-features-refresh.css?v=20260927">
     <link rel="stylesheet" href="styles/ui-motion.css?v=20260927">
     <link rel="stylesheet" href="styles/liquid-glass.css?v=20260927">
     <link rel="stylesheet" href="styles/voice-interaction.css?v=20260927">
     <link rel="stylesheet" href="styles/practice-experience.css?v=20260928">
     <link rel="stylesheet" href="styles/score-motion.css?v=20260928">
+    <link rel="stylesheet" href="styles/exam-center.css?v=20261103">
 </head>
 
 <body class="ui-workspace">
@@ -92,34 +93,34 @@
                 <br />
                 <div class="result-grid">
                     <!-- 评分框 -->
-                    <div class="left" style="border: 3px solid #007bff; padding: 20px; border-radius: 15px; 
-    box-shadow: 2px 2px 10px #cccccc; width: 300px; background-color: #f7f7f7;
-    display: flex; flex-direction: column; justify-content: space-between; min-height: 150px;">
-
-                        <p style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
-                            准确度：<span id="accuracy_score" style="font-weight: bold; color: #007bff;">0</span>
-                        </p>
-                        <p style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
-                            流畅度：<span id="fluency_score" style="font-weight: bold; color: #007bff;">0</span>
-                        </p>
-                        <p style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
-                            完整度：<span id="integrity_score" style="font-weight: bold; color: #007bff;">0</span>
-                        </p>
-                        <p id="initial_score_wrapper"
-                            style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
-                            声母分：<span id="initial_score" style="font-weight: bold; color: #007bff;">0</span>
-                        </p>
-                        <p id="final_score_wrapper"
-                            style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
-                            韵母分：<span id="final_score" style="font-weight: bold; color: #007bff;">0</span>
-                        </p>
-                        <p id="tone_score_wrapper"
-                            style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
-                            声调分：<span id="tone_score" style="font-weight: bold; color: #007bff;">0</span>
-                        </p>
-                        <p style="padding-bottom: 10px; margin: 0; color: #333; font-size: 18px;">
-                            总分：<span id="total_score" style="font-weight: bold; color: #007bff;">0</span>
-                        </p>
+                    <div class="left score-card" data-state="idle">
+                        <div class="score-hero">
+                            <div class="score-ring">
+                                <svg viewBox="0 0 120 120" aria-hidden="true">
+                                    <circle cx="60" cy="60" r="52" class="score-ring-track"></circle>
+                                    <circle cx="60" cy="60" r="52" class="score-ring-bar"></circle>
+                                </svg>
+                                <p class="score-ring-value"><span id="total_score">--</span><small>总分</small></p>
+                            </div>
+                            <div class="score-summary">
+                                <p id="score_grade" class="score-grade">等待朗读</p>
+                                <p id="score_focus" class="score-focus"></p>
+                                <p class="score-hint">完成一次朗读后，这里会显示各项得分；文本中的每个字会按准确度着色。</p>
+                                <ul class="score-legend" aria-label="颜色说明">
+                                    <li data-level="good">准确 ≥80</li>
+                                    <li data-level="warn">待改进 60–79</li>
+                                    <li data-level="bad">错误 &lt;60</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="score-metrics">
+                            <p class="metric"><span class="metric-head"><span>准确度</span><span id="accuracy_score">--</span></span><b class="metric-bar"><i></i></b></p>
+                            <p class="metric"><span class="metric-head"><span>流畅度</span><span id="fluency_score">--</span></span><b class="metric-bar"><i></i></b></p>
+                            <p class="metric"><span class="metric-head"><span>完整度</span><span id="integrity_score">--</span></span><b class="metric-bar"><i></i></b></p>
+                            <p id="initial_score_wrapper" class="metric"><span class="metric-head"><span>声母</span><span id="initial_score">--</span></span><b class="metric-bar"><i></i></b></p>
+                            <p id="final_score_wrapper" class="metric"><span class="metric-head"><span>韵母</span><span id="final_score">--</span></span><b class="metric-bar"><i></i></b></p>
+                            <p id="tone_score_wrapper" class="metric"><span class="metric-head"><span>声调</span><span id="tone_score">--</span></span><b class="metric-bar"><i></i></b></p>
+                        </div>
                     </div>
 
                     <section class="feedback-panel" aria-labelledby="feedback_panel_title">
@@ -196,72 +197,68 @@
             <div class="toolchoice">
                 <div class="toolchoice1">
                     <div class="toolchoice11">
-                        <div class="toolchoice111">MagicTools</div>
+                        <div class="toolchoice111">AI 学习工具</div>
                     </div>
                 </div>
                 <div class="toolchoice2">
-                    <button><img src="img/icon-all.png" alt=""> All</button>
-                    <button>Planning</button>
-                    <button>Content</button>
-                    <button>Questions</button>
-                    <button>Intellectual Prep</button>
-                    <button>Student Support</button>
-                    <button>Communication</button>
-                    <button>Community Tools</button>
-                    <button>Admin</button>
+                    <button class="active" data-category="all"><img src="img/icon-all.png" alt=""> 全部</button>
+                    <button data-category="vocab">词汇语法</button>
+                    <button data-category="writing">阅读写作</button>
+                    <button data-category="culture">文化翻译</button>
+                    <button data-category="speaking">口语朗读</button>
                 </div>
             </div>
             <div class="AllTools">
-                <div class="tools Tool1" onclick="window.location.href='https://typing-word.ttentau.top'">
+                <div class="tools Tool1" data-category="vocab" onclick="window.location.href='https://typing-word.ttentau.top'">
                     <img src="SVG/单词本.svg" alt="">
                     <div class="text-container">
                         <div class="h1p">单词本</div>
                         <div class="h2p">根据您学习的主题提供HSK 1-6级中文单词的记背和检测</div>
                     </div>
                 </div>
-                <div class="tools Content">
+                <div class="tools Content" data-category="writing">
                     <img src="SVG/演讲家.svg" alt="">
                     <div class="text-container">
                         <div class="h1p">演讲家</div>
                         <div class="h2p">基于您需要的话题和要求，进行AI生成的演讲稿撰写</div>
                     </div>
                 </div>
-                <div class="tools Questions">
+                <div class="tools Questions" data-category="vocab">
                     <img src="SVG/语法.svg" alt="">
                     <div class="text-container">
                         <div class="h1p">语法家</div>
                         <div class="h2p">为您讲解语法点，纠正您句子中的语法错误</div>
                     </div>
                 </div>
-                <div class="tools Intellectual Prep">
+                <div class="tools Intellectual Prep" data-category="writing">
                     <img src="SVG/阅读.svg" alt="">
                     <div class="text-container">
                         <div class="h1p">阅读家</div>
                         <div class="h2p">提供不同难度的阅读材料</div>
                     </div>
                 </div>
-                <div class="tools Intellectual Prep">
+                <div class="tools Intellectual Prep" data-category="culture">
                     <img src="SVG/文化.svg" alt="">
                     <div class="text-container">
                         <div class="h1p">文化家</div>
                         <div class="h2p">提供中国文化相关的知识</div>
                     </div>
                 </div>
-                <div class="tools Intellectual Prep">
+                <div class="tools Intellectual Prep" data-category="culture">
                     <img src="SVG/中外互译.svg" alt="">
                     <div class="text-container">
                         <div class="h1p">中外互译</div>
                         <div class="h2p">提供中外互译功能</div>
                     </div>
                 </div>
-                <div class="tools Intellectual Prep">
+                <div class="tools Intellectual Prep" data-category="writing">
                     <img src="SVG/写作生成.svg" alt="">
                     <div class="text-container">
                         <div class="h1p">写作生成</div>
                         <div class="h2p">提供写作生成功能</div>
                     </div>
                 </div>
-                <div class="tools Intellectual Prep">
+                <div class="tools Intellectual Prep" data-category="speaking">
                     <img src="SVG/朗读.svg" alt="">
                     <div class="text-container">
                         <div class="h1p">朗读家</div>
@@ -400,107 +397,75 @@
             <div class="exam-dashboard">
                 <div class="dashboard-header">
                     <h2>考试冲刺中心</h2>
-                    <div class="exam-tabs">
-                        <button class="exam-tab active" data-exam="hskk">HSKK</button>
-                        <button class="exam-tab" data-exam="putonghua">普通话水平测试</button>
+                    <div class="exam-tabs" role="tablist" aria-label="考试类型">
+                        <button class="exam-tab active" type="button" role="tab" aria-selected="true" data-exam="hskk">HSKK 中级</button>
+                        <button class="exam-tab" type="button" role="tab" aria-selected="false" data-exam="putonghua">普通话水平测试</button>
                     </div>
                 </div>
 
-                <!-- 备考统计卡片 -->
-                <div class="stats-row">
-                    <div class="stat-mini-card">
-                        <i class="ph ph-exam mini-icon-svg"></i>
-                        <div class="mini-info">
-                            <span class="mini-value">15</span>
-                            <span class="mini-label">已完成模考</span>
+                <!-- 冲刺计划：内容由 ExamCenter.js 按考试类型填充 -->
+                <section class="ex-plan" aria-labelledby="ex_plan_title">
+                    <div class="ex-plan-main">
+                        <p class="ex-kicker">我的冲刺计划</p>
+                        <h3 id="ex_plan_title" data-exam-field="title"></h3>
+                        <p class="ex-plan-desc" data-exam-field="desc"></p>
+                        <ol class="ex-phases" data-exam-field="phases"></ol>
+                        <button type="button" class="ex-start" data-exam-start>开始今日训练
+                            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7.5 4.5 13 10l-5.5 5.5"/></svg>
+                        </button>
+                    </div>
+                    <div class="ex-plan-side">
+                        <div class="ex-countdown"><strong data-exam-field="days"></strong><span>天后考试</span></div>
+                        <div class="ex-ready">
+                            <div class="ex-ready-ring" data-exam-field="ring">
+                                <svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52"></circle><circle cx="60" cy="60" r="52"></circle></svg>
+                                <p><strong data-exam-field="predicted"></strong><small>预估得分</small></p>
+                            </div>
+                            <p class="ex-ready-note" data-exam-field="readyNote"></p>
                         </div>
                     </div>
-                    <div class="stat-mini-card">
-                        <i class="ph ph-chart-line mini-icon-svg"></i>
-                        <div class="mini-info">
-                            <span class="mini-value">82%</span>
-                            <span class="mini-label">平均得分</span>
-                        </div>
-                    </div>
-                    <div class="stat-mini-card">
-                        <i class="ph ph-clock mini-icon-svg"></i>
-                        <div class="mini-info">
-                            <span class="mini-value">3天</span>
-                            <span class="mini-label">距考试</span>
-                        </div>
-                    </div>
-                    <div class="stat-mini-card">
-                        <i class="ph ph-warning-circle mini-icon-svg"></i>
-                        <div class="mini-info">
-                            <span class="mini-value">23</span>
-                            <span class="mini-label">待复习错题</span>
-                        </div>
-                    </div>
-                </div>
+                </section>
 
-                <!-- 考试功能卡片 -->
-                <div class="exam-features-grid">
-                    <div class="exam-feature-card">
-                        <div class="exam-card-left">
-                            <i class="ph ph-file-text exam-icon-svg"></i>
-                        </div>
-                        <div class="exam-card-right">
-                            <h3>真题模考</h3>
-                            <p>历年真题，全真模拟</p>
-                            <button class="card-btn">开始模考</button>
-                        </div>
+                <section class="ex-block" aria-labelledby="ex_sections_title">
+                    <header class="ex-block-head">
+                        <h3 id="ex_sections_title">题型专项练习</h3>
+                        <p>每个题型都连接真实的 AI 语音评测，练完立即出分。</p>
+                    </header>
+                    <div class="ex-sections" data-exam-field="sections"></div>
+                </section>
+
+                <section class="ex-block" aria-labelledby="ex_tools_title">
+                    <header class="ex-block-head">
+                        <h3 id="ex_tools_title">冲刺工具</h3>
+                        <p>购买冲刺包后解锁。</p>
+                    </header>
+                    <div class="ex-tools">
+                        <button type="button" class="ex-tool" data-exam-pro>
+                            <i class="ph ph-file-text" aria-hidden="true"></i>
+                            <span class="ex-tool-name">真题模考</span>
+                            <span class="ex-tool-desc">历年真题，全真模拟</span>
+                            <span class="ex-tool-lock"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>冲刺包</span>
+                        </button>
+                        <button type="button" class="ex-tool" data-exam-pro>
+                            <i class="ph ph-desktop" aria-hidden="true"></i>
+                            <span class="ex-tool-name">机考模拟</span>
+                            <span class="ex-tool-desc">还原考场界面与计时</span>
+                            <span class="ex-tool-lock"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>冲刺包</span>
+                        </button>
+                        <button type="button" class="ex-tool" data-exam-pro>
+                            <i class="ph ph-graduation-cap" aria-hidden="true"></i>
+                            <span class="ex-tool-name">评分标准解读</span>
+                            <span class="ex-tool-desc">逐项拆解评分规则</span>
+                            <span class="ex-tool-lock"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>冲刺包</span>
+                        </button>
+                        <button type="button" class="ex-tool" data-exam-pro>
+                            <i class="ph ph-list-dashes" aria-hidden="true"></i>
+                            <span class="ex-tool-name">错题分析</span>
+                            <span class="ex-tool-desc">自动汇总薄弱题型</span>
+                            <span class="ex-tool-lock"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>冲刺包</span>
+                        </button>
                     </div>
-                    <div class="exam-feature-card">
-                        <div class="exam-card-left">
-                            <i class="ph ph-desktop exam-icon-svg"></i>
-                        </div>
-                        <div class="exam-card-right">
-                            <h3>机考模拟</h3>
-                            <p>还原真实考试环境</p>
-                            <button class="card-btn">进入模拟</button>
-                        </div>
-                    </div>
-                    <div class="exam-feature-card">
-                        <div class="exam-card-left">
-                            <i class="ph ph-microphone exam-icon-svg"></i>
-                        </div>
-                        <div class="exam-card-right">
-                            <h3>专项语音训练</h3>
-                            <p>针对考试题型强化</p>
-                            <button class="card-btn">开始训练</button>
-                        </div>
-                    </div>
-                    <div class="exam-feature-card">
-                        <div class="exam-card-left">
-                            <i class="ph ph-graduation-cap exam-icon-svg"></i>
-                        </div>
-                        <div class="exam-card-right">
-                            <h3>评分标准解读</h3>
-                            <p>专家解析评分规则</p>
-                            <button class="card-btn">查看解析</button>
-                        </div>
-                    </div>
-                    <div class="exam-feature-card">
-                        <div class="exam-card-left">
-                            <i class="ph ph-robot exam-icon-svg"></i>
-                        </div>
-                        <div class="exam-card-right">
-                            <h3>AI模考测评</h3>
-                            <p>智能评分与分析</p>
-                            <button class="card-btn">立即测评</button>
-                        </div>
-                    </div>
-                    <div class="exam-feature-card">
-                        <div class="exam-card-left">
-                            <i class="ph ph-list-dashes exam-icon-svg"></i>
-                        </div>
-                        <div class="exam-card-right">
-                            <h3>错题分析</h3>
-                            <p>错题本与巩固练习</p>
-                            <button class="card-btn">查看错题</button>
-                        </div>
-                    </div>
-                </div>
+                </section>
             </div>
             <!-- 浮动购买按钮 -->
             <div class="float-buy-btn" onclick="showPurchaseModal('exam-service')">
@@ -547,17 +512,18 @@
     <script src="js/prompt/prompts.js?v=20260927"></script>
 
     <!-- Modules Scripts -->
-    <script src="js/components/Sidebar.js?v=20260927"></script>
+    <script src="js/components/Sidebar.js?v=20261103"></script>
     <script src="js/modules/LegacyContent.js?v=20260927"></script>
     <script src="js/modules/Chatbot.js?v=20260927"></script>
     <script src="js/modules/FeedbackSpeech.js?v=20260927"></script>
     <script src="js/recording-capsule.js?v=20260928"></script>
     <script src="js/score-motion.js?v=20260928"></script>
-    <script src="js/modules/SpeechEval.js?v=20260928"></script>
-    <script src="js/modules/MagicTool.js?v=20260927"></script>
+    <script src="js/modules/SpeechEval.js?v=20261103"></script>
+    <script src="js/modules/MagicTool.js?v=20261103"></script>
     <script src="js/modules/History.js?v=20260927"></script>
     <script src="js/modules/Love.js?v=20260927"></script>
     <script src="js/modules/CustomLearning.js?v=20260927"></script>
+    <script src="js/modules/ExamCenter.js?v=20261103"></script>
 
     <!-- Purchase Modal Functions -->
     <script>
@@ -668,17 +634,6 @@
             // 这里可以添加实际的支付逻辑
         }
 
-        // 考试标签切换
-        document.addEventListener('DOMContentLoaded', function() {
-            const examTabs = document.querySelectorAll('.exam-tab');
-            examTabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    examTabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    // 这里可以添加切换考试类型的逻辑
-                });
-            });
-        });
     </script>
 
     <!-- Main Script -->

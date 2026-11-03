@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>登录 · 声动汉语</title>
     <link rel="stylesheet" href="styles/login.css">
     </link>
     <link rel="stylesheet" href="styles/ui-base.css">
@@ -13,15 +13,24 @@
     <link rel="stylesheet" href="styles/liquid-glass.css?v=20260927">
 </head>
 
-<body class="ui-auth" background="img/背景图.jpg" style="background-attachment: fixed; background-size: 100% 100%;">
+<body class="ui-auth">
+    <aside class="auth-art">
+        <a class="auth-brand" href="entry.html"><img src="img/side_logo.png" alt="" width="28" height="28">声动汉语</a>
+        <div class="auth-art-copy">
+            <p class="auth-slogan">让每一次开口，<br>都被精准听见</p>
+            <p class="auth-sub">逐字诊断声韵调 · AI 助教纠音 · 数字人陪练</p>
+        </div>
+    </aside>
+    <main class="auth-main">
     <div class="form-container">
-        <h1 class="form-title" style="text-align:left">欢迎 <span style="color:#2a91f6;">登录</span></h1>
+        <h1 class="form-title">欢迎回来</h1>
+        <p class="form-sub">登录后继续你的口语练习</p>
             <!-- 登录表单 -->
             <form id="LoginForm">
-                <span style="font-size:14px;width:80px;text-align:right;line-height: 40px;">用户名: </span>
+                <span style="font-size:14px;width:80px;text-align:right;line-height: 40px;">用户名</span>
                 <br>
                 <input type="text" placeholder="" class="username" aria-label="用户名" autocomplete="username" required>
-                <span style="font-size:14px;width:80px;text-align:right;line-height: 40px;">密码: </span>
+                <span style="font-size:14px;width:80px;text-align:right;line-height: 40px;">密码</span>
                 <br>
                 <input type="password" placeholder="" class="password" aria-label="密码" autocomplete="current-password" required>
                 <button type="submit" class="button" id="login">登录</button>
@@ -30,8 +39,9 @@
             <a href="register.html">新用户？立即注册</a>
             <a href="entry.html">回到首页</a>
     </div>
+    </main>
     <script src="js/config/config.js?v=20260927"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="js/vendor/axios-1.21.0.min.js"></script>
     <script src="js/login.js?v=20260927"></script>
 
     <script defer src="js/ui-motion.js?v=20260927"></script>

@@ -1,34 +1,53 @@
 html:has(.ui-auth) { display: block; height: auto; min-height: 100%; }
+/* 左侧插画面板 + 右侧表单，配色与首页、工作台一致 */
 body.ui-auth {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
   min-height: 100svh;
   height: auto;
   margin: 0;
-  padding: 40px clamp(24px, 8vw, 150px);
-  background-color: #edf3fb;
-  background-size: cover !important;
-  background-position: center;
+  padding: 16px;
+  gap: 16px;
+  background: #f7f8fa radial-gradient(at 100% 0%, #e8edf8 0, transparent 44%) no-repeat;
 }
+.ui-auth .auth-art {
+  position: sticky;
+  top: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100svh - 32px);
+  padding: 28px 32px 36px;
+  border-radius: 28px;
+  overflow: hidden;
+  color: #fff;
+  background:
+    linear-gradient(180deg, rgba(14, 24, 52, .35) 0%, rgba(14, 24, 52, 0) 28%, rgba(14, 24, 52, 0) 52%, rgba(14, 24, 52, .72) 100%),
+    url("../img/背景图.jpg") 14% 50% / cover no-repeat;
+}
+.ui-auth .auth-brand { display: inline-flex; align-items: center; gap: 10px; width: fit-content; color: #fff; font-size: 16px; font-weight: 700; letter-spacing: .04em; text-decoration: none; }
+.ui-auth .auth-brand img { width: 28px; height: 28px; border-radius: 8px; }
+.ui-auth .auth-slogan { margin: 0; font-size: clamp(28px, 2.8vw, 40px); font-weight: 700; line-height: 1.3; text-shadow: 0 2px 18px rgba(10, 20, 45, .35); }
+.ui-auth .auth-sub { margin: 14px 0 0; color: rgba(255, 255, 255, .82); font-size: 14px; letter-spacing: .02em; }
+.ui-auth .auth-main { display: flex; align-items: center; justify-content: center; padding: 32px 24px; }
 .ui-auth .form-container {
   position: relative;
   inset: auto;
   transform: none;
-  width: 420px;
+  width: 400px;
   max-width: 100%;
   padding: 36px;
-  border: 1px solid rgba(255, 255, 255, .9);
-  border-radius: 28px;
-  background: var(--ui-glass);
-  -webkit-backdrop-filter: blur(28px) saturate(125%);
-  backdrop-filter: blur(28px) saturate(125%);
-  box-shadow: 0 18px 60px rgba(30, 54, 89, .12), inset 0 1px 0 #fff;
+  border: 1px solid rgba(39, 45, 59, .09);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 24px 60px -30px rgba(25, 35, 50, .22);
 }
+.ui-auth .form-sub { margin: -16px 0 10px; color: var(--ui-muted); font-size: 14px; }
 .ui-auth .form-title {
   margin: 0 0 24px;
-  font-size: 30px;
-  font-weight: 650;
+  text-align: left;
+  font-size: 28px;
+  font-weight: 700;
   line-height: 1.4;
   letter-spacing: -.03em;
 }
@@ -80,11 +99,13 @@ body.ui-auth {
   display: block;
   clear: both;
   width: 100%;
-  margin: 24px 0 18px;
+  margin: 26px 0 16px;
   padding: 11px 18px;
-  box-shadow: 0 5px 14px rgba(8, 102, 223, .16);
+  border-radius: 999px !important;
+  background: linear-gradient(170deg, #578af1, #356ae3 70%, #2e60d3);
+  box-shadow: inset 0 2px 2px rgba(255, 255, 255, .38), inset 0 -1px 1px rgba(14, 48, 120, .2), 0 8px 20px -8px rgba(47, 95, 181, .55);
 }
-.ui-auth .button:hover { background: #0055c4; }
+.ui-auth .button:hover { filter: brightness(1.04); }
 .ui-auth .code { width: calc(100% - 126px) !important; float: none !important; }
 .ui-auth .GetCode {
   width: 114px !important;
@@ -114,6 +135,14 @@ body.ui-pricing {
   background: radial-gradient(ellipse at 50% 0%, #e6f0ff 0, transparent 55%), #f5f7fa;
 }
 .ui-pricing .container { width: min(1240px, calc(100% - 64px)); overflow: visible; }
+.ui-pricing .pricing-nav { position: sticky; top: 14px; z-index: 10; display: flex; align-items: center; justify-content: space-between; width: min(1240px, calc(100% - 64px)); margin: 14px auto 0; padding: 8px 10px 8px 18px; border: 1px solid rgba(255, 255, 255, .9); border-radius: 999px; background: rgba(255, 255, 255, .8); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); box-shadow: var(--ui-shadow); }
+.ui-pricing .pricing-brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ui-ink); font-size: 16px; font-weight: 700; text-decoration: none; }
+.ui-pricing .pricing-brand img { border-radius: 8px; }
+.ui-pricing .pricing-nav-links { display: flex; align-items: center; gap: 8px; }
+.ui-pricing .pricing-nav-links a { padding: 8px 16px; border-radius: 999px; color: #5b6472; font-size: 14px; text-decoration: none; }
+.ui-pricing .pricing-nav-links a:hover { color: var(--ui-ink); background: rgba(39, 45, 59, .05); }
+.ui-pricing .pricing-nav-links .pricing-cta { color: #fff; font-weight: 600; background: linear-gradient(170deg, #578af1, #356ae3 70%, #2e60d3); }
+.ui-pricing .pricing-nav-links .pricing-cta:hover { color: #fff; background: linear-gradient(170deg, #578af1, #356ae3 70%, #2e60d3); filter: brightness(1.05); }
 .ui-pricing .pricing-header { padding: 76px 24px 34px; }
 .ui-pricing .pricing-header h2 {
   color: var(--ui-ink);
@@ -175,12 +204,19 @@ body.ui-pricing {
   line-height: 1.7;
 }
 
+@media (max-width: 860px) {
+  body.ui-auth { grid-template-columns: 1fr; gap: 0; }
+  .ui-auth .auth-art { position: relative; top: 0; height: 220px; padding: 20px 22px 24px; border-radius: 22px; }
+  .ui-auth .auth-slogan { font-size: 24px; }
+  .ui-auth .auth-sub { display: none; }
+  .ui-auth .auth-main { padding: 20px 0 8px; }
+}
+
 @media (max-width: 1000px) {
   .ui-pricing .pricing-plans { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 600px) {
-  body.ui-auth { justify-content: center; padding: 24px 18px; background-position: 25% center; }
-  .ui-auth .form-container { padding: 28px 24px; border-radius: 24px; }
+  .ui-auth .form-container { padding: 28px 22px; }
   .ui-auth .form-title { font-size: 27px; }
   .ui-pricing .container { width: calc(100% - 32px); }
   .ui-pricing .pricing-header { padding: 42px 16px 20px; }

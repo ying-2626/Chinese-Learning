@@ -314,9 +314,23 @@ class SpeechEvalModule {
 
     displayScore(id, value) {
         const element = document.getElementById(id);
-        const text = value.toFixed(2);
+        const text = String(Math.round(value));
         if (typeof ScoreMotion !== 'undefined') ScoreMotion.set(element, text);
         else element.innerText = text;
+        // 进度条和环形图读取 --score
+        const score = Math.max(0, Math.min(100, value));
+        element.closest('.metric, .score-card')?.style.setProperty('--score', score);
+        if (id === 'total_score') this.displayGrade(score);
+    }
+
+    displayGrade(score) {
+        const card = document.querySelector('.score-card');
+        const grade = document.getElementById('score_grade');
+        if (!card || !grade) return;
+        const [label, level] = score >= 85 ? ['优秀', 'good'] : score >= 70 ? ['良好', 'good'] : score >= 60 ? ['合格', 'warn'] : ['需加强', 'bad'];
+        card.dataset.state = 'scored';
+        grade.textContent = label;
+        grade.dataset.level = level;
     }
 
     async getAnalysis(req_content) {
@@ -597,21 +611,20 @@ class SpeechEvalModule {
             //单字PronAccuracy低于60标红，60-80标黄
             const evalText = document.getElementById("evalText");
             let coloredText = "";
+            const weakWords = [];
             for (let i = 0; i < jsonData.result.Words.length; i++) {
                 let word = jsonData.result.Words[i].Word
                 let word_accuracy = jsonData.result.Words[i].PronAccuracy
-                let randomColor = `rgb(0, 0, 0)`;
                 if (word != "*") {
-                    if (word_accuracy < 60) {
-                        randomColor = `rgb(255, 0, 0)`;
-                    } else if (word_accuracy >= 60 && word_accuracy < 80) {
-                        randomColor = `rgb(255, 165, 0)`;
-                    } else {
-                        randomColor = `rgb(34, 139, 34)`; // Green for >= 80
-                    }
-                    coloredText += `<span style="color: ${randomColor}">${LegacyContent.escapeHtml(word)}</span>`;
+                    // 低于 60 为错误，60-80 待改进，80 以上准确
+                    const level = word_accuracy < 60 ? 'bad' : word_accuracy < 80 ? 'warn' : 'good';
+                    if (level !== 'good' && !weakWords.includes(word)) weakWords.push(word);
+                    coloredText += `<span class="eval-word" data-level="${level}" title="准确度 ${Math.round(word_accuracy)}">${LegacyContent.escapeHtml(word)}</span>`;
                 }
             }
+
+            const focus = document.getElementById('score_focus');
+            if (focus) focus.textContent = weakWords.length ? `需要加强：${weakWords.slice(0, 6).join('、')}` : '每个字都读得很准确';
 
             // 准备传给 AI 的分析数据
             let analysisRequestData = {};
