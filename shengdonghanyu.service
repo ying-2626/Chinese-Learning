@@ -10,6 +10,8 @@ ExecStart=/usr/bin/java -jar /home/ubuntu/backend-0.0.1-SNAPSHOT.jar
 Restart=always
 RestartSec=10
 Environment="JAVA_OPTS=-Xmx512m -Xms256m"
+# 数据库、Redis、邮件与密钥等配置（格式见 backend/.env.example）；文件不存在时忽略
+EnvironmentFile=-/home/ubuntu/shengdonghanyu.env
 
 [Install]
 WantedBy=multi-user.target

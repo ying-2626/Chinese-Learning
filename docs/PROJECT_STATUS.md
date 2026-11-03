@@ -26,11 +26,25 @@
 | 朗读练习 | 复用 PCM 的录音波形、计时、停止控件；真实分数的数字过渡；录音失败与迟到回调收尾 | 实际麦克风、腾讯 SOE、FastGPT 联合成功链路尚未完整实测 |
 | 数字人入口 | 同源 `avatar-stage.html`：沿用原托管形象 Shizuku 与「可爱城市」背景，接受互动卡的播报与打断，音量驱动口型（2026-11-03 替换原 Light4AI 托管页） | 动作、头发物理未接；素材许可待确认 |
 | 交互底座 | 当前账号鉴权，临时交互会话、轮次、取消、旧结果隔离；`AvatarBridge` / `AvatarHost` 协议；`agent.ask` 把场景上下文与最近 6 轮对话交给 OpenAI 兼容接口 | 本地未配置 AI 密钥，仅用模拟接口验证；游戏规则、判分、语音输入未接 |
-| 数字人语音 | 鉴权后的本机 `say/Tingting` TTS，由数字人舞台播放并驱动口型 | macOS 本地实现，上线需换云端 TTS |
+| 数字人语音 | 服务器默认腾讯云语音合成（TextToVoice）；本机可设 `INTERACTION_TTS_PROVIDER=local` 用 macOS `say` | 尚未用真实密钥实测签名通过 |
 
 录音模块的 `pendingRecorderStart` 保护要保留：现有录音 SDK 共享 Worker，浏览器权限请求未决时不能并发启动第二个录音器。原“听反馈”使用浏览器语音能力，也不等于数字人控制。
 
 既有验证记录来自两个聊天的交接，本次文档整理未重跑：前后端界面侧最近 37 项前端检查通过，较早业务后端 19 项检查通过；交互侧最近 7 项控制器检查通过，较早交互后端 19 项及会话工具 4 项检查通过。它们覆盖不同范围，不能作为整站或供应商全部通过的结论。
+
+## 上线准备（2026-11-03）
+
+已在本机用 Linux 容器模拟服务器验证（nginx 1.20 加载仓库 `nginx.conf`、Java 17 运行新 jar、全新 MySQL 建表）：用局域网 IP 访问可注册、登录、进入工作台，数字人画面与互动卡正常；页面不再依赖 jsdelivr；2.5 MB 上传不再被 nginx 拦截；未配置腾讯语音合成时提示明确，配置错误密钥时腾讯云返回 `AuthFailure.SecretIdNotFound`，说明服务器到腾讯云的请求链路可用。
+
+上线前仍需在服务器上完成：
+
+1. 备案完成前用 IP 访问：部署新版 `nginx.conf`（新增 `listen 80 default_server` 段）并 `nginx -t && nginx -s reload`；安全组放行 80。HTTP 下浏览器禁用麦克风，语音测评无法录音，数字人不受影响。
+2. 静态文件：`webdemo1-1/` 全部内容复制到 `/usr/share/nginx/html/`（含 `live2d/`、`js/vendor/`）。
+3. 后端：上传新 jar，按 `backend/.env.example` 写 `/home/ubuntu/shengdonghanyu.env`，安装新版 `shengdonghanyu.service` 后 `systemctl daemon-reload && systemctl restart shengdonghanyu`。
+4. 数据库：确认已执行 `add_user_profile_fields.sql`、`add_chat_tables.sql`。
+5. 腾讯云账号开通「语音合成」并配置密钥；用真实密钥让数字人说一句话，确认签名通过。
+6. 注册验证码需要真实 SMTP；或提前为组员建好账号。
+7. 建议安全组关闭公网 8088，只经 nginx 访问后端。
 
 ## 界面方向：人物、场景、轻量输入共同组成练习
 

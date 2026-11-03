@@ -1,4 +1,5 @@
 // Provider credentials are held by the backend.
 var CONFIG = {
-    BACKEND_API: ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname) ? window.location.origin : "https://shengdonghanyu.com"
+    // 与页面同源：域名、IP 或本机访问都请求当前地址，由 nginx 转发到后端。
+    BACKEND_API: window.location.origin
 };

@@ -19,7 +19,7 @@
 - 对话历史存在本次交互会话里，点「重新开始」清空；换场景时建议重新开始。
 - 大模型未配置或调用失败返回 502 `agent_failed`，数字人不开口，卡片显示原因。
 - 人物渲染在 `js/interaction/live2d-stage.js`：Cubism Core 计算顶点，本项目用 WebGL 绘制，遮罩用模板缓冲近似；待机呼吸、眨眼、轻微摆头为程序参数，未播放 motion3 动作、未接物理。
-- 语音合成仍是 macOS `say`（婷婷），只适合本机演示；上线需换云端 TTS。学习者语音输入（ASR）和腾讯评测尚未接入此链路。
+- 语音合成由 `INTERACTION_TTS_PROVIDER` 选择：默认 `tencent`，调用腾讯云 TextToVoice（按句切成 ≤150 字分段合成 16k PCM，拼成一段 WAV；音色 `TENCENT_TTS_VOICE_TYPE`，默认 101001 智瑜）；`local` 为 macOS `say`，仅供本机预览。学习者语音输入（ASR）和腾讯评测尚未接入此链路。
 - 浏览器可能要求在人物画面内点一次「点击启用语音」才允许出声。
 
 人物沿用原 Light4AI 托管页的形象：Shizuku + 「可爱城市」动态背景，取自开源项目 [awesome-digital-human-live2d](https://github.com/wan-h/awesome-digital-human-live2d) 的 `web/public/sentio/`（原托管页加载的是同一组文件）。取景在 `avatar-stage.html` 的 `framing` 参数中调整。

@@ -2,6 +2,7 @@ package com.shengdonghanyu.backend.interaction;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
@@ -14,11 +15,13 @@ import java.nio.file.Path;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-/** macOS 本机预览专用；没有云端 TTS 或其他自动回退。 */
+/** macOS 本机预览专用（INTERACTION_TTS_PROVIDER=local）；不会自动回退到其他实现。 */
 @Component
-public class LocalSpeechSynthesis {
+@ConditionalOnProperty(name = "interaction.tts.provider", havingValue = "local")
+public class LocalSpeechSynthesis implements SpeechSynthesis {
     private static final Logger LOG = LoggerFactory.getLogger(LocalSpeechSynthesis.class);
 
+    @Override
     public byte[] synthesize(InteractionSession session, long turnId, String text) {
         session.requireSpeech(turnId, text);
         Path executable = Path.of("/usr/bin/say");

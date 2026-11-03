@@ -14,11 +14,11 @@ public class InteractionSessionService {
     private static final String AGENT_MODE = "local-script";
     private final InteractionReply reply;
     private final AgentReply agentReply;
-    private final LocalSpeechSynthesis speechSynthesis;
+    private final SpeechSynthesis speechSynthesis;
     private final SessionUtils loginSession;
 
     public InteractionSessionService(InteractionReply reply, AgentReply agentReply,
-                                     LocalSpeechSynthesis speechSynthesis, SessionUtils loginSession) {
+                                     SpeechSynthesis speechSynthesis, SessionUtils loginSession) {
         this.reply = reply;
         this.agentReply = agentReply;
         this.speechSynthesis = speechSynthesis;

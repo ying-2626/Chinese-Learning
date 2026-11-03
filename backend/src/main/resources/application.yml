@@ -53,6 +53,17 @@ tencent:
     appid: ${TENCENT_SOE_APPID:}
     secretId: ${TENCENT_SOE_SECRET_ID:}
     secretKey: ${TENCENT_SOE_SECRET_KEY:}
+  tts:
+    # 数字人发声：使用腾讯云 API 密钥（默认复用语音评测的同一组密钥）
+    secretId: ${TENCENT_TTS_SECRET_ID:${TENCENT_SOE_SECRET_ID:}}
+    secretKey: ${TENCENT_TTS_SECRET_KEY:${TENCENT_SOE_SECRET_KEY:}}
+    voiceType: ${TENCENT_TTS_VOICE_TYPE:101001}
+interaction:
+  tts:
+    # tencent：服务器使用；local：仅 macOS 本机预览（/usr/bin/say）
+    provider: ${INTERACTION_TTS_PROVIDER:tencent}
+  agent:
+    model: ${INTERACTION_AGENT_MODEL:}
 fastgpt:
   api:
     key: ${FASTGPT_API_KEY:}
