@@ -1,18 +1,18 @@
 [Unit]
-Description=声动汉语后端服务
-After=network.target
+Description=ShengDongHanYu Backend Service
+After=network.target mysqld.service redis.service
 
 [Service]
 Type=simple
-User=ubuntu
+User=root
 WorkingDirectory=/home/ubuntu
-# systemd 会展开 $JAVA_OPTS，使下方的内存上限真正生效（小内存服务器上避免 JVM 占满内存）
+# 小内存服务器（2 核 / 2 GB）：堆上限 512 MB，串行 GC 占用更少
+Environment="JAVA_OPTS=-Xms256m -Xmx512m -XX:+UseSerialGC -XX:MaxMetaspaceSize=256m"
+# 数据库、Redis、邮件与各项密钥（仅 root 可读；格式见仓库 backend/.env.example）
+EnvironmentFile=/home/ubuntu/shengdonghanyu.env
 ExecStart=/usr/bin/java $JAVA_OPTS -jar /home/ubuntu/backend-0.0.1-SNAPSHOT.jar
 Restart=always
 RestartSec=10
-Environment="JAVA_OPTS=-Xmx512m -Xms256m"
-# 数据库、Redis、邮件与密钥等配置（格式见 backend/.env.example）；文件不存在时忽略
-EnvironmentFile=-/home/ubuntu/shengdonghanyu.env
 
 [Install]
 WantedBy=multi-user.target

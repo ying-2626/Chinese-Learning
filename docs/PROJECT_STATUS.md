@@ -46,6 +46,16 @@
 6. 注册验证码需要真实 SMTP；或提前为组员建好账号。
 7. 建议安全组关闭公网 8088，只经 nginx 访问后端。
 
+## 线上部署记录（2026-11-04）
+
+已部署 `0a8c6ac` 到阿里云服务器 121.43.81.138（Alibaba Cloud Linux 3，2 核 / 1.9 GB）。备案完成前用 `http://121.43.81.138/` 访问。
+
+- 前端：`/usr/share/nginx/html`（保留 `.well-known`）。nginx 站点配置：`/etc/nginx/conf.d/shengdonghanyu.com.conf`，与仓库 `nginx.conf` 一致（证书 `/etc/nginx/ssl/`，录音 `alias /www/wwwroot/web/audios/`）。
+- 后端：`/home/ubuntu/backend-0.0.1-SNAPSHOT.jar`，systemd `shengdonghanyu`（与仓库 `shengdonghanyu.service` 一致，堆上限 512 MB、SerialGC）。配置在 `/home/ubuntu/shengdonghanyu.env`（600，仅 root；由旧版内置配置迁移，未入库）。数据库 `shengdonghanyu`，旧版已有所需表结构，本次未执行 SQL。
+- 部署后：后端常驻内存约 243 MB，整机可用约 700 MB；数据库、Redis 连接正常；未登录访问新接口返回 401。
+- 回滚：`/root/backup-20261104/` 存有旧 jar（`old-backend.jar`）、旧 systemd 单元、旧 nginx 配置、旧网站 `html.tgz` 与录音 `audios.tgz`。还原对应文件后执行 `systemctl daemon-reload && systemctl restart shengdonghanyu && nginx -t && systemctl reload nginx`。
+- 待办：安全组关闭公网 3306、8088；腾讯云开通语音合成；作废并重发泄露的密钥后修改 env 文件并重启后端；登录后实测数字人发声与 AI 回答。
+
 ## 界面方向：人物、场景、轻量输入共同组成练习
 
 弹窗只是当前容器的选择。建议保持人物为主视角，把题目与操作放进同一个场景，整轮结束时再显示较完整的总结。
