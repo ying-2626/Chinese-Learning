@@ -1,6 +1,7 @@
 package com.shengdonghanyu.backend.util;
 
 import com.shengdonghanyu.backend.dto.SessionData;
+import com.shengdonghanyu.backend.entity.User;
 import com.shengdonghanyu.backend.exception.EnumExceptionType;
 import com.shengdonghanyu.backend.exception.MyException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,5 +50,16 @@ class SessionUtilsTest {
         SessionData data = new SessionData(); data.setId("user-1");
         when(redis.get("session-1")).thenReturn(data);
         assertEquals("user-1", sessions.getUserId());
+    }
+
+    @Test void refreshOverwritesSessionWithoutDeletingIt() throws Exception {
+        // 先删后写会让并发请求把会话判为过期并删除，用户随之被登出。
+        User user = new User(); user.setId("user-1");
+        when(redis.get("user-1")).thenReturn("session-1");
+        when(redis.isExpire("session-1")).thenReturn(false);
+        sessions.refreshData(user);
+        verify(redis, never()).del(anyString());
+        verify(redis).set(eq("session-1"), any(SessionData.class), eq(86400L));
+        verify(redis).set("user-1", "session-1", 86400L);
     }
 }

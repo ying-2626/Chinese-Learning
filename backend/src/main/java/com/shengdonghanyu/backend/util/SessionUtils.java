@@ -119,9 +119,8 @@ public class SessionUtils {
 
         SessionData sessionData = new SessionData(user);
 
-        redisUtil.del(sessionId);
+        // 直接覆盖写入并续期，不能先删再写：删与写之间的并发请求会把会话判为过期并删除，导致用户被登出。
         redisUtil.set(sessionId, sessionData, 86400);
-        redisUtil.del(userId);
         redisUtil.set(userId, sessionId, 86400);
     }
 }
