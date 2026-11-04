@@ -110,9 +110,11 @@ class ChatbotModule {
         }
         this.authRequired = false;
         this.statusEl.textContent = '';
-        this.sessionListEl.textContent = '加载中...';
+        // 请求较快时直接显示列表；超过 400ms 才提示加载中。
+        const slow = setTimeout(() => { this.sessionListEl.textContent = '加载中...'; }, 400);
         try {
             const sessions = await this.request('/chat/sessions');
+            clearTimeout(slow);
             if (!Array.isArray(sessions)) throw new Error('对话列表格式异常，请重试');
             this.sessions = sessions;
             this.renderSessionList();
@@ -121,6 +123,7 @@ class ChatbotModule {
             this.sessionListEl.textContent = '';
             this.showError(error, () => this.loadSessions());
         } finally {
+            clearTimeout(slow);
             this.updateControls();
         }
     }
@@ -162,8 +165,11 @@ class ChatbotModule {
         this.currentChatId = session.chatId;
         this.loadingMessages = true;
         this.renderSessionList();
-        this.messagesContainer.textContent = '加载中...';
         this.statusEl.textContent = '';
+        // 请求较快时直接换成新对话；超过 400ms 才提示加载中。
+        const slow = setTimeout(() => {
+            if (requestVersion === this.sessionRequest) this.messagesContainer.textContent = '加载中...';
+        }, 400);
         try {
             const messages = await this.request('/chat/sessions/' + sessionId + '/messages');
             if (requestVersion !== this.sessionRequest) return;
@@ -177,6 +183,7 @@ class ChatbotModule {
             this.messagesContainer.replaceChildren();
             this.showError(error, () => this.switchSession(sessionId));
         } finally {
+            clearTimeout(slow);
             if (requestVersion === this.sessionRequest) {
                 this.loadingMessages = false;
                 this.updateControls();

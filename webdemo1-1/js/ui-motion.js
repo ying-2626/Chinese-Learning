@@ -47,17 +47,9 @@
         });
         return;
       }
-      if (element.matches('.module')) {
-        const cards = [...element.querySelectorAll('.practice-layout > *, .profile-stats-container > *, .exam-features-grid > *, .AllTools > .tools')]
-          .filter(shown).slice(0, 4);
-        if (cards.length > 1) {
-          cards.forEach((card, index) => animate(card,
-            [{ opacity: .82, translate: '0 6px' }, { opacity: 1, translate: '0 0' }],
-            { duration: 260, delay: index * 24 }));
-        } else {
-          animate(element, [{ opacity: .85, translate: '0 6px' }, { opacity: 1, translate: '0 0' }], { duration: 260 });
-        }
-      } else {
+      // 切换工作台模块时直接显示内容，不做淡入，避免闪出中间态。
+      if (element.matches('.module')) return;
+      {
         const content = element.querySelector('.modal-content, .dialog-content, [role="document"]') || element;
         animate(content, [
           { opacity: .6, translate: '0 16px', scale: '.97' },
@@ -107,21 +99,6 @@
       };
       updateHeader();
       window.addEventListener('scroll', updateHeader, { passive: true });
-    }
-
-    if ('IntersectionObserver' in window) {
-      const reveal = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting) return;
-          reveal.unobserve(entry.target);
-          animate(entry.target, [
-            { opacity: .55, translate: '0 22px' },
-            { opacity: 1, translate: '0 0' }
-          ], { duration: 580 });
-        });
-      }, { threshold: .08, rootMargin: '0px 0px -28px 0px' });
-      document.querySelectorAll('.ui-entry > .video, .ui-entry > .bottom-block, .ui-entry > .testimonial-container, .ui-entry > .login-container')
-        .forEach(element => reveal.observe(element));
     }
 
     function controlAt(target) {

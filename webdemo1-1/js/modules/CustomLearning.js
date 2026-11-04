@@ -1,7 +1,11 @@
 class CustomLearningModule {
     constructor() {
         this.container = document.querySelector('#custom-learning .profile-stats-container');
-        if (this.container) this.container.className = 'learning-profile-live';
+        if (this.container) {
+            this.container.className = 'learning-profile-live';
+            // HTML 里的示例档案只是占位，从不展示：直接清空，等真实数据渲染，避免首次打开时闪出示例内容。
+            this.container.replaceChildren();
+        }
         this.loadVersion = 0;
         this.generating = false;
         this.isEditing = false;
@@ -53,7 +57,10 @@ class CustomLearningModule {
     async loadAllData() {
         const version = ++this.loadVersion;
         const userId = LegacyContent.getUser()?.id;
-        this.container.innerHTML = '<div class="loading-spinner">加载中...</div>';
+        // 请求较快时直接显示结果；超过 400ms 才提示加载中，避免一闪而过的中间态。
+        const slow = setTimeout(() => {
+            if (version === this.loadVersion) this.container.innerHTML = '<div class="loading-spinner">加载中...</div>';
+        }, 400);
         try {
             const headers = this.getHeaders();
             const [profile, scores] = await Promise.all([
@@ -73,6 +80,8 @@ class CustomLearningModule {
             this.container.innerHTML = '<div class="cl-empty"><p></p><button class="cl-btn">重试</button></div>';
             this.container.querySelector('p').textContent = '加载失败：' + (error.message || '请检查连接');
             this.container.querySelector('button').onclick = () => this.checkAuth();
+        } finally {
+            clearTimeout(slow);
         }
     }
 

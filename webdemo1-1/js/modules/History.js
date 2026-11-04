@@ -11,7 +11,8 @@ class HistoryModule {
 
     async loadHistory() {
         if (!LegacyContent.getUser()) { this.renderNotLoggedInState(); return; }
-        this.container.innerHTML = '<div class="loading-spinner">加载中...</div>';
+        // 请求较快时直接显示结果；超过 400ms 才提示加载中，避免一闪而过的中间态。
+        const slow = setTimeout(() => { this.container.innerHTML = '<div class="loading-spinner">加载中...</div>'; }, 400);
         try {
             const scoreActions = await ScoreService.findCurrentUserScoreActions();
             if (scoreActions.length === 0) { this.renderEmptyState(); return; }
@@ -21,6 +22,8 @@ class HistoryModule {
             this.container.innerHTML = '<div class="history-load-error"><p></p><button class="retry-btn">重试</button></div>';
             this.container.querySelector('p').textContent = '记录加载失败：' + (error.message || '请检查连接后重试');
             this.container.querySelector('button').onclick = () => this.loadHistory();
+        } finally {
+            clearTimeout(slow);
         }
     }
 
